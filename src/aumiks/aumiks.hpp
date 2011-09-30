@@ -46,17 +46,18 @@ THE SOFTWARE. */
 #include "Exc.hpp"
 
 
+
 //#define M_ENABLE_AUMIKS_TRACE
 #ifdef M_ENABLE_AUMIKS_TRACE
-#define M_AUMIKS_TRACE(x) TRACE(<<"[aumiks] ") TRACE(x)
+#define M_AUMIKS_TRACE(x) TRACE(<< "[aumiks] ") TRACE(x)
 #else
 #define M_AUMIKS_TRACE(x)
 #endif
 
 
+
 namespace aumiks{
 
-using namespace ting;
 
 //forward declarations
 class Lib;
@@ -75,6 +76,7 @@ public:
 	 * @param requestedBufferSizeInFrames - size of desired playing buffer
 	 *                                      in frames (1 frame is 4 bytes for 16bit stereo).
 	 */
+	//TODO: buffer size in milliseconds, sound frequency, mono/stereo
 	Lib(unsigned requestedBufferSizeInFrames = 4096);
 	~Lib();
 
@@ -106,13 +108,13 @@ private:
 	public:
 		ting::Mutex chPoolMutex;
 		
-		typedef std::list<Ref<aumiks::Channel> > TChPool;
+		typedef std::list<ting::Ref<aumiks::Channel> > TChPool;
 		typedef TChPool::iterator TChIter;
 		TChPool chPool;
 
 		TChPool chPoolToAdd;
 
-		volatile bool isMuted;
+		ting::Inited<volatile bool, false> isMuted;
 
 		SoundThread(unsigned requestedBufferSizeInFrames);
 
@@ -150,7 +152,7 @@ public:
 	}
 
 	inline void Play(){
-		aumiks::Lib::Inst().PlayChannel(Ref<aumiks::Channel>(this));
+		aumiks::Lib::Inst().PlayChannel(ting::Ref<aumiks::Channel>(this));
 	}
 
 	inline void Stop(){
@@ -168,8 +170,8 @@ protected:
 	virtual void OnStart(){}
 private:
 	//this function is called by SoundThread when it needs more data to play.
-	//retun true to remove channel from playing channels list
-	virtual bool MixToMixBuf(Array<s32>& mixBuf) = 0;
+	//return true to remove channel from playing channels list
+	virtual bool MixToMixBuf(ting::Array<ting::s32>& mixBuf) = 0;
 };
 
 
