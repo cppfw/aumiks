@@ -34,9 +34,9 @@ THE SOFTWARE. */
 
 #include "aumiks.hpp"
 
-#include "backend/AudioBackend.hpp"
+#include "../backend/AudioBackend.hpp"
 
-#include "backend/PulseAudioBackend.hpp"
+#include "../backend/PulseAudioBackend.hpp"
 //#include "backend/ALSABackend.hpp"
 //#include "backend/ESoundBackend.hpp"
 
@@ -83,15 +83,14 @@ void Lib::PlayChannel(ting::Ref<Channel> ch){
 
 
 Lib::SoundThread::SoundThread(unsigned requestedBufferSizeInFrames) :
-		desiredBufferSizeInFrames(requestedBufferSizeInFrames),
-		isMuted(false)
+		desiredBufferSizeInFrames(requestedBufferSizeInFrames)
 {
 	TRACE(<< "SoundThread(): invoked" << std::endl)
 }
 
 
 
-static void CopyFromMixBufToPlayBuf(const Array<s32>& mixBuf, Array<ting::u8>& playBuf){
+static void CopyFromMixBufToPlayBuf(const ting::Array<ting::s32>& mixBuf, ting::Array<ting::u8>& playBuf){
 	ASSERT(mixBuf.Size() == playBuf.Size() / 2) //2 bytes per sample
 
 	//TODO: make it work for other bytes per sample values?
@@ -119,13 +118,13 @@ void Lib::SoundThread::Run(){
 //	ting::Ptr<aumiks::AudioBackend> backend(new ALSABackend(this->desiredBufferSizeInFrames));
 //	ting::Ptr<aumiks::AudioBackend> backend(new ESoundBackend(this->desiredBufferSizeInFrames));
 
-	ting::Array<s32> mixBuf(backend->BufferSizeInSamples());
+	ting::Array<ting::s32> mixBuf(backend->BufferSizeInSamples());
 	ting::Array<ting::u8> playBuf(backend->BufferSizeInBytes());
 
 	M_AUMIKS_TRACE(<< "mixBuf.Size() = " << mixBuf.Size() << std::endl)
 
 	while(!this->quitFlag){
-		while(Ptr<Message> m = this->queue.PeekMsg()){
+		while(ting::Ptr<ting::Message> m = this->queue.PeekMsg()){
 			m->Handle();
 		}
 
