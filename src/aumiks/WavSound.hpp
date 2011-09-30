@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2010 Ivan Gagis
+Copyright (c) 2009-2011 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,10 +25,13 @@ THE SOFTWARE. */
 
 
 #include <ting/Array.hpp>
+#include <ting/File.hpp>
+
+
 
 #include "aumiks.hpp"
 
-#include "../MyMaemoFW/File.hpp"
+
 
 namespace aumiks{
 

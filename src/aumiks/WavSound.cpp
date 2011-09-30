@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009-2010 Ivan Gagis
+Copyright (c) 2009-2011 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,9 +32,7 @@ using namespace aumiks;
 
 
 Ref<WavSound> WavSound::LoadWAV(File& fi){
-	File::Guard  fileGuard(fi);//make sure we close the file even in case of exception is thrown
-
-	fi.Open(File::READ);//open the file
+	File::Guard fileGuard(fi, File::READ);//make sure we close the file even in case of exception is thrown
 
 	//Start reading Wav-file header
 	{
@@ -45,7 +43,7 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 		}
 	}
 
-	fi.SeekFwd(4);//Skip "Wav-file size minus 7". We are not intrested in this information
+	fi.SeekForward(4);//Skip "Wav-file size minus 7". We are not intrested in this information
 
 	{
 		StaticBuffer<u8, 4> wave;
@@ -63,7 +61,7 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 		}
 	}
 
-	fi.SeekFwd(4);//Skip 4 bytes. Their purpose is unknown to me.
+	fi.SeekForward(4);//Skip 4 bytes. Their purpose is unknown to me.
 
 	unsigned chans;
 	{
@@ -89,7 +87,7 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 		frequency = ting::Deserialize32(buf.Begin());
 	}
 
-	fi.SeekFwd(4);//Playback speed (freq*PCMSampleSize). We don't need this info.
+	fi.SeekForward(4);//Playback speed (freq * PCMSampleSize). We don't need this info.
 
 	u32 bitDepth;
 	{
