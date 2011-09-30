@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009 Ivan Gagis
+Copyright (c) 2009-2011 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,19 +20,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-/*
- * aumiks 0.1
- *
- * File:   Exc.hpp
- * Author: ivan
- *
- * Created on March 9, 2009, 3:33 PM
+/**
+ * @author Ivan Gagis <igagis@gmail.com>
  */
 
-#ifndef M_Exc_hpp
-#define	M_Exc_hpp
+#pragma once
+
+
 
 #include <ting/Exc.hpp>
+
+
 
 namespace aumiks{
 
@@ -41,7 +39,7 @@ public:
 	inline Exc(const char* msg) :
 			ting::Exc(msg),
 			errorCode(UNKNOWN)
-	{};
+	{}
 
 	enum E_Error{
 		UNKNOWN
@@ -51,4 +49,3 @@ public:
 };
 
 }//~namespace
-#endif //~once
