@@ -21,6 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
 
+/**
+ * @author Ivan Gagis <igagis@gmail.com>
+ */
+
+
 #pragma once
 
 
