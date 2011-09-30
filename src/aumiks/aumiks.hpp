@@ -20,12 +20,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-/*
- * aumiks 0.2
- * File:   aumiks.hpp
- * Author: ivan
- *
- * Created on February 16, 2009, 10:28 PM
+/**
+ * @author Ivan Gagis <igagis@gmail.com>
  */
 
 #pragma once
