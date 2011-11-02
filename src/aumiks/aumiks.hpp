@@ -61,6 +61,27 @@ class Channel;
 
 
 
+enum E_Format{
+	MONO_8_11025,
+	MONO_16_11025,
+	STEREO_8_11025,
+	STEREO_16_11025,
+	MONO_8_22050,
+	MONO_16_22050,
+	STEREO_8_22050,
+	STEREO_16_22050,
+	MONO_8_44100,
+	MONO_16_44100,
+	STEREO_8_44100,
+	STEREO_16_44100,
+	MONO_8_48000,
+	MONO_16_48000,
+	STEREO_8_48000,
+	STEREO_16_48000
+};
+
+
+
 class Lib : public ting::Singleton<Lib>{
 	friend class Channel;
 
@@ -69,11 +90,11 @@ public:
 	 * @brief Create sound library singleton instance.
 	 * Creates singleton instance of sound library object and
 	 * opens sound device.
-	 * @param requestedBufferSizeInFrames - size of desired playing buffer
-	 *                                      in frames (1 frame is 4 bytes for 16bit stereo).
+	 * @param bufferSizeMillis - size of desired playing buffer in milliseconds.
+	 * @param format - desired format of sound output.
 	 */
-	//TODO: buffer size in milliseconds, sound frequency, mono/stereo
-	Lib(unsigned requestedBufferSizeInFrames = 4096);
+	Lib(unsigned bufferSizeMillis = 100, aumiks::E_Format format = STEREO_16_22050);
+	
 	~Lib();
 
 	void PlayChannel(ting::Ref<Channel> ch);
@@ -100,7 +121,7 @@ public:
 
 private:
 	class SoundThread : public ting::MsgThread{
-		unsigned desiredBufferSizeInFrames;
+		E_Format format;
 	public:
 		ting::Mutex chPoolMutex;
 		
@@ -112,7 +133,7 @@ private:
 
 		ting::Inited<volatile bool, false> isMuted;
 
-		SoundThread(unsigned requestedBufferSizeInFrames);
+		SoundThread(unsigned bufferSizeMillis, E_Format format);
 
 		//override
 		void Run();
