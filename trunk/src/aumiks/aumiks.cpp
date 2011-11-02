@@ -39,8 +39,8 @@ THE SOFTWARE. */
 
 using namespace aumiks;
 
-Lib::Lib(unsigned requestedBufferSizeInFrames) :
-		thread(requestedBufferSizeInFrames)
+Lib::Lib(unsigned bufferSizeMillis, aumiks::E_Format format) :
+		thread(bufferSizeMillis, format)
 {
 	this->thread.Start();
 }
@@ -80,8 +80,8 @@ void Lib::PlayChannel(ting::Ref<Channel> ch){
 
 
 
-Lib::SoundThread::SoundThread(unsigned requestedBufferSizeInFrames) :
-		desiredBufferSizeInFrames(requestedBufferSizeInFrames)
+Lib::SoundThread::SoundThread(unsigned bufferSizeMillis, E_Format format) :
+		format(format)
 {
 //	TRACE(<< "SoundThread(): invoked" << std::endl)
 }
