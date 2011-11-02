@@ -91,7 +91,7 @@ public:
 			);
 	}
 
-	inline Ref<WavSound::Channel> Play(u8 volume = 255)const{
+	inline Ref<WavSound::Channel> Play(u8 volume = u8(-1))const{
 		Ref<WavSound::Channel> ret = this->CreateChannel();
 		ret->SetVolume(volume);
 		ret->Play();

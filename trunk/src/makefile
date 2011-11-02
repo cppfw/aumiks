@@ -117,7 +117,7 @@ ifeq ($(platform), maemo_linux)
     libs := 
 endif
 ifeq ($(platform), linux)
-    libs := 
+    libs := `pkg-config libpulse-simple --libs`
 endif
 ifeq ($(platform), win32)
     libs := 
