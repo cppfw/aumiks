@@ -128,18 +128,14 @@ class Channel : public ting::RefCounted{
 	friend class Lib;
 	friend class Lib::SoundThread;
 
-	volatile bool isPlaying;
+	ting::Inited<volatile bool, false> isPlaying;
 	
 protected:
-	bool stopFlag;
+	ting::Inited<bool, false> stopFlag;
 
-	ting::u8 volume;
+	ting::Inited<ting::u8, ting::u8(-1)> volume;
 	
-	Channel() :
-			isPlaying(false),
-			stopFlag(false),
-			volume(0xff)
-	{}
+	Channel(){}
 	
 public:
 

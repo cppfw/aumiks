@@ -1,5 +1,6 @@
 subdirs :=
 subdirs += src
+subdirs += tests
 
 
 

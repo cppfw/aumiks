@@ -48,12 +48,12 @@ Lib::Lib(unsigned requestedBufferSizeInFrames) :
 
 
 Lib::~Lib(){
-//	TRACE(<< "aumiks::~Lib(): enter")
+//	TRACE(<< "aumiks::~Lib(): enter" << std::endl)
 	//need to stop thread before closing the device
 	//because it can attempt write data after the device is closed
 	this->thread.PushQuitMessage();
 	this->thread.Join();
-//	TRACE(<< "aumiks::~Lib(): exit")
+//	TRACE(<< "aumiks::~Lib(): exit" << std::endl)
 }
 
 
@@ -61,6 +61,7 @@ Lib::~Lib(){
 void Lib::PlayChannel(ting::Ref<Channel> ch){
 	ASSERT(ch.IsValid())
 
+	//TODO: remove from here and add to mixing procedure
 	if(this->thread.isMuted){
 		return;
 	}
@@ -82,7 +83,7 @@ void Lib::PlayChannel(ting::Ref<Channel> ch){
 Lib::SoundThread::SoundThread(unsigned requestedBufferSizeInFrames) :
 		desiredBufferSizeInFrames(requestedBufferSizeInFrames)
 {
-	TRACE(<< "SoundThread(): invoked" << std::endl)
+//	TRACE(<< "SoundThread(): invoked" << std::endl)
 }
 
 
@@ -121,8 +122,17 @@ void Lib::SoundThread::Run(){
 	M_AUMIKS_TRACE(<< "mixBuf.Size() = " << mixBuf.Size() << std::endl)
 
 	while(!this->quitFlag){
-		while(ting::Ptr<ting::Message> m = this->queue.PeekMsg()){
-			m->Handle();
+		//If there is nothing to play then just hang on the message queue.
+		//When new channel is added to the list a NOP message will be sent to
+		//the queue. Otherwise, handle the pending messages if any and continue mixing.
+		if(this->chPool.size() == 0){
+			M_AUMIKS_TRACE(<< "SoundThread::Run(): going to hang on GetMsg()" << std::endl)
+			this->queue.GetMsg()->Handle();
+			M_AUMIKS_TRACE(<< "SoundThread::Run(): GetMsg() returned, message handled" << std::endl)
+		}else{
+			while(ting::Ptr<ting::Message> m = this->queue.PeekMsg()){
+				m->Handle();
+			}
 		}
 
 		//clean mixBuf
@@ -137,18 +147,6 @@ void Lib::SoundThread::Run(){
 				this->chPool.push_back(ch);
 				ch->OnStart();//notify channel that it was just started
 			}
-		}
-
-		if(this->isMuted){
-			this->chPool.clear();
-		}
-
-		//If there is nothing to play then just hang on the message queue.
-		//When new channel is added to the list a NOP message will be sent to
-		//the queue.
-		if(this->chPool.size() == 0){
-			this->queue.GetMsg()->Handle();
-			continue;
 		}
 
 		//mix channels to mixbuf
@@ -172,7 +170,7 @@ void Lib::SoundThread::Run(){
 		backend->Write(playBuf);
 	}//~while
 
-	TRACE(<< "SoundThread::Run(): exiting" << std::endl)
+//	TRACE(<< "SoundThread::Run(): exiting" << std::endl)
 }
 
 
