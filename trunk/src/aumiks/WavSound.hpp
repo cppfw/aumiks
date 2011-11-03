@@ -49,6 +49,7 @@ class WavSound : public aumiks::Sound{
 
 	WavSound(){}
 
+	//TODO: re-wise formats
 	enum EFormat{
 		MONO_44100_S16,
 		STEREO_44100_S16

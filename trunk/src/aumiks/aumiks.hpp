@@ -73,11 +73,7 @@ enum E_Format{
 	MONO_8_44100,
 	MONO_16_44100,
 	STEREO_8_44100,
-	STEREO_16_44100,
-	MONO_8_48000,
-	MONO_16_48000,
-	STEREO_8_48000,
-	STEREO_16_48000
+	STEREO_16_44100
 };
 
 
@@ -121,7 +117,28 @@ public:
 
 private:
 	class SoundThread : public ting::MsgThread{
-		E_Format format;
+		
+		//Base class for mixer buffers of different formats
+		class MixerBuffer{
+		protected:
+			MixerBuffer(unsigned mixBufSize, unsigned playBufSize) :
+					mixBuf(mixBufSize),
+					playBuf(playBufSize)
+			{}
+			
+		public:
+			virtual ~MixerBuffer(){}
+			
+			ting::Array<ting::s32> mixBuf;
+			ting::Array<ting::u8> playBuf;
+			
+			//return true if channel has finished playing and should be removed from playing channels pool
+			virtual bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
+			
+			virtual void CopyFromMixBufToPlayBuf() = 0;
+		};
+		
+		const ting::Ptr<MixerBuffer> mixerBuffer;
 	public:
 		ting::Mutex chPoolMutex;
 		
@@ -137,6 +154,9 @@ private:
 
 		//override
 		void Run();
+		
+	private:
+		static MixerBuffer* CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format);
 	};
 
 	SoundThread thread;
@@ -184,7 +204,18 @@ protected:
 private:
 	//this function is called by SoundThread when it needs more data to play.
 	//return true to remove channel from playing channels list
-	virtual bool MixToMixBuf(ting::Array<ting::s32>& mixBuf) = 0;
+	virtual bool MixToMixBuf11025Mono8(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf11025Stereo8(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf22050Mono8(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf22050Stereo8(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf44100Mono8(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf44100Stereo8(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool MixToMixBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
 };
 
 
