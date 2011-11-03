@@ -19,12 +19,17 @@
         <df name="1">
           <df name="2">
             <df name="aumiks">
-              <in>WavSound.d</in>
-              <in>aumiks.d</in>
             </df>
           </df>
         </df>
       </df>
+    </df>
+    <df name="tests" root="../tests">
+      <df name="playwav">
+        <in>main.cpp</in>
+        <in>makefile</in>
+      </df>
+      <in>makefile</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
