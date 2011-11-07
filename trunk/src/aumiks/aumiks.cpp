@@ -31,8 +31,6 @@ THE SOFTWARE. */
 
 #include "aumiks.hpp"
 
-#include "../backend/AudioBackend.hpp"
-
 #include "../backend/PulseAudioBackend.hpp"
 //#include "backend/ALSABackend.hpp"
 //#include "backend/ESoundBackend.hpp"
@@ -81,7 +79,7 @@ void Lib::PlayChannel(ting::Ref<Channel> ch){
 
 
 Lib::SoundThread::SoundThread(unsigned bufferSizeMillis, E_Format format) :
-		AudioBackend(SoundThread::CreateAudioBackend(bufferSizeMillis, format)),
+		audioBackend(PulseAudioBackend::New(bufferSizeMillis, format)),
 		mixerBuffer(SoundThread::CreateMixerBuffer(bufferSizeMillis, format))
 {
 //	TRACE(<< "SoundThread(): invoked" << std::endl)
@@ -91,50 +89,11 @@ Lib::SoundThread::SoundThread(unsigned bufferSizeMillis, E_Format format) :
 
 namespace aumiks{
 
-class MixerBuffer11025Mono8 : public Lib::MixerBuffer{
-	MixerBuffer11025Mono8(unsigned bufferSizeMillis) :
-			MixerBuffer(
-					11025 * bufferSizeMillis / 1000,
-					11025 * bufferSizeMillis / 1000
-				)
-	{}
-	
-	//override
-	virtual bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
-		ASSERT(ch.IsValid())
-		return ch->MixToMixBuf11025Mono8(this->mixBuf);
-	}
-	
-	//override
-	virtual void CopyFromMixBufToPlayBuf(){
-		ASSERT(this->mixBuf.Size() == this->playBuf.Size())
-
-		const ting::s32 *src = this->mixBuf.Begin();
-		ting::u8* dst = this->playBuf.Begin();
-		for(; src != this->mixBuf.End(); ++src, ++dst){
-			ting::s32 tmp = *src;
-			ting::ClampTop(tmp, 0x7f);
-			ting::ClampBottom(tmp, -0x7f);
-
-			*dst = ting::u8(tmp);
-		}
-	}
-	
-public:
-	inline static ting::Ptr<MixerBuffer11025Mono8> New(unsigned bufferSizeMillis){
-		return ting::Ptr<MixerBuffer11025Mono8>(
-				new MixerBuffer11025Mono8(bufferSizeMillis)
-			);
-	}
-};
-
-
-
 class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
 	MixerBuffer44100Stereo16(unsigned bufferSizeMillis) :
 			MixerBuffer(
-					2 * 44100 * bufferSizeMillis / 1000, //size in s32
-					(2 * 44100 * bufferSizeMillis / 1000) * 2 //size in bytes
+					aumiks::Lib::BufferSizeInSamples(bufferSizeMillis, STEREO_16_44100), //size in s32
+					aumiks::Lib::BufferSizeInSamples(bufferSizeMillis, STEREO_16_44100) * 2 //size in bytes
 				)
 	{}
 	
@@ -179,21 +138,11 @@ public:
 
 
 //static
-ting::Ptr<Lib::AudioBackend> Lib::SoundThread::CreateAudioBackend(unsigned bufferSizeMillis, E_Format format){
-	//TODO:
-}
-
-
-
-//static
-ting::Ptr<Lib::SoundThread::MixerBuffer> Lib::SoundThread::CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format){
+ting::Ptr<Lib::MixerBuffer> Lib::SoundThread::CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format){
 	switch(format){
-		case aumiks::MONO_8_11025:
-			return MixerBuffer11025Mono8::New(bufferSizeMillis);
-			
 		//TODO:
 		
-		case aumiks::MixerBuffer44100Stereo16:
+		case aumiks::STEREO_16_44100:
 			return MixerBuffer44100Stereo16::New(bufferSizeMillis);
 		default:
 			throw aumiks::Exc("Unknown sound output format requested");
@@ -204,15 +153,7 @@ ting::Ptr<Lib::SoundThread::MixerBuffer> Lib::SoundThread::CreateMixerBuffer(uns
 
 void Lib::SoundThread::Run(){
 	M_AUMIKS_TRACE(<< "Thread started" << std::endl)
-
-	ting::Ptr<aumiks::AudioBackend> backend(new PulseAudioBackend(this->desiredBufferSizeInFrames));
-//	ting::Ptr<aumiks::AudioBackend> backend(new ALSABackend(this->desiredBufferSizeInFrames));
-//	ting::Ptr<aumiks::AudioBackend> backend(new ESoundBackend(this->desiredBufferSizeInFrames));
-
-	ting::Array<ting::s32> mixBuf(backend->BufferSizeInSamples());
-	ting::Array<ting::u8> playBuf(backend->BufferSizeInBytes());
-
-	M_AUMIKS_TRACE(<< "mixBuf.Size() = " << mixBuf.Size() << std::endl)
+	
 
 	while(!this->quitFlag){
 		//If there is nothing to play then just hang on the message queue.
@@ -229,7 +170,7 @@ void Lib::SoundThread::Run(){
 		}
 
 		//clean mixBuf
-		memset(mixBuf.Begin(), 0, mixBuf.SizeInBytes());
+		this->mixerBuffer->CleanMixBuf();
 
 		{//add queued channels to playing pool
 			ting::Mutex::Guard mut(this->chPoolMutex);//lock mutex
@@ -244,7 +185,7 @@ void Lib::SoundThread::Run(){
 
 		//mix channels to mixbuf
 		for(TChIter i = this->chPool.begin(); i != this->chPool.end();){
-			if((*i)->MixToMixBuf(mixBuf)){
+			if(this->mixerBuffer->MixToMixBuf(*i)){
 				(*i)->isPlaying = false;//clear playing flag
 				i = this->chPool.erase(i);
 			}else{
@@ -255,15 +196,45 @@ void Lib::SoundThread::Run(){
 //		TRACE(<< "chPool.size() = " << this->chPool.size() << std::endl)
 		M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)
 
-		CopyFromMixBufToPlayBuf(mixBuf, playBuf);
+		this->mixerBuffer->CopyFromMixBufToPlayBuf();
 
 		M_AUMIKS_TRACE(<< "SoundThread::Run(): writing data..." << std::endl)
 
 		//write data
-		backend->Write(playBuf);
+		this->audioBackend->Write(this->mixerBuffer->playBuf);
 	}//~while
 
 //	TRACE(<< "SoundThread::Run(): exiting" << std::endl)
 }
 
+
+
+unsigned Lib::BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
+	unsigned samplesPerSecond;
+	
+	switch(format){
+		case MONO_16_11025:
+			samplesPerSecond = 11025;
+			break;
+		case STEREO_16_11025:
+			samplesPerSecond = 2 * 11025;
+			break;
+		case MONO_16_22050:
+			samplesPerSecond = 22050;
+			break;
+		case STEREO_16_22050:
+			samplesPerSecond = 2 * 22050;
+			break;
+		case MONO_16_44100:
+			samplesPerSecond = 44100;
+			break;
+		case STEREO_16_44100:
+			samplesPerSecond = 2 * 44100;
+			break;
+		default:
+			throw aumiks::Exc("unknown sound format");
+	}
+	
+	return samplesPerSecond * bufferSizeMillis / 1000;
+}
 

@@ -58,21 +58,17 @@ namespace aumiks{
 //forward declarations
 class Lib;
 class Channel;
+class MixerBuffer44100Stereo16;
+class PulseAudioBackend;
 
 
 
 enum E_Format{
-	MONO_8_11025,
 	MONO_16_11025,
-	STEREO_8_11025,
-	STEREO_16_11025,
-	MONO_8_22050,
 	MONO_16_22050,
-	STEREO_8_22050,
-	STEREO_16_22050,
-	MONO_8_44100,
 	MONO_16_44100,
-	STEREO_8_44100,
+	STEREO_16_11025,
+	STEREO_16_22050,
 	STEREO_16_44100
 };
 
@@ -80,7 +76,6 @@ enum E_Format{
 
 class Lib : public ting::Singleton<Lib>{
 	friend class aumiks::Channel;
-	friend class aumiks::MixerBuffer11025Mono8;
 	friend class aumiks::MixerBuffer44100Stereo16;
 	friend class aumiks::PulseAudioBackend;
 	
@@ -118,7 +113,7 @@ public:
 		return this->thread.isMuted;
 	}
 
-private:
+public:
 	//Base class for mixer buffers of different formats
 	class MixerBuffer{
 	protected:
@@ -133,6 +128,10 @@ private:
 		ting::Array<ting::s32> mixBuf;
 		ting::Array<ting::u8> playBuf;
 
+		inline void CleanMixBuf(){
+			memset(this->mixBuf.Begin(), 0, this->mixBuf.SizeInBytes());
+		}
+		
 		//return true if channel has finished playing and should be removed from playing channels pool
 		virtual bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
 
@@ -148,7 +147,7 @@ private:
 
 		virtual void Write(const ting::Buffer<ting::u8>& buf) = 0;
 	};
-	
+private:
 	class SoundThread : public ting::MsgThread{
 		const ting::Ptr<AudioBackend> audioBackend;
 		const ting::Ptr<MixerBuffer> mixerBuffer;
@@ -169,12 +168,14 @@ private:
 		void Run();
 		
 	private:
-		static ting::Ptr<AudioBackend> CreateAudioBackend(unsigned bufferSizeMillis, E_Format format);
+		
 		//TODO: create mixer buffer based on actual buffer size and format from the backend
 		static ting::Ptr<MixerBuffer> CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format);
 	};
 
 	SoundThread thread;
+	
+	static unsigned BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format);
 };
 
 
@@ -183,13 +184,12 @@ private:
 class Channel : public ting::RefCounted{
 	friend class Lib;
 	friend class Lib::SoundThread;
-	friend class aumiks::MixerBuffer11025Mono8;
 	friend class aumiks::MixerBuffer44100Stereo16;
 
 	ting::Inited<volatile bool, false> isPlaying;
 	
 protected:
-	ting::Inited<bool, false> stopFlag;
+	ting::Inited<bool, false> stopFlag;//TODO: should it be volatile?
 
 	ting::Inited<ting::u8, ting::u8(-1)> volume;
 	

@@ -75,12 +75,15 @@ public:
 
 //		virtual void SetFrequency(float freq){}
 	private:
+
 		//override
-		bool MixToMixBuf(Array<s32>& mixBuf);
+		virtual bool MixToMixBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf);
+		
+		//TODO: implement methods for other mixinig formats
+		
+		bool MixStereo44100S16ToMixBuf(ting::Buffer<ting::s32>& mixBuf);
 
-		bool MixStereo44100S16ToMixBuf(Array<s32>& mixBuf);
-
-		bool MixMono44100S16ToMixBuf(Array<s32>& mixBuf);
+		bool MixMono44100S16ToMixBuf(ting::Buffer<ting::s32>& mixBuf);
 	};//~class Channel
 
 public:
