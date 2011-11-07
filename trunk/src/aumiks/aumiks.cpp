@@ -81,6 +81,7 @@ void Lib::PlayChannel(ting::Ref<Channel> ch){
 
 
 Lib::SoundThread::SoundThread(unsigned bufferSizeMillis, E_Format format) :
+		AudioBackend(SoundThread::CreateAudioBackend(bufferSizeMillis, format)),
 		mixerBuffer(SoundThread::CreateMixerBuffer(bufferSizeMillis, format))
 {
 //	TRACE(<< "SoundThread(): invoked" << std::endl)
@@ -88,10 +89,9 @@ Lib::SoundThread::SoundThread(unsigned bufferSizeMillis, E_Format format) :
 
 
 
-namespace{
+namespace aumiks{
 
-class MixerBuffer11025Mono8 : public Lib::SoundThread::MixerBuffer{
-public:
+class MixerBuffer11025Mono8 : public Lib::MixerBuffer{
 	MixerBuffer11025Mono8(unsigned bufferSizeMillis) :
 			MixerBuffer(
 					11025 * bufferSizeMillis / 1000,
@@ -110,48 +110,95 @@ public:
 		ASSERT(this->mixBuf.Size() == this->playBuf.Size())
 
 		const ting::s32 *src = this->mixBuf.Begin();
-		ting::s8* dst = this->playBuf.Begin();
+		ting::u8* dst = this->playBuf.Begin();
 		for(; src != this->mixBuf.End(); ++src, ++dst){
 			ting::s32 tmp = *src;
 			ting::ClampTop(tmp, 0x7f);
 			ting::ClampBottom(tmp, -0x7f);
 
-			*dst = ting::s8(tmp);
+			*dst = ting::u8(tmp);
 		}
 	}
+	
+public:
+	inline static ting::Ptr<MixerBuffer11025Mono8> New(unsigned bufferSizeMillis){
+		return ting::Ptr<MixerBuffer11025Mono8>(
+				new MixerBuffer11025Mono8(bufferSizeMillis)
+			);
+	}
 };
+
+
+
+class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
+	MixerBuffer44100Stereo16(unsigned bufferSizeMillis) :
+			MixerBuffer(
+					2 * 44100 * bufferSizeMillis / 1000, //size in s32
+					(2 * 44100 * bufferSizeMillis / 1000) * 2 //size in bytes
+				)
+	{}
+	
+	//override
+	virtual bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
+		ASSERT(ch.IsValid())
+		return ch->MixToMixBuf44100Stereo16(this->mixBuf);
+	}
+	
+	//override
+	virtual void CopyFromMixBufToPlayBuf(){
+		ASSERT((this->mixBuf.Size() * 2) == this->playBuf.Size())
+
+		const ting::s32 *src = this->mixBuf.Begin();
+		ting::u8* dst = this->playBuf.Begin();
+		for(; src != this->mixBuf.End(); ++src, ++dst){
+			ting::s32 tmp = *src;
+			ting::ClampTop(tmp, 0x7fff);
+			ting::ClampBottom(tmp, -0x7fff);
+
+			ASSERT(dst < this->playBuf.End())
+			*dst = ting::u8(tmp);
+			++dst;
+			ASSERT(dst < this->playBuf.End())
+			*dst = ting::u8(tmp >> 8);
+		}
+	}
+	
+public:
+	inline static ting::Ptr<MixerBuffer44100Stereo16> New(unsigned bufferSizeMillis){
+		return ting::Ptr<MixerBuffer44100Stereo16>(
+				new MixerBuffer44100Stereo16(bufferSizeMillis)
+			);
+	}
+};
+
+
 
 //TODO: add mixerBuffer classes for all formats
 }
 
 
 
-Lib::SoundThread::MixerBuffer* Lib::SoundThread::CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format){
+//static
+ting::Ptr<Lib::AudioBackend> Lib::SoundThread::CreateAudioBackend(unsigned bufferSizeMillis, E_Format format){
 	//TODO:
 }
 
 
 
-/*
-static void CopyFromMixBufToPlayBuf(const ting::Array<ting::s32>& mixBuf, ting::Array<ting::u8>& playBuf){
-	ASSERT(mixBuf.Size() == playBuf.Size() / 2) //2 bytes per sample
-
-	//TODO: make it work for other bytes per sample values?
-
-	const ting::s32 *src = mixBuf.Begin();
-	ting::s16* dst = reinterpret_cast<ting::s16*>(playBuf.Begin());//TODO: cast from u8* to s16* is forbidden by c++ standard
-	ASSERT(reinterpret_cast<void*>(dst) == reinterpret_cast<void*>(playBuf.Begin()))
-	for(unsigned i = 0; i < mixBuf.Size(); ++i){
-		ting::s32 tmp = *src;
-		ting::ClampTop(tmp, 0x7fff);
-		ting::ClampBottom(tmp, -0x7fff);
-
-		*dst = ting::s16(tmp);
-		++dst;
-		++src;
+//static
+ting::Ptr<Lib::SoundThread::MixerBuffer> Lib::SoundThread::CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format){
+	switch(format){
+		case aumiks::MONO_8_11025:
+			return MixerBuffer11025Mono8::New(bufferSizeMillis);
+			
+		//TODO:
+		
+		case aumiks::MixerBuffer44100Stereo16:
+			return MixerBuffer44100Stereo16::New(bufferSizeMillis);
+		default:
+			throw aumiks::Exc("Unknown sound output format requested");
 	}
 }
-*/
 
 
 

@@ -79,8 +79,11 @@ enum E_Format{
 
 
 class Lib : public ting::Singleton<Lib>{
-	friend class Channel;
-
+	friend class aumiks::Channel;
+	friend class aumiks::MixerBuffer11025Mono8;
+	friend class aumiks::MixerBuffer44100Stereo16;
+	friend class aumiks::PulseAudioBackend;
+	
 public:
 	/**
 	 * @brief Create sound library singleton instance.
@@ -116,28 +119,38 @@ public:
 	}
 
 private:
+	//Base class for mixer buffers of different formats
+	class MixerBuffer{
+	protected:
+		MixerBuffer(unsigned mixBufSize, unsigned playBufSize) :
+				mixBuf(mixBufSize),
+				playBuf(playBufSize)
+		{}
+
+	public:
+		virtual ~MixerBuffer(){}
+
+		ting::Array<ting::s32> mixBuf;
+		ting::Array<ting::u8> playBuf;
+
+		//return true if channel has finished playing and should be removed from playing channels pool
+		virtual bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
+
+		virtual void CopyFromMixBufToPlayBuf() = 0;
+	};
+
+	//base class for audio backends
+	class AudioBackend{
+	protected:
+		inline AudioBackend(){}
+	public:
+		virtual ~AudioBackend(){}
+
+		virtual void Write(const ting::Buffer<ting::u8>& buf) = 0;
+	};
+	
 	class SoundThread : public ting::MsgThread{
-		
-		//Base class for mixer buffers of different formats
-		class MixerBuffer{
-		protected:
-			MixerBuffer(unsigned mixBufSize, unsigned playBufSize) :
-					mixBuf(mixBufSize),
-					playBuf(playBufSize)
-			{}
-			
-		public:
-			virtual ~MixerBuffer(){}
-			
-			ting::Array<ting::s32> mixBuf;
-			ting::Array<ting::u8> playBuf;
-			
-			//return true if channel has finished playing and should be removed from playing channels pool
-			virtual bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
-			
-			virtual void CopyFromMixBufToPlayBuf() = 0;
-		};
-		
+		const ting::Ptr<AudioBackend> audioBackend;
 		const ting::Ptr<MixerBuffer> mixerBuffer;
 	public:
 		ting::Mutex chPoolMutex;
@@ -156,7 +169,9 @@ private:
 		void Run();
 		
 	private:
-		static MixerBuffer* CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format);
+		static ting::Ptr<AudioBackend> CreateAudioBackend(unsigned bufferSizeMillis, E_Format format);
+		//TODO: create mixer buffer based on actual buffer size and format from the backend
+		static ting::Ptr<MixerBuffer> CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format);
 	};
 
 	SoundThread thread;
@@ -168,6 +183,8 @@ private:
 class Channel : public ting::RefCounted{
 	friend class Lib;
 	friend class Lib::SoundThread;
+	friend class aumiks::MixerBuffer11025Mono8;
+	friend class aumiks::MixerBuffer44100Stereo16;
 
 	ting::Inited<volatile bool, false> isPlaying;
 	
