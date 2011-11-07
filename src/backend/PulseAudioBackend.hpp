@@ -31,18 +31,18 @@ THE SOFTWARE. */
 #include <pulse/simple.h>
 #include <pulse/error.h>
 
-#include "AudioBackend.hpp"
-
+#include "../aumiks/aumiks.hpp"
 #include "../aumiks/Exc.hpp"
 
 
 
 namespace aumiks{
 
-class PulseAudioBackend : public AudioBackend{
+class PulseAudioBackend : public aumiks::Lib::AudioBackend{
 	 pa_simple *handle;
 
 public:
+	//PulseAudioBackend(unsigned bufferSizeMillis, E_Format format){
 	PulseAudioBackend(unsigned requestedBufferSizeInFrames){
 		//TODO: get actual buffer size from pulseaudio
 		this->bufSizeInFrames = requestedBufferSizeInFrames;
