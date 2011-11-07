@@ -158,7 +158,8 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 }
 
 
-
+//TODO: remove this
+/*
 //override
 bool WavSound::Channel::MixToMixBuf(Array<s32>& mixBuf){
 	if(this->stopFlag)
@@ -178,10 +179,10 @@ bool WavSound::Channel::MixToMixBuf(Array<s32>& mixBuf){
 	
 	return true;
 }
+*/
 
 
-
-bool WavSound::Channel::MixMono44100S16ToMixBuf(Array<s32>& mixBuf){
+bool WavSound::Channel::MixMono44100S16ToMixBuf(ting::Buffer<ting::s32>& mixBuf){
 	ASSERT(this->wavSound->data.Size() % 2 == 0)
 	ASSERT(this->curPos < this->wavSound->data.Size())
 	ASSERT(this->curPos % 2 == 0)//make sure curPos is not corrupted (we work with 16 bit samples, mono)
@@ -227,7 +228,10 @@ bool WavSound::Channel::MixMono44100S16ToMixBuf(Array<s32>& mixBuf){
 
 
 
-bool WavSound::Channel::MixStereo44100S16ToMixBuf(Array<s32>& mixBuf){
+bool WavSound::Channel::MixStereo44100S16ToMixBuf(ting::Buffer<ting::s32>& mixBuf){
+	if(this->stopFlag)
+		return true;
+	
 	ASSERT(this->wavSound->data.Size() % 4 == 0)
 	ASSERT(this->curPos < this->wavSound->data.Size())
 	ASSERT(this->curPos % 4 == 0)//make sure curPos is not corrupted (we work with 16 bit samples, stereo)

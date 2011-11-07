@@ -5,7 +5,7 @@
 
 
 int main(int argc, char *argv[]){
-	aumiks::Lib aumiksLibrary;
+	aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_44100);
 	
 	ting::Ref<aumiks::WavSound> snd;
 	{

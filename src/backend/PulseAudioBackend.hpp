@@ -39,27 +39,31 @@ THE SOFTWARE. */
 namespace aumiks{
 
 class PulseAudioBackend : public aumiks::Lib::AudioBackend{
-	 pa_simple *handle;
+	pa_simple *handle;
 
-public:
-	//PulseAudioBackend(unsigned bufferSizeMillis, E_Format format){
-	PulseAudioBackend(unsigned requestedBufferSizeInFrames){
+	PulseAudioBackend(unsigned bufferSizeMillis, E_Format format){
 		//TODO: get actual buffer size from pulseaudio
-		this->bufSizeInFrames = requestedBufferSizeInFrames;
-		this->sampleSizeInBytes = 2;
-		this->numChannels = 2;
 		
 		TRACE(<< "opening device" << std::endl)
 
 		pa_sample_spec ss;
-		ss.format = PA_SAMPLE_S16NE;
-		ss.channels = 2;
-		ss.rate = 44100;
+		unsigned bufferSizeInBytes;
+		switch(format){
+			//TODO:
+			case aumiks::STEREO_16_44100:
+				ss.format = PA_SAMPLE_S16LE;//TODO: PA_SAMPLE_S16NE ? (native endian)
+				ss.channels = 2;
+				ss.rate = 44100;
+				bufferSizeInBytes = 2 * aumiks::Lib::BufferSizeInSamples(bufferSizeMillis, format);
+				break;
+			default:
+				throw aumiks::Exc("unknown sound output format requested");
+		}
 
 		pa_buffer_attr ba;
-		ba.fragsize = this->BufferSizeInBytes();
-		ba.tlength = this->BufferSizeInBytes();
-		ba.minreq = this->BufferSizeInBytes() / 2;
+		ba.fragsize = bufferSizeInBytes;
+		ba.tlength = bufferSizeInBytes;
+		ba.minreq = bufferSizeInBytes / 2;
 		ba.maxlength = ba.tlength;
 		ba.prebuf = ba.tlength;
 		
@@ -85,19 +89,10 @@ public:
 			throw aumiks::Exc("error opening PulseAudio connection");
 		}
 	}
-
-
-
-	~PulseAudioBackend(){
-		ASSERT(this->handle)
-		pa_simple_free(this->handle);
-	}
-
-
-
+	
 	//override
 	void Write(const ting::Buffer<ting::u8>& buf){
-		ASSERT(buf.Size() == this->BufferSizeInBytes())
+//		ASSERT(buf.Size() == this->BufferSizeInBytes())
 
 		if(pa_simple_write(
 				this->handle,
@@ -106,11 +101,24 @@ public:
 				0 // no error return
 			) < 0)
 		{
+			//TODO: handle error somehow
 			//ignore error
 			TRACE(<< "pa_simple_write(): error" << std::endl)
         }
 	}
 
+public:
+
+	~PulseAudioBackend(){
+		ASSERT(this->handle)
+		pa_simple_free(this->handle);
+	}
+	
+	inline static ting::Ptr<PulseAudioBackend> New(unsigned bufferSizeMillis, E_Format format){
+		return ting::Ptr<PulseAudioBackend>(
+				new PulseAudioBackend(bufferSizeMillis, format)
+			);
+	}
 };
 
 }//~namespace
