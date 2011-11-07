@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009 Ivan Gagis
+Copyright (c) 2009-2011 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,7 @@ THE SOFTWARE. */
  * Created on March 9, 2009, 3:22 PM
  */
 
-#ifndef M_ALSA_hpp
-#define	M_ALSA_hpp
+#pragma once
 
 /* Use the newer ALSA API */
 #define ALSA_PCM_NEW_HW_PARAMS_API
@@ -295,4 +294,3 @@ public:
 };
 
 }//~namespace
-#endif//~once

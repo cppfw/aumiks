@@ -31,6 +31,125 @@ using namespace aumiks;
 
 
 
+
+namespace aumiks{
+
+class WavSound44100Stereo16 : public WavSound{
+	Array<s16> data;
+	
+	class Channel : public WavSound::Channel{
+		friend class WavSound44100Stereo16;
+
+		const Ref<const WavSound44100Stereo16> wavSound;
+
+		unsigned curPos;//current index into sound data buffer
+	protected:
+
+	private:
+		inline Channel(const Ref<const WavSound44100Stereo16>& sound) :
+				wavSound(sound),
+				curPos(0)
+		{
+			ASSERT(this->wavSound.IsValid())
+		}
+
+	private:
+		//override
+		virtual bool MixToMixBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){
+			if(this->stopFlag)
+				return true;
+			
+			ASSERT(mixBuf.Size() % 2 == 0)
+
+			ASSERT(this->wavSound->data.Size() % 2 == 0)
+			ASSERT(this->curPos < this->wavSound->data.Size())
+			ASSERT(this->curPos % 2 == 0)//make sure curPos is not corrupted
+			
+			const s16* src = &this->wavSound->data[this->curPos];
+
+			s32* dst = mixBuf.Begin();
+
+			u32 samplesCopied = 0;
+
+			//if sound end will be reached
+			for(;;){
+				u32 samplesTillSoundEnd = (this->wavSound->data.Size() - this->curPos);
+				if(samplesTillSoundEnd <= (mixBuf.Size() - samplesCopied)){
+					for(u32 i = 0; i < samplesTillSoundEnd; ++i){
+						ASSERT(mixBuf.Begin() <= dst && dst < mixBuf.End())
+						*dst += s32(*src);
+						++dst;
+						++src;
+					}
+					this->curPos = 0;
+
+					samplesCopied += samplesTillSoundEnd;
+
+					//if sound is looped then continue
+					if(this->looped){
+						continue;
+					}
+					
+					return true;//remove channel from playing pool
+				}else{
+					break;
+				}
+			}
+
+			for(u32 i = samplesCopied; i < mixBuf.Size(); ++i){
+				ASSERT(mixBuf.Begin() <= dst && dst < mixBuf.End())
+				*dst += s32(*src);
+				++dst;
+				++src;
+			}
+			this->curPos += (mixBuf.Size() - samplesCopied);
+			return false;
+		}
+		
+		//TODO: implement methods for other mixing formats
+		
+	};//~class Channel
+	
+	//override
+	Ref<WavSound::Channel> CreateChannel()const{
+		return Ref<WavSound::Channel>(
+				new WavSound44100Stereo16::Channel(
+						Ref<const WavSound44100Stereo16>(this)
+					)
+			);
+	}
+	
+private:
+	WavSound44100Stereo16(const ting::Buffer<ting::u8>& d){
+		ASSERT(d.Size() % 4 == 0) // 2 channels and 2 bytes per sample (16 bit)
+		
+		this->data.Init(d.Size() / 2);
+		
+		const ting::u8* src = d.Begin();
+		for(ting::s16* dst = this->data.Begin(); dst != this->data.End(); ++dst, ++src){
+			ting::s16 tmp;
+			
+			tmp = ting::s16(*src);
+			++src;
+			tmp |= ((ting::s16(*src)) << 8);
+			ASSERT(this->data.Begin() <= dst && dst < this->data.End())
+			*dst = tmp;
+		}
+	}
+
+public:
+	static inline ting::Ref<WavSound44100Stereo16> New(const ting::Buffer<ting::u8>& d){
+		return ting::Ref<WavSound44100Stereo16>(
+				new WavSound44100Stereo16(d)
+			);
+	}
+};
+
+}//~namespace
+
+
+
+
 Ref<WavSound> WavSound::LoadWAV(File& fi){
 	File::Guard fileGuard(fi, File::READ);//make sure we close the file even in case of exception is thrown
 
@@ -111,10 +230,19 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 		fi.Read(buf);//read the size of the sound data
 		dataSize = ting::Deserialize32(buf.Begin());
 	}
+	
+	//read in the sound data
+	ting::Array<ting::u8> data(dataSize);
+	{
+		unsigned bytesRead = fi.Read(data);//Load Sound data
 
+		if(bytesRead != dataSize){
+			throw Exc("WavSound::LoadWAV(): sound data size is incorrect");
+		}
+	}
+	
 	//Now we have Wav-file info
-	Ref<WavSound> ret(new WavSound());
-	unsigned bytesRead;
+	Ref<WavSound> ret;
 	if(bitDepth == 8){
 //		C_Ref<C_PCM_ParticularNonStreamedSound<s8> > r = new C_PCM_ParticularNonStreamedSound<s8>(chans, igagis::uint(frequency), dataSize);
 //		ret = static_cast<C_PCM_NonStreamedSound*>(r.operator->());
@@ -122,35 +250,26 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 //		//convert data to signed format
 //		for(s8* ptr=r->buf.Buf(); ptr<(r->buf.Buf()+r->buf.SizeOfArray()); ++ptr)
 //			*ptr=s8(int(*ptr)-0x80);
-		ASSERT_INFO(false, "8 bit WAV files are not supported yet")
+		ASSERT_INFO_ALWAYS(false, "8 bit WAV files are not supported yet")
 	}else if(bitDepth == 16){
 		//set the format
 		if(chans == 1){//mono
 			if(frequency == 44100){
-				ret->format = WavSound::MONO_44100_S16;
+				ASSERT_INFO_ALWAYS(false, "unsupported WAV file frequency: " << frequency)
 			}else{
-				ASSERT_INFO(false, "unsupported WAV file frequency: " << frequency)
+				ASSERT_INFO_ALWAYS(false, "unsupported WAV file frequency: " << frequency)
 			}
-		}else{//stereo
-			ASSERT(chans == 2)
-
+		}else if(chans == 2){//stereo
 			if(frequency == 44100){
-				ret->format = WavSound::STEREO_44100_S16;
+				ret = WavSound44100Stereo16::New(data);
 			}else{
-				ASSERT_INFO(false, "unsupported WAV file frequency")
+				ASSERT_INFO_ALWAYS(false, "unsupported WAV file frequency")
 			}
+		}else{
+			throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");
 		}
-
-		//read in the sound data
-		ASSERT(dataSize % 2 == 0)//check that dataSize is even
-		ret->data.Init(dataSize);
-		bytesRead = fi.Read(ret->data);//Load Sound data
 	}else{
 		throw Exc("WavSound::LoadWAV(): unsupported bit depth");
-	}
-
-	if(bytesRead != dataSize){
-		throw Exc("WavSound::LoadWAV(): sound data size is incorrect");
 	}
 
 	//M_SOUND_PRINT(<<"C_Sound::LoadWAV(): sound loaded, freq="<<(this->freq)<<" bd="<<(this->bd)<<" chans="<<(this->chans)<<" length="<<this->length<<std::endl)
@@ -181,7 +300,7 @@ bool WavSound::Channel::MixToMixBuf(Array<s32>& mixBuf){
 }
 */
 
-
+/*
 bool WavSound::Channel::MixMono44100S16ToMixBuf(ting::Buffer<ting::s32>& mixBuf){
 	ASSERT(this->wavSound->data.Size() % 2 == 0)
 	ASSERT(this->curPos < this->wavSound->data.Size())
@@ -267,4 +386,4 @@ bool WavSound::Channel::MixStereo44100S16ToMixBuf(ting::Buffer<ting::s32>& mixBu
 	this->curPos += (mixBuf.Size() - samplesCopied) * 2;
 	return false;
 }
-
+*/
