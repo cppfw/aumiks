@@ -32,8 +32,6 @@ THE SOFTWARE. */
 #include <ting/Array.hpp>
 #include <ting/File.hpp>
 
-
-
 #include "aumiks.hpp"
 
 
@@ -45,55 +43,22 @@ using namespace ting;
 
 
 class WavSound : public aumiks::Sound{
-	Array<u8> data;
-
+	
+protected:
 	WavSound(){}
-
-	//TODO: re-wise formats
-	enum EFormat{
-		MONO_44100_S16,
-		STEREO_44100_S16
-	} format;
 	
 public:
-
 	class Channel : public aumiks::Channel{
-		friend class WavSound;
-
-		const Ref<WavSound> wavSound;
-
-		unsigned curPos;//current index into sound data buffer
 	protected:
+		ting::Inited<bool, false> looped;
 
-	private:
-		inline Channel(const Ref<WavSound>& sound) :
-				wavSound(sound),
-				curPos(0)
-		{
-			ASSERT(this->wavSound.IsValid())
+		inline void SetLooped(bool looped){
+			this->looped = looped;
 		}
-
-//		virtual void SetFrequency(float freq){}
-	private:
-
-		//override
-		virtual bool MixToMixBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf);
-		
-		//TODO: implement methods for other mixinig formats
-		
-		bool MixStereo44100S16ToMixBuf(ting::Buffer<ting::s32>& mixBuf);
-
-		bool MixMono44100S16ToMixBuf(ting::Buffer<ting::s32>& mixBuf);
-	};//~class Channel
+	};
 
 public:
-	Ref<WavSound::Channel> CreateChannel()const{
-		return Ref<WavSound::Channel>(
-				new WavSound::Channel(
-						Ref<WavSound>(const_cast<WavSound*>(this))
-					)
-			);
-	}
+	virtual Ref<WavSound::Channel> CreateChannel()const = 0;
 
 	inline Ref<WavSound::Channel> Play(u8 volume = u8(-1))const{
 		Ref<WavSound::Channel> ret = this->CreateChannel();

@@ -13,6 +13,8 @@ int main(int argc, char *argv[]){
 		snd = aumiks::WavSound::LoadWAV(fi);
 	}
 
+	ASSERT(snd)
+	
 	ting::Ref<aumiks::Channel> ch = snd->Play();
 	
 	while(ch->IsPlaying()){
