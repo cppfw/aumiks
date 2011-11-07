@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
 	
 	ting::Ref<aumiks::WavSound> snd;
 	{
-		ting::FSFile fi("sample.wav");
+		ting::FSFile fi("sample44100stereo16.wav");
 		snd = aumiks::WavSound::LoadWAV(fi);
 	}
 
