@@ -24,7 +24,7 @@ void Play(const std::string& fileName){
 int main(int argc, char *argv[]){
 	aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_44100);
 	
-//	Play("sample44100mono16.wav");
+	Play("sample44100mono16.wav");
 	Play("sample44100stereo16.wav");
 	
 	return 0;
