@@ -32,7 +32,7 @@ using namespace aumiks;
 
 
 
-namespace aumiks{
+namespace{
 
 class WavSound44100Stereo16 : public WavSound{
 	Array<s16> data;
@@ -55,98 +55,103 @@ class WavSound44100Stereo16 : public WavSound{
 
 	private:
 		//override
-		virtual bool MixToMixBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){
-			if(this->stopFlag)
-				return true;
-			
-			ASSERT(mixBuf.Size() % 2 == 0)
-
-			ASSERT(this->wavSound->data.Size() % 2 == 0)
-			ASSERT(this->curPos < this->wavSound->data.Size())
-			ASSERT(this->curPos % 2 == 0)//make sure curPos is not corrupted
-			
-			const s16* src = &this->wavSound->data[this->curPos];
-
-			s32* dst = mixBuf.Begin();
-
-			u32 samplesCopied = 0;
-
-			//if sound end will be reached
-			for(;;){
-				u32 samplesTillSoundEnd = (this->wavSound->data.Size() - this->curPos);
-				if(samplesTillSoundEnd <= (mixBuf.Size() - samplesCopied)){
-					for(u32 i = 0; i < samplesTillSoundEnd; ++i){
-						ASSERT(mixBuf.Begin() <= dst && dst < mixBuf.End())
-						*dst += s32(*src);
-						++dst;
-						++src;
-					}
-					this->curPos = 0;
-
-					samplesCopied += samplesTillSoundEnd;
-
-					//if sound is looped then continue
-					if(this->looped){
-						continue;
-					}
-					
-					return true;//remove channel from playing pool
-				}else{
-					break;
-				}
-			}
-
-			for(u32 i = samplesCopied; i < mixBuf.Size(); ++i){
-				ASSERT(mixBuf.Begin() <= dst && dst < mixBuf.End())
-				*dst += s32(*src);
-				++dst;
-				++src;
-			}
-			this->curPos += (mixBuf.Size() - samplesCopied);
-			return false;
-		}
+		virtual bool MixToMixBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf);
 		
 		//TODO: implement methods for other mixing formats
 		
+	public:
+		static inline ting::Ref<Channel> New(const Ref<const WavSound44100Stereo16>& sound){
+			return ting::Ref<Channel>(new Channel(sound));
+		}
 	};//~class Channel
 	
 	//override
-	Ref<WavSound::Channel> CreateChannel()const{
-		return Ref<WavSound::Channel>(
-				new WavSound44100Stereo16::Channel(
-						Ref<const WavSound44100Stereo16>(this)
-					)
-			);
+	virtual Ref<WavSound::Channel> CreateChannel()const{
+		return Channel::New(Ref<const WavSound44100Stereo16>(this));
 	}
 	
 private:
-	WavSound44100Stereo16(const ting::Buffer<ting::u8>& d){
-		ASSERT(d.Size() % 4 == 0) // 2 channels and 2 bytes per sample (16 bit)
-		
-		this->data.Init(d.Size() / 2);
-		
-		const ting::u8* src = d.Begin();
-		for(ting::s16* dst = this->data.Begin(); dst != this->data.End(); ++dst, ++src){
-			ting::s16 tmp;
-			
-			tmp = ting::s16(*src);
-			++src;
-			tmp |= ((ting::s16(*src)) << 8);
-			ASSERT(this->data.Begin() <= dst && dst < this->data.End())
-			*dst = tmp;
-		}
-	}
+	WavSound44100Stereo16(const ting::Buffer<ting::u8>& d);
 
 public:
 	static inline ting::Ref<WavSound44100Stereo16> New(const ting::Buffer<ting::u8>& d){
-		return ting::Ref<WavSound44100Stereo16>(
-				new WavSound44100Stereo16(d)
-			);
+		return ting::Ref<WavSound44100Stereo16>(new WavSound44100Stereo16(d));
 	}
 };
 
 }//~namespace
 
+
+
+WavSound44100Stereo16::WavSound44100Stereo16(const ting::Buffer<ting::u8>& d){
+	ASSERT(d.Size() % 4 == 0) // 2 channels and 2 bytes per sample (16 bit)
+
+	this->data.Init(d.Size() / 2);
+
+	const ting::u8* src = d.Begin();
+	for(ting::s16* dst = this->data.Begin(); dst != this->data.End(); ++dst, ++src){
+		ting::s16 tmp;
+
+		tmp = ting::s16(*src);
+		++src;
+		tmp |= ((ting::s16(*src)) << 8);
+		ASSERT(this->data.Begin() <= dst && dst < this->data.End())
+		*dst = tmp;
+	}
+}
+
+
+
+bool WavSound44100Stereo16::Channel::MixToMixBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){
+	if(this->stopFlag)
+		return true;
+
+	ASSERT(mixBuf.Size() % 2 == 0)
+
+	ASSERT(this->wavSound->data.Size() % 2 == 0)
+	ASSERT(this->curPos < this->wavSound->data.Size())
+	ASSERT(this->curPos % 2 == 0)//make sure curPos is not corrupted
+
+	const s16* src = &this->wavSound->data[this->curPos];
+
+	s32* dst = mixBuf.Begin();
+
+	u32 samplesCopied = 0;
+
+	//if sound end will be reached
+	for(;;){
+		u32 samplesTillSoundEnd = (this->wavSound->data.Size() - this->curPos);
+		if(samplesTillSoundEnd <= (mixBuf.Size() - samplesCopied)){
+			for(u32 i = 0; i < samplesTillSoundEnd; ++i){
+				ASSERT(mixBuf.Begin() <= dst && dst < mixBuf.End())
+				*dst += s32(*src);
+				++dst;
+				++src;
+			}
+			this->curPos = 0;
+
+			samplesCopied += samplesTillSoundEnd;
+
+			//if sound is looped then continue
+			if(this->looped){
+				continue;
+			}
+
+			return true;//remove channel from playing pool
+		}else{
+			break;
+		}
+	}
+
+	for(u32 i = samplesCopied; i < mixBuf.Size(); ++i){
+		ASSERT(mixBuf.Begin() <= dst && dst < mixBuf.End())
+		*dst += s32(*src);
+		++dst;
+		++src;
+	}
+	this->curPos += (mixBuf.Size() - samplesCopied);
+	return false;
+}
 
 
 
@@ -277,6 +282,8 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 }
 
 
+
+
 //TODO: remove this
 /*
 //override
@@ -387,3 +394,6 @@ bool WavSound::Channel::MixStereo44100S16ToMixBuf(ting::Buffer<ting::s32>& mixBu
 	return false;
 }
 */
+
+
+
