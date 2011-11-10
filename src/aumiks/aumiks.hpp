@@ -119,6 +119,7 @@ public:
 	protected:
 		MixerBuffer(unsigned mixBufSize, unsigned playBufSize) :
 				mixBuf(mixBufSize),
+				smpBuf(mixBufSize),
 				playBuf(playBufSize)
 		{}
 
@@ -126,6 +127,7 @@ public:
 		virtual ~MixerBuffer(){}
 
 		ting::Array<ting::s32> mixBuf;
+		ting::Array<ting::s32> smpBuf;
 		ting::Array<ting::u8> playBuf;
 
 		inline void CleanMixBuf(){
@@ -133,9 +135,14 @@ public:
 		}
 		
 		//return true if channel has finished playing and should be removed from playing channels pool
-		virtual bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
+		bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch);
 
 		virtual void CopyFromMixBufToPlayBuf() = 0;
+		
+	private:
+		virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
+		
+		void MixSmpBufToMixBuf();
 	};
 
 	//base class for audio backends
@@ -221,12 +228,12 @@ protected:
 private:
 	//this function is called by SoundThread when it needs more data to play.
 	//return true to remove channel from playing channels list
-	virtual bool MixToMixBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool MixToMixBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool MixToMixBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool MixToMixBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool MixToMixBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool MixToMixBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
 };
 
 

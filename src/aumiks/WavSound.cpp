@@ -94,32 +94,32 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 
 	private:
 		//override
-		virtual bool MixToMixBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){
+		virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::MixToMixBuf<1, 11025>(this, mixBuf);
 		}
 		
 		//override
-		virtual bool MixToMixBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){
+		virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::MixToMixBuf<2, 11025>(this, mixBuf);
 		}
 		
 		//override
-		virtual bool MixToMixBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){
+		virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::MixToMixBuf<1, 22050>(this, mixBuf);
 		}
 		
 		//override
-		virtual bool MixToMixBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){
+		virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::MixToMixBuf<2, 22050>(this, mixBuf);
 		}
 		
 		//override
-		virtual bool MixToMixBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){
+		virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::MixToMixBuf<1, 44100>(this, mixBuf);
 		}
 		
 		//override
-		virtual bool MixToMixBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){
+		virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::MixToMixBuf<2, 44100>(this, mixBuf);
 		}
 		
@@ -157,7 +157,7 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 			if(samplesTillSoundEnd <= (mixBuf.Size() - samplesCopied)){
 				for(unsigned i = 0; i < samplesTillSoundEnd; ++i){
 					ASSERT(mixBuf.Begin() <= dst && dst <= mixBuf.End() - 1)
-					*dst += s32(*src);
+					*dst = s32(*src);
 					++dst;
 					++src;
 				}
@@ -170,6 +170,7 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 					continue;
 				}
 
+				//TODO: fill the rest of buffer with zeros (silence)
 				return true;//remove channel from playing pool
 			}else{
 				break;
@@ -178,7 +179,7 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 
 		for(; dst != mixBuf.End();){
 			ASSERT(mixBuf.Begin() <= dst && dst <= mixBuf.End() - 1)
-			*dst += s32(*src);
+			*dst = s32(*src);
 			++dst;
 			++src;
 		}
