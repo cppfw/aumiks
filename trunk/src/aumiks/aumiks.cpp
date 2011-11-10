@@ -87,6 +87,15 @@ Lib::SoundThread::SoundThread(unsigned bufferSizeMillis, E_Format format) :
 
 
 
+bool Lib::MixerBuffer::MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
+	bool ret = this->FillSmpBuf(ch);
+	//TODO: call channel processing
+	this->MixSmpBufToMixBuf();
+	return ret;
+}
+
+
+
 namespace aumiks{
 
 class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
@@ -98,9 +107,9 @@ class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
 	{}
 	
 	//override
-	virtual bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
+	virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
 		ASSERT(ch.IsValid())
-		return ch->MixToMixBuf44100Stereo16(this->mixBuf);
+		return ch->FillSmpBuf44100Stereo16(this->smpBuf);
 	}
 	
 	//override
@@ -237,4 +246,18 @@ unsigned Lib::BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
 	
 	return samplesPerSecond * bufferSizeMillis / 1000;
 }
+
+
+
+void aumiks::Lib::MixerBuffer::MixSmpBufToMixBuf(){
+	ASSERT(this->smpBuf.Size() == this->mixBuf.Size())
+	
+	ting::s32* src = this->smpBuf.Begin();
+	ting::s32* dst = this->mixBuf.Begin();
+	
+	for(; dst != this->mixBuf.End(); ++src, ++dst){
+		*dst += *src;
+	}
+}
+
 
