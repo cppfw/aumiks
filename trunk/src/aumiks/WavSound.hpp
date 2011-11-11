@@ -49,12 +49,7 @@ protected:
 	
 public:
 	class Channel : public aumiks::Channel{
-	protected:
-		ting::Inited<bool, false> looped;
 
-		inline void SetLooped(bool looped){
-			this->looped = looped;
-		}
 	};
 
 public:

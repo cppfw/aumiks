@@ -223,30 +223,42 @@ void Lib::SoundThread::Run(){
 unsigned Lib::BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
 	unsigned samplesPerSecond;
 	
+	//NOTE: for simplicity of conversion from lower sample rates to higher ones,
+	//      the size of output buffer should be that it would hold no fractional
+	//      parts of source samples when they are mixed to it.
+	unsigned granularity;
+	
 	switch(format){
 		case MONO_16_11025:
 			samplesPerSecond = 11025;
+			granularity = 1;
 			break;
 		case STEREO_16_11025:
 			samplesPerSecond = 2 * 11025;
+			granularity = 1;
 			break;
 		case MONO_16_22050:
 			samplesPerSecond = 22050;
+			granularity = 2;
 			break;
 		case STEREO_16_22050:
 			samplesPerSecond = 2 * 22050;
+			granularity = 4;
 			break;
 		case MONO_16_44100:
 			samplesPerSecond = 44100;
+			granularity = 4;
 			break;
 		case STEREO_16_44100:
 			samplesPerSecond = 2 * 44100;
+			granularity = 8;
 			break;
 		default:
 			throw aumiks::Exc("unknown sound format");
 	}
 	
-	return samplesPerSecond * bufferSizeMillis / 1000;
+	unsigned ret = samplesPerSecond * bufferSizeMillis / 1000;
+	return ret + (granularity - ret % granularity);
 }
 
 

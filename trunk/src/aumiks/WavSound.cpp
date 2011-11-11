@@ -36,42 +36,33 @@ using namespace aumiks;
 namespace{
 
 //mixes sound frame to mixing buffer.
+//NOTE: partial specialization of a function template is not allowed by C++, therefore use static class member
 template <class TSampleType, unsigned chans, unsigned freq, unsigned outputChans, unsigned outputFreq>
-		inline void MixFrameToMixBuf(const TSampleType*& src, ting::s32*& dst);
+		struct FrameToSmpBufPutter
+{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst);
+};
 
-template <> inline void MixFrameToMixBuf<ting::s8, 1, 44100, 2, 44100>(const ting::s8*& src, ting::s32*& dst){
-	*dst += s32(*src);
-	++dst;
-	*dst += s32(*src);
-	++dst;
-	++src;
-}
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = s32(*src);
+		++dst;
+		*dst = s32(*src);
+		++dst;
+		++src;
+	}
+};
 
-template <> inline void MixFrameToMixBuf<ting::s16, 1, 44100, 2, 44100>(const ting::s16*& src, ting::s32*& dst){
-	*dst += s32(*src);
-	++dst;
-	*dst += s32(*src);
-	++dst;
-	++src;
-}
-
-template <> inline void MixFrameToMixBuf<ting::s8, 2, 44100, 2, 44100>(const ting::s8*& src, ting::s32*& dst){
-	*dst += s32(*src);
-	++dst;
-	++src;
-	*dst += s32(*src);
-	++dst;
-	++src;
-}
-
-template <> inline void MixFrameToMixBuf<ting::s16, 2, 44100, 2, 44100>(const ting::s16*& src, ting::s32*& dst){
-	*dst += s32(*src);
-	++dst;
-	++src;
-	*dst += s32(*src);
-	++dst;
-	++src;
-}
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = s32(*src);
+		++dst;
+		++src;
+		*dst = s32(*src);
+		++dst;
+		++src;
+	}
+};
 
 
 template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl : public WavSound{
@@ -94,6 +85,8 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 		{}
 
 	private:
+		//TODO: uncomment
+/*
 		//override
 		virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<1, 11025>(this, mixBuf);
@@ -118,13 +111,12 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 		virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<1, 44100>(this, mixBuf);
 		}
+ */
 		
 		//override
 		virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<2, 44100>(this, mixBuf);
 		}
-		
-		//TODO: implement methods for other mixing formats
 		
 	public:
 		static inline ting::Ref<Channel> New(const Ref<const WavSoundImpl>& sound){
@@ -145,7 +137,72 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 
 		s32* dst = buf.Begin();
 
-		unsigned samplesCopied = 0;
+		for(;;){
+			ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+			unsigned samplesTillEndOfBuffer = buf.End() - dst;
+			ASSERT(samplesTillEndOfBuffer % outputChans == 0)
+			unsigned framesTillEndOfBuffer = samplesTillEndOfBuffer / outputChans;
+
+			ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+			
+			if(outputFreq >= freq){	
+				unsigned samplesTillEndOfSound = ch->wavSound->data.End() - src;
+				ASSERT(samplesTillEndOfSound % chans == 0)
+				unsigned framesTillEndOfSound =  samplesTillEndOfSound / chans;
+				
+				//NOTE: we support only 11025, 22050 and 44100 Hz, so expect ratio of 1, 2 or 4 only
+				ASSERT((outputFreq / freq == 1) || (outputFreq / freq == 2) || (outputFreq / freq == 4))
+				
+				unsigned bufFramesTillEndOfSound = framesTillEndOfSound * (outputFreq / freq);
+
+//				TRACE(<< "framesTillEndOfSound = " << framesTillEndOfSound << std::endl)
+//				TRACE(<< "bufFramesTillEndOfSound = " << bufFramesTillEndOfSound << std::endl)
+//				TRACE(<< "framesTillEndOfBuffer = " << framesTillEndOfBuffer << std::endl)
+				
+				//if sound end will be reached
+				if(bufFramesTillEndOfSound <= framesTillEndOfBuffer){
+					for(; src != ch->wavSound->data.End();){
+						ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
+					}
+					if(ch->numLoops > 0){
+						--ch->numLoops;
+						if(ch->numLoops == 0){
+							ch->curPos = 0;
+							return true;
+						}else{
+							continue;
+						}
+					}else{
+						//loop infinitely
+						continue;
+					}
+				}else{//no end of sound will be reached
+					for(; dst != buf.End();){
+						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+						ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
+					}
+					ch->curPos += framesTillEndOfBuffer * chans * freq / outputFreq;
+					return false;
+				}
+				
+			}else{//freq < outputFreq
+				ASSERT(false)
+				//TODO:
+				return false;
+			}
+		}//~for(;;)
+
+		
+		
+		
+		
+		
+		
+		/*
+		
 
 		//TODO:!!!!!!!!!!
 		
@@ -183,6 +240,7 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 		}
 		ch->curPos += (buf.Size() - samplesCopied);
 		return false;
+		*/
 	}
 	//=============class Channel============
 	//  ==================================
