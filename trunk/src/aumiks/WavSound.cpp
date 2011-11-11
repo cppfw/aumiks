@@ -35,7 +35,7 @@ using namespace aumiks;
 
 namespace{
 
-//mixes sound frame to mixing buffer.
+//puts sound frame to output sample buffer.
 //NOTE: partial specialization of a function template is not allowed by C++, therefore use static class member
 template <class TSampleType, unsigned chans, unsigned freq, unsigned outputChans, unsigned outputFreq>
 		struct FrameToSmpBufPutter
@@ -123,7 +123,8 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 			return ting::Ref<Channel>(new Channel(sound));
 		}
 	};//~class Channel
-	
+
+private:
 	//NOTE: local classes are not allowed to have template members by C++ standard, this is why this method is
 	//      defined here as static, instead of being a member of Channel class
 	template <unsigned outputChans, unsigned outputFreq> static bool FillSmpBuf(Channel* ch, ting::Buffer<ting::s32>& buf){
@@ -145,14 +146,13 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 
 			ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
 			
-			if(outputFreq >= freq){//rely on optimizer to optimize this if out since it evaluates to constant expression upon template instantiation
-				unsigned samplesTillEndOfSound = ch->wavSound->data.End() - src;
-				ASSERT(samplesTillEndOfSound % chans == 0)
-				unsigned framesTillEndOfSound =  samplesTillEndOfSound / chans;
-				
+			unsigned samplesTillEndOfSound = ch->wavSound->data.End() - src;
+			ASSERT(samplesTillEndOfSound % chans == 0)
+			unsigned framesTillEndOfSound =  samplesTillEndOfSound / chans;
+			
+			if(outputFreq >= freq){//rely on optimizer to optimize this 'if' out since it evaluates to constant expression upon template instantiation
 				//NOTE: we support only 11025, 22050 and 44100 Hz, so expect ratio of 1, 2 or 4 only
 				ASSERT((outputFreq / freq == 1) || (outputFreq / freq == 2) || (outputFreq / freq == 4))
-				
 				unsigned bufFramesTillEndOfSound = framesTillEndOfSound * (outputFreq / freq);
 
 //				TRACE(<< "framesTillEndOfSound = " << framesTillEndOfSound << std::endl)
