@@ -162,8 +162,8 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 				//if sound end will be reached
 				if(bufFramesTillEndOfSound <= framesTillEndOfBuffer){
 					for(; src != ch->wavSound->data.End();){
-						ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
 						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+						ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
 						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
 					}
 					if(ch->numLoops > 0){
@@ -185,6 +185,7 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
 					}
 					ch->curPos += framesTillEndOfBuffer * chans * freq / outputFreq;
+					ASSERT(ch->curPos < ch->wavSound->data.Size())
 					return false;
 				}
 				
@@ -194,53 +195,7 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 				return false;
 			}
 		}//~for(;;)
-
-		
-		
-		
-		
-		
-		
-		/*
-		
-
-		//TODO:!!!!!!!!!!
-		
-		//if sound end will be reached
-		for(;;){
-			unsigned samplesTillSoundEnd = (ch->wavSound->data.Size() - ch->curPos);
-			if(samplesTillSoundEnd <= (buf.Size() - samplesCopied)){
-				for(unsigned i = 0; i < samplesTillSoundEnd; ++i){
-					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-					*dst = s32(*src);
-					++dst;
-					++src;
-				}
-				ch->curPos = 0;
-
-				samplesCopied += samplesTillSoundEnd;
-
-				//if sound is looped then continue
-				if(ch->looped){
-					continue;
-				}
-
-				//TODO: fill the rest of buffer with zeros (silence)
-				return true;//remove channel from playing pool
-			}else{
-				break;
-			}
-		}
-
-		for(; dst != buf.End();){
-			ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-			*dst = s32(*src);
-			++dst;
-			++src;
-		}
-		ch->curPos += (buf.Size() - samplesCopied);
-		return false;
-		*/
+		ASSERT(false)
 	}
 	//=============class Channel============
 	//  ==================================
