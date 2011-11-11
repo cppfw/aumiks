@@ -4,11 +4,7 @@
 
 
 void Play(const std::string& fileName){
-	ting::Ref<aumiks::WavSound> snd;
-	{
-		ting::FSFile fi(fileName);
-		snd = aumiks::WavSound::LoadWAV(fi);
-	}
+	ting::Ref<aumiks::WavSound> snd = aumiks::WavSound::LoadWAV(fileName);
 
 	ASSERT(snd)
 	

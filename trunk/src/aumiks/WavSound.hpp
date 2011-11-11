@@ -67,6 +67,7 @@ public:
 		return ret;
 	}
 
+	static Ref<WavSound> LoadWAV(const std::string& fileName);
 	static Ref<WavSound> LoadWAV(File& fi);
 };
 
