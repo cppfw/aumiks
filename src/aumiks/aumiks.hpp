@@ -196,6 +196,9 @@ class Channel : public ting::RefCounted{
 	ting::Inited<volatile bool, false> isPlaying;
 	
 protected:
+	ting::Inited<unsigned, 0> numLoops;//0 means loop infinitely
+
+protected:
 	ting::Inited<bool, false> stopFlag;//TODO: should it be volatile?
 
 	ting::Inited<ting::u8, ting::u8(-1)> volume;
@@ -208,7 +211,8 @@ public:
 		return this->isPlaying;
 	}
 
-	inline void Play(){
+	inline void Play(unsigned numLoops = 1){
+		this->numLoops = numLoops;//TODO: should it be under mutex protection?
 		aumiks::Lib::Inst().PlayChannel(ting::Ref<aumiks::Channel>(this));
 	}
 
@@ -219,7 +223,7 @@ public:
 	inline void SetVolume(ting::u8 vol){
 		this->volume = vol;
 	}
-
+	
 protected:
 	/**
 	 * @brief Called when channel has been added to pool of playing channels.
