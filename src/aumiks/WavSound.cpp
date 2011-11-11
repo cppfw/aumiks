@@ -145,7 +145,7 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 
 			ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
 			
-			if(outputFreq >= freq){	
+			if(outputFreq >= freq){//rely on optimizer to optimize this if out since it evaluates to constant expression upon template instantiation
 				unsigned samplesTillEndOfSound = ch->wavSound->data.End() - src;
 				ASSERT(samplesTillEndOfSound % chans == 0)
 				unsigned framesTillEndOfSound =  samplesTillEndOfSound / chans;
