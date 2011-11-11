@@ -22,6 +22,7 @@ THE SOFTWARE. */
 
 
 #include <ting/Buffer.hpp>
+#include <ting/FSFile.hpp>
 
 #include "WavSound.hpp"
 
@@ -95,32 +96,32 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 	private:
 		//override
 		virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::MixToMixBuf<1, 11025>(this, mixBuf);
+			return WavSoundImpl::FillSmpBuf<1, 11025>(this, mixBuf);
 		}
 		
 		//override
 		virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::MixToMixBuf<2, 11025>(this, mixBuf);
+			return WavSoundImpl::FillSmpBuf<2, 11025>(this, mixBuf);
 		}
 		
 		//override
 		virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::MixToMixBuf<1, 22050>(this, mixBuf);
+			return WavSoundImpl::FillSmpBuf<1, 22050>(this, mixBuf);
 		}
 		
 		//override
 		virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::MixToMixBuf<2, 22050>(this, mixBuf);
+			return WavSoundImpl::FillSmpBuf<2, 22050>(this, mixBuf);
 		}
 		
 		//override
 		virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::MixToMixBuf<1, 44100>(this, mixBuf);
+			return WavSoundImpl::FillSmpBuf<1, 44100>(this, mixBuf);
 		}
 		
 		//override
 		virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::MixToMixBuf<2, 44100>(this, mixBuf);
+			return WavSoundImpl::FillSmpBuf<2, 44100>(this, mixBuf);
 		}
 		
 		//TODO: implement methods for other mixing formats
@@ -133,11 +134,8 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 	
 	//NOTE: local classes are not allowed to have template members by C++ standard, this is why this method is
 	//      defined here as static, instead of being a member of Channel class
-	template <unsigned outputChans, unsigned outputFreq> static bool MixToMixBuf(Channel* ch, ting::Buffer<ting::s32>& mixBuf){
-		if(ch->stopFlag)
-			return true;
-
-		ASSERT(mixBuf.Size() % outputChans == 0)
+	template <unsigned outputChans, unsigned outputFreq> static bool FillSmpBuf(Channel* ch, ting::Buffer<ting::s32>& buf){
+		ASSERT(buf.Size() % outputChans == 0)
 
 		ASSERT(ch->wavSound->data.Size() % chans == 0)
 		ASSERT(ch->curPos < ch->wavSound->data.Size())
@@ -145,7 +143,7 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 
 		const TSampleType* src = &ch->wavSound->data[ch->curPos];
 
-		s32* dst = mixBuf.Begin();
+		s32* dst = buf.Begin();
 
 		unsigned samplesCopied = 0;
 
@@ -154,9 +152,9 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 		//if sound end will be reached
 		for(;;){
 			unsigned samplesTillSoundEnd = (ch->wavSound->data.Size() - ch->curPos);
-			if(samplesTillSoundEnd <= (mixBuf.Size() - samplesCopied)){
+			if(samplesTillSoundEnd <= (buf.Size() - samplesCopied)){
 				for(unsigned i = 0; i < samplesTillSoundEnd; ++i){
-					ASSERT(mixBuf.Begin() <= dst && dst <= mixBuf.End() - 1)
+					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
 					*dst = s32(*src);
 					++dst;
 					++src;
@@ -177,13 +175,13 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 			}
 		}
 
-		for(; dst != mixBuf.End();){
-			ASSERT(mixBuf.Begin() <= dst && dst <= mixBuf.End() - 1)
+		for(; dst != buf.End();){
+			ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
 			*dst = s32(*src);
 			++dst;
 			++src;
 		}
-		ch->curPos += (mixBuf.Size() - samplesCopied);
+		ch->curPos += (buf.Size() - samplesCopied);
 		return false;
 	}
 	//=============class Channel============
@@ -224,6 +222,13 @@ public:
 
 
 }//~namespace
+
+
+
+Ref<WavSound> WavSound::LoadWAV(const std::string& fileName){
+	ting::FSFile fi(fileName);
+	return WavSound::LoadWAV(fi);
+}
 
 
 

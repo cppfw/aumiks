@@ -109,6 +109,8 @@ class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
 	//override
 	virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
 		ASSERT(ch.IsValid())
+		if(ch->stopFlag)
+			return true;
 		return ch->FillSmpBuf44100Stereo16(this->smpBuf);
 	}
 	
