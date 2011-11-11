@@ -65,6 +65,7 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2
 };
 
 
+
 template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl : public WavSound{
 	Array<TSampleType> data;
 	
@@ -169,13 +170,19 @@ private:
 					if(ch->numLoops > 0){
 						--ch->numLoops;
 						if(ch->numLoops == 0){
+							//fill the rest of the buffer with zeros
+							for(; dst != buf.End(); ++dst){
+								*dst = 0;
+							}
 							ch->curPos = 0;
 							return true;
 						}else{
+							src = ch->wavSound->data.Begin();
 							continue;
 						}
 					}else{
 						//loop infinitely
+						src = ch->wavSound->data.Begin();
 						continue;
 					}
 				}else{//no end of sound will be reached
@@ -211,10 +218,18 @@ private:
 	WavSoundImpl(const ting::Buffer<ting::u8>& d){
 		ASSERT(d.Size() % (chans * sizeof(TSampleType)) == 0)
 
-		this->data.Init(d.Size() / sizeof(TSampleType));
+		unsigned numSamples = d.Size() / sizeof(TSampleType);
+		unsigned granularity = ((freq / 11025) * chans);//in samples
+		unsigned tail;
+		if(numSamples % granularity > 0){
+			tail = granularity - numSamples % granularity;
+		}
+		
+		this->data.Init(numSamples + tail);
 
 		const ting::u8* src = d.Begin();
-		for(TSampleType* dst = this->data.Begin(); dst != this->data.End(); ++dst){
+		TSampleType* dst = this->data.Begin();
+		for(; src != d.End(); ++dst){
 			TSampleType tmp = 0;
 			for(unsigned i = 0; i != sizeof(TSampleType); ++i){
 				ASSERT(d.Begin() <= src && src < d.End())
@@ -223,6 +238,10 @@ private:
 			}
 			ASSERT(this->data.Begin() <= dst && dst < this->data.End())
 			*dst = tmp;
+		}
+		ASSERT(dst + tail == this->data.End())
+		for(;dst != this->data.End(); ++dst){
+			*dst = 0;
 		}
 	}
 
