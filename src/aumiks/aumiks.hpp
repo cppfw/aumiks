@@ -117,10 +117,10 @@ public:
 	//Base class for mixer buffers of different formats
 	class MixerBuffer{
 	protected:
-		MixerBuffer(unsigned mixBufSize, unsigned playBufSize) :
+		MixerBuffer(unsigned mixBufSize) :
 				mixBuf(mixBufSize),
 				smpBuf(mixBufSize),
-				playBuf(playBufSize)
+				playBuf(mixBufSize * 2) //2 bytes per sample
 		{}
 
 	public:
@@ -189,6 +189,7 @@ private:
 class Channel : public ting::RefCounted{
 	friend class Lib;
 	friend class Lib::SoundThread;
+	friend class Lib::MixerBuffer;
 	friend class aumiks::MixerBuffer44100Mono16;
 	friend class aumiks::MixerBuffer44100Stereo16;
 

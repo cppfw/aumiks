@@ -254,8 +254,6 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 		friend class WavSoundImpl;
 
 		const Ref<const WavSoundImpl> wavSound;
-
-		ting::Inited<unsigned, 0> curPos;//current index in samples into sound data buffer
 	protected:
 
 	private:
