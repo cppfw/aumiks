@@ -58,13 +58,56 @@ namespace aumiks{
 //forward declarations
 class Lib;
 class Channel;
-class MixerBuffer11025Mono16;
-class MixerBuffer11025Stereo16;
-class MixerBuffer22050Mono16;
-class MixerBuffer22050Stereo16;
-class MixerBuffer44100Mono16;
-class MixerBuffer44100Stereo16;
-class PulseAudioBackend;
+
+
+
+//base channel class
+class Channel : public ting::RefCounted{
+	friend class aumiks::Lib;
+
+	ting::Inited<volatile bool, false> isPlaying;
+	
+protected:
+	ting::Inited<unsigned, 0> numLoops;//0 means loop infinitely
+
+protected:
+	ting::Inited<volatile bool, false> stopFlag;
+
+	ting::Inited<ting::u8, ting::u8(-1)> volume;
+	
+	Channel(){}
+	
+public:
+
+	inline bool IsPlaying()const{
+		return this->isPlaying;
+	}
+
+	inline void Play(unsigned numLoops = 1);
+
+	inline void Stop(){
+		this->stopFlag = true;
+	}
+
+	inline void SetVolume(ting::u8 vol){
+		this->volume = vol;
+	}
+	
+protected:
+	/**
+	 * @brief Called when channel has been added to pool of playing channels.
+	 */
+	virtual void OnStart(){}
+private:
+	//this function is called by SoundThread when it needs more data to play.
+	//return true to remove channel from playing channels list
+	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
+};
 
 
 
@@ -81,7 +124,6 @@ enum E_Format{
 
 class Lib : public ting::Singleton<Lib>{
 	friend class aumiks::Channel;
-	friend class aumiks::PulseAudioBackend;
 	
 public:
 	/**
@@ -89,7 +131,7 @@ public:
 	 * Creates singleton instance of sound library object and
 	 * opens sound device.
 	 * @param bufferSizeMillis - size of desired playing buffer in milliseconds.
-	 * @param format - desired format of sound output.
+	 * @param format - format of sound output.
 	 */
 	Lib(ting::u16 bufferSizeMillis = 100, aumiks::E_Format format = STEREO_16_22050);
 	
@@ -127,6 +169,24 @@ public:
 				playBuf(mixBufSize * 2) //2 bytes per sample
 		{}
 
+		inline bool FillSmpBuf11025Mono16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->FillSmpBuf11025Mono16(this->smpBuf);
+		}
+		inline bool FillSmpBuf11025Stereo16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->FillSmpBuf11025Stereo16(this->smpBuf);
+		}
+		inline bool FillSmpBuf22050Mono16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->FillSmpBuf22050Mono16(this->smpBuf);
+		}
+		inline bool FillSmpBuf22050Stereo16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->FillSmpBuf22050Stereo16(this->smpBuf);
+		}
+		inline bool FillSmpBuf44100Mono16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->FillSmpBuf44100Mono16(this->smpBuf);
+		}
+		inline bool FillSmpBuf44100Stereo16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->FillSmpBuf44100Stereo16(this->smpBuf);
+		}
 	public:
 		virtual ~MixerBuffer(){}
 
@@ -189,74 +249,20 @@ private:
 
 
 
-//base channel class
-class Channel : public ting::RefCounted{
-	friend class Lib;
-	friend class Lib::SoundThread;
-	friend class Lib::MixerBuffer;
-	friend class aumiks::MixerBuffer11025Mono16;
-	friend class aumiks::MixerBuffer11025Stereo16;
-	friend class aumiks::MixerBuffer22050Mono16;
-	friend class aumiks::MixerBuffer22050Stereo16;
-	friend class aumiks::MixerBuffer44100Mono16;
-	friend class aumiks::MixerBuffer44100Stereo16;
-
-	ting::Inited<volatile bool, false> isPlaying;
-	
-protected:
-	ting::Inited<unsigned, 0> numLoops;//0 means loop infinitely
-
-protected:
-	ting::Inited<bool, false> stopFlag;//TODO: should it be volatile?
-
-	ting::Inited<ting::u8, ting::u8(-1)> volume;
-	
-	Channel(){}
-	
-public:
-
-	inline bool IsPlaying()const{
-		return this->isPlaying;
-	}
-
-	inline void Play(unsigned numLoops = 1){
-		this->numLoops = numLoops;//TODO: should it be under mutex protection?
-		aumiks::Lib::Inst().PlayChannel(ting::Ref<aumiks::Channel>(this));
-	}
-
-	inline void Stop(){
-		this->stopFlag = true;
-	}
-
-	inline void SetVolume(ting::u8 vol){
-		this->volume = vol;
-	}
-	
-protected:
-	/**
-	 * @brief Called when channel has been added to pool of playing channels.
-	 */
-	virtual void OnStart(){}
-private:
-	//this function is called by SoundThread when it needs more data to play.
-	//return true to remove channel from playing channels list
-	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
-};
-
-
-
 //base class for all sounds
 class Sound : public ting::RefCounted{
 protected:
 	Sound(){}
 public:
-
-
 };
+
+
+
+inline void Channel::Play(unsigned numLoops){
+	this->numLoops = numLoops;//TODO: should it be under mutex protection?
+	aumiks::Lib::Inst().PlayChannel(ting::Ref<aumiks::Channel>(this));
+}
+
+
 
 } //~namespace
