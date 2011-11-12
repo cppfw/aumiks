@@ -58,6 +58,10 @@ namespace aumiks{
 //forward declarations
 class Lib;
 class Channel;
+class MixerBuffer11025Mono16;
+class MixerBuffer11025Stereo16;
+class MixerBuffer22050Mono16;
+class MixerBuffer22050Stereo16;
 class MixerBuffer44100Mono16;
 class MixerBuffer44100Stereo16;
 class PulseAudioBackend;
@@ -190,6 +194,10 @@ class Channel : public ting::RefCounted{
 	friend class Lib;
 	friend class Lib::SoundThread;
 	friend class Lib::MixerBuffer;
+	friend class aumiks::MixerBuffer11025Mono16;
+	friend class aumiks::MixerBuffer11025Stereo16;
+	friend class aumiks::MixerBuffer22050Mono16;
+	friend class aumiks::MixerBuffer22050Stereo16;
 	friend class aumiks::MixerBuffer44100Mono16;
 	friend class aumiks::MixerBuffer44100Stereo16;
 
