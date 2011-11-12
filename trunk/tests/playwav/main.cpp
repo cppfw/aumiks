@@ -20,6 +20,18 @@ void Play(const std::string& fileName){
 
 int main(int argc, char *argv[]){
 	{
+		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
+		aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_11025);
+
+		Play("sample11025mono16.wav");
+		Play("sample11025stereo16.wav");
+		Play("sample22050mono16.wav");
+		Play("sample22050stereo16.wav");
+		Play("sample44100mono16.wav");
+		Play("sample44100stereo16.wav");
+	}
+	
+	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
 		aumiks::Lib aumiksLibrary(100, aumiks::MONO_16_22050);
 

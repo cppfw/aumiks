@@ -45,6 +45,114 @@ template <class TSampleType, unsigned chans, unsigned freq, unsigned outputChans
 
 
 
+//========== Stereo 11025 output
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 11025>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = s32(*src);
+		++dst;
+		++src;
+		*dst = s32(*src);
+		++dst;
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		s32 tmp = ting::s32(*src);
+		++src;
+		tmp += ting::s32(*src);
+		++src;
+		tmp /= 2;
+		
+		*dst = tmp;
+		++dst;
+		*dst = tmp;
+		++dst;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 11025>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		ting::s32 tmp1 = ting::s32(*src);
+		++src;
+		ting::s32 tmp2 = ting::s32(*src);
+		++src;
+		tmp1 += ting::s32(*src);
+		++src;
+		tmp2 += ting::s32(*src);
+		++src;
+		tmp1 /= 2;
+		tmp2 /= 2;
+		
+		*dst = tmp1;
+		++dst;
+		*dst = tmp2;
+		++dst;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 11025>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		s32 tmp = s32(*src);
+		++src;
+		tmp += s32(*src);
+		++src;
+		tmp += s32(*src);
+		++src;
+		tmp += s32(*src);
+		++src;
+		tmp /= 4;
+		
+		*dst = tmp;
+		++dst;
+		*dst = tmp;
+		++dst;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 11025>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		s32 tmp1 = s32(*src);
+		++src;
+		s32 tmp2 = s32(*src);
+		++src;
+		tmp1 += s32(*src);
+		++src;
+		tmp2 += s32(*src);
+		++src;
+		tmp1 += s32(*src);
+		++src;
+		tmp2 += s32(*src);
+		++src;
+		tmp1 += s32(*src);
+		++src;
+		tmp2 += s32(*src);
+		++src;
+		tmp1 /= 4;
+		tmp2 /= 4;
+		
+		*dst = tmp1;
+		++dst;
+		*dst = tmp2;
+		++dst;
+	}
+};
+
+
+
 //========== Mono 22050 output
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 22050>{
@@ -175,7 +283,7 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 22050>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = s32(*src);;
+		*dst = s32(*src);
 		++dst;
 		++src;
 		*dst = s32(*src);
@@ -304,6 +412,8 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1
 		++dst;
 	}
 };
+
+
 
 //========== Stereo 44100 output
 
@@ -441,12 +551,12 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 		virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<1, 11025>(this, mixBuf);
 		}
-		
+*/
 		//override
 		virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<2, 11025>(this, mixBuf);
 		}
-*/		
+
 		//override
 		virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<1, 22050>(this, mixBuf);
@@ -715,7 +825,8 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 //		//convert data to signed format
 //		for(s8* ptr=r->buf.Buf(); ptr<(r->buf.Buf()+r->buf.SizeOfArray()); ++ptr)
 //			*ptr=s8(int(*ptr)-0x80);
-		ASSERT_INFO_ALWAYS(false, "8 bit WAV files are not supported yet")
+		//TODO: support it
+		throw Exc("WavSound::LoadWAV(): unsupported bit depth (8 bit) wav file");
 	}else if(bitDepth == 16){
 		//set the format
 		switch(chans){
