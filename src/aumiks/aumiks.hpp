@@ -91,7 +91,7 @@ public:
 	 * @param bufferSizeMillis - size of desired playing buffer in milliseconds.
 	 * @param format - desired format of sound output.
 	 */
-	Lib(unsigned bufferSizeMillis = 100, aumiks::E_Format format = STEREO_16_22050);
+	Lib(ting::u16 bufferSizeMillis = 100, aumiks::E_Format format = STEREO_16_22050);
 	
 	~Lib();
 
@@ -173,7 +173,7 @@ private:
 
 		ting::Inited<volatile bool, false> isMuted;
 
-		SoundThread(unsigned bufferSizeMillis, E_Format format);
+		SoundThread(ting::u16 bufferSizeMillis, E_Format format);
 
 		//override
 		void Run();

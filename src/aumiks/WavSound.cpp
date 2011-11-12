@@ -421,54 +421,57 @@ private:
 			ASSERT(samplesTillEndOfSound % chans == 0)
 			unsigned framesTillEndOfSound =  samplesTillEndOfSound / chans;
 			
+			unsigned bufFramesTillEndOfSound;
 			if(outputFreq >= freq){//rely on optimizer to optimize this 'if' out since it evaluates to constant expression upon template instantiation
 				//NOTE: we support only 11025, 22050 and 44100 Hz, so expect ratio of 1, 2 or 4 only
 				ASSERT((outputFreq / freq == 1) || (outputFreq / freq == 2) || (outputFreq / freq == 4))
-				unsigned bufFramesTillEndOfSound = framesTillEndOfSound * (outputFreq / freq);
+				bufFramesTillEndOfSound = framesTillEndOfSound * (outputFreq / freq);
+			}else{
+				ASSERT((freq / outputFreq == 1) || (freq / outputFreq == 2) || (freq / outputFreq == 4))
+				ASSERT(framesTillEndOfSound % (freq / outputFreq) == 0)//make sure there is a proper granularity
+				bufFramesTillEndOfSound = framesTillEndOfSound / (freq / outputFreq);
+			}
 
-//				TRACE(<< "framesTillEndOfSound = " << framesTillEndOfSound << std::endl)
-//				TRACE(<< "bufFramesTillEndOfSound = " << bufFramesTillEndOfSound << std::endl)
-//				TRACE(<< "framesTillEndOfBuffer = " << framesTillEndOfBuffer << std::endl)
+//			TRACE(<< "framesTillEndOfSound = " << framesTillEndOfSound << std::endl)
+//			TRACE(<< "bufFramesTillEndOfSound = " << bufFramesTillEndOfSound << std::endl)
+//			TRACE(<< "framesTillEndOfBuffer = " << framesTillEndOfBuffer << std::endl)
 				
-				//if sound end will be reached
-				if(bufFramesTillEndOfSound <= framesTillEndOfBuffer){
-					for(; src != ch->wavSound->data.End();){
-						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-						ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
-						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
-					}
-					if(ch->numLoops > 0){
-						--ch->numLoops;
-						if(ch->numLoops == 0){
-							//fill the rest of the buffer with zeros
-							for(; dst != buf.End(); ++dst){
-								*dst = 0;
-							}
-							ch->curPos = 0;
-							return true;
-						}else{
-							src = ch->wavSound->data.Begin();
-							continue;
+			//if sound end will be reached
+			if(bufFramesTillEndOfSound <= framesTillEndOfBuffer){
+				for(; src != ch->wavSound->data.End();){
+					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+					ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+					FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
+				}
+				if(ch->numLoops > 0){
+					--ch->numLoops;
+					if(ch->numLoops == 0){
+						//fill the rest of the buffer with zeros
+						for(; dst != buf.End(); ++dst){
+							*dst = 0;
 						}
+						ch->curPos = 0;
+						return true;
 					}else{
-						//loop infinitely
 						src = ch->wavSound->data.Begin();
 						continue;
 					}
-				}else{//no end of sound will be reached
-					for(; dst != buf.End();){
-						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-						ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
-						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
-					}
-					ch->curPos += framesTillEndOfBuffer * chans * freq / outputFreq;
-					ASSERT(ch->curPos < ch->wavSound->data.Size())
-					return false;
+				}else{
+					ASSERT(ch->numLoops == 0)
+					//loop infinitely
+					src = ch->wavSound->data.Begin();
+					continue;
+				}
+			}else{//no end of sound will be reached
+				for(; dst != buf.End();){
+					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+					ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+					FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
 				}
 				
-			}else{//freq < outputFreq
-				ASSERT(false)
-				//TODO:
+				ch->curPos += framesTillEndOfBuffer * chans * freq / outputFreq;
+				
+				ASSERT(ch->curPos < ch->wavSound->data.Size())
 				return false;
 			}
 		}//~for(;;)
