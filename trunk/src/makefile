@@ -61,6 +61,7 @@ compiler_flags += -Wnon-virtual-dtor #warn if base class has non-virtual destruc
 compiler_flags += -fno-operator-names #do not treat 'and', 'bitand','bitor','compl','not','or','xor' as keywords
 compiler_flags += -Werror #treat warnings as errors
 compiler_flags += -Wfatal-errors # stop on first error encountered
+compiler_flags += -Wno-div-by-zero #disable integer division by zero warning as it is sometimes useful when working with templates
 compiler_flags += -fstrict-aliasing #strict aliasing (in order to comply with the c++ standard more strictly)
 compiler_flags += -g #include debugging symbols
                 #-P -E #-Wreorder

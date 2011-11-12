@@ -102,7 +102,7 @@ unsigned BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
 
 
 
-Lib::Lib(unsigned bufferSizeMillis, aumiks::E_Format format) :
+Lib::Lib(ting::u16 bufferSizeMillis, aumiks::E_Format format) :
 		thread(bufferSizeMillis, format)
 {
 	this->thread.Start();
@@ -143,7 +143,7 @@ void Lib::PlayChannel(ting::Ref<Channel> ch){
 
 
 
-Lib::SoundThread::SoundThread(unsigned bufferSizeMillis, E_Format format) :
+Lib::SoundThread::SoundThread(ting::u16 bufferSizeMillis, E_Format format) :
 		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format)),
 		mixerBuffer(SoundThread::CreateMixerBuffer(bufferSizeMillis, format))
 {
