@@ -41,20 +41,28 @@ namespace aumiks{
 class PulseAudioBackend : public aumiks::Lib::AudioBackend{
 	pa_simple *handle;
 
-	PulseAudioBackend(unsigned bufferSizeMillis, E_Format format){
+	PulseAudioBackend(unsigned bufferSizeFrames, E_Format format){
 		//TODO: get actual buffer size from pulseaudio
 		
 		TRACE(<< "opening device" << std::endl)
 
 		pa_sample_spec ss;
+		ss.format = PA_SAMPLE_S16NE;//Native endian
+		
 		unsigned bufferSizeInBytes;
 		switch(format){
 			//TODO:
+			case aumiks::MONO_16_44100:
+				TRACE(<< "Requested format: Mono 44100" << std::endl)
+				ss.channels = 1;
+				ss.rate = 44100;
+				bufferSizeInBytes = bufferSizeFrames * 2;//2 bytes per sample, 1 sample per frame
+				break;
 			case aumiks::STEREO_16_44100:
-				ss.format = PA_SAMPLE_S16LE;//TODO: PA_SAMPLE_S16NE ? (native endian)
+				TRACE(<< "Requested format: Stereo 44100" << std::endl)
 				ss.channels = 2;
 				ss.rate = 44100;
-				bufferSizeInBytes = 2 * aumiks::Lib::BufferSizeInSamples(bufferSizeMillis, format);
+				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 samples per frame
 				break;
 			default:
 				throw aumiks::Exc("unknown sound output format requested");
