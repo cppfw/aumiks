@@ -168,9 +168,85 @@ bool Lib::MixerBuffer::MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
 
 namespace aumiks{
 
+class MixerBuffer11025Mono16 : public Lib::MixerBuffer{
+	MixerBuffer11025Mono16(unsigned bufferSizeMillis) :
+			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, MONO_16_11025))
+	{}
+	
+	//override
+	virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return ch->FillSmpBuf11025Mono16(this->smpBuf);
+	}
+	
+public:
+	inline static ting::Ptr<MixerBuffer11025Mono16> New(unsigned bufferSizeMillis){
+		return ting::Ptr<MixerBuffer11025Mono16>(
+				new MixerBuffer11025Mono16(bufferSizeMillis)
+			);
+	}
+};
 
 
-//TODO: add mixerBuffer classes for all formats
+
+class MixerBuffer11025Stereo16 : public Lib::MixerBuffer{
+	MixerBuffer11025Stereo16(unsigned bufferSizeMillis) :
+			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, STEREO_16_11025))
+	{}
+	
+	//override
+	virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return ch->FillSmpBuf11025Stereo16(this->smpBuf);
+	}
+	
+public:
+	inline static ting::Ptr<MixerBuffer11025Stereo16> New(unsigned bufferSizeMillis){
+		return ting::Ptr<MixerBuffer11025Stereo16>(
+				new MixerBuffer11025Stereo16(bufferSizeMillis)
+			);
+	}
+};
+
+
+
+class MixerBuffer22050Mono16 : public Lib::MixerBuffer{
+	MixerBuffer22050Mono16(unsigned bufferSizeMillis) :
+			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, MONO_16_22050))
+	{}
+	
+	//override
+	virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return ch->FillSmpBuf22050Mono16(this->smpBuf);
+	}
+	
+public:
+	inline static ting::Ptr<MixerBuffer22050Mono16> New(unsigned bufferSizeMillis){
+		return ting::Ptr<MixerBuffer22050Mono16>(
+				new MixerBuffer22050Mono16(bufferSizeMillis)
+			);
+	}
+};
+
+
+
+class MixerBuffer22050Stereo16 : public Lib::MixerBuffer{
+	MixerBuffer22050Stereo16(unsigned bufferSizeMillis) :
+			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, STEREO_16_22050))
+	{}
+	
+	//override
+	virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return ch->FillSmpBuf22050Stereo16(this->smpBuf);
+	}
+	
+public:
+	inline static ting::Ptr<MixerBuffer22050Stereo16> New(unsigned bufferSizeMillis){
+		return ting::Ptr<MixerBuffer22050Stereo16>(
+				new MixerBuffer22050Stereo16(bufferSizeMillis)
+			);
+	}
+};
+
+
 
 class MixerBuffer44100Mono16 : public Lib::MixerBuffer{
 	MixerBuffer44100Mono16(unsigned bufferSizeMillis) :
@@ -179,7 +255,6 @@ class MixerBuffer44100Mono16 : public Lib::MixerBuffer{
 	
 	//override
 	virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
-		ASSERT(ch.IsValid())
 		return ch->FillSmpBuf44100Mono16(this->smpBuf);
 	}
 	
@@ -200,7 +275,6 @@ class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
 	
 	//override
 	virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
-		ASSERT(ch.IsValid())
 		return ch->FillSmpBuf44100Stereo16(this->smpBuf);
 	}
 	
@@ -219,6 +293,14 @@ public:
 //static
 ting::Ptr<Lib::MixerBuffer> Lib::SoundThread::CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format){
 	switch(format){
+		case aumiks::MONO_16_11025:
+			return MixerBuffer11025Mono16::New(bufferSizeMillis);
+		case aumiks::STEREO_16_11025:
+			return MixerBuffer11025Stereo16::New(bufferSizeMillis);
+		case aumiks::MONO_16_22050:
+			return MixerBuffer22050Mono16::New(bufferSizeMillis);
+		case aumiks::STEREO_16_22050:
+			return MixerBuffer22050Stereo16::New(bufferSizeMillis);
 		case aumiks::MONO_16_44100:
 			return MixerBuffer44100Mono16::New(bufferSizeMillis);
 		case aumiks::STEREO_16_44100:
