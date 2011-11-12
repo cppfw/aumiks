@@ -49,7 +49,8 @@ protected:
 	
 public:
 	class Channel : public aumiks::Channel{
-
+	protected:
+		ting::Inited<unsigned, 0> curPos;//current index in samples into sound data buffer
 	};
 
 public:
