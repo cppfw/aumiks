@@ -43,12 +43,99 @@ template <class TSampleType, unsigned chans, unsigned freq, unsigned outputChans
 	static inline void Put(const TSampleType*& src, ting::s32*& dst);
 };
 
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		TSampleType tmp = s32(*src);
+		++src;
+		
+		*dst = tmp;
+		++dst;
+		*dst = s32(*src);
+		++dst;
+		
+		*dst = tmp;
+		++dst;
+		*dst = s32(*src);
+		++dst;
+		
+		*dst = tmp;
+		++dst;
+		*dst = s32(*src);
+		++dst;
+
+		*dst = tmp;
+		++dst;
+		*dst = s32(*src);
+		++dst;
+
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		TSampleType tmp = s32(*src);
+		++src;
+		
+		*dst = tmp;
+		++dst;
+		*dst = s32(*src);
+		++dst;
+		
+		*dst = tmp;
+		++dst;
+		*dst = s32(*src);
+		++dst;
+		
+		++src;
+	}
+};
+
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
 		*dst = s32(*src);
 		++dst;
 		*dst = s32(*src);
 		++dst;
+		
 		++src;
 	}
 };
@@ -367,21 +454,40 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 		ASSERT_INFO_ALWAYS(false, "8 bit WAV files are not supported yet")
 	}else if(bitDepth == 16){
 		//set the format
-		if(chans == 1){//mono
-			if(frequency == 44100){
-				ret = WavSoundImpl<ting::s16, 1, 44100>::New(data);
-			}else{
-				ASSERT_INFO_ALWAYS(false, "unsupported WAV file frequency: " << frequency)
-			}
-		}else if(chans == 2){//stereo
-			if(frequency == 44100){
-				ret = WavSoundImpl<ting::s16, 2, 44100>::New(data);
-			}else{
-				ASSERT_INFO_ALWAYS(false, "unsupported WAV file frequency")
-			}
-		}else{
-			throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");
-		}
+		switch(chans){
+			case 1://mono
+				switch(frequency){
+					case 11025:
+						ret = WavSoundImpl<ting::s16, 1, 11025>::New(data);
+						break;
+					case 22050:
+						ret = WavSoundImpl<ting::s16, 1, 22050>::New(data);
+						break;
+					case 44100:
+						ret = WavSoundImpl<ting::s16, 1, 44100>::New(data);
+						break;
+					default:
+						throw Exc("WavSound::LoadWAV(): unsupported sampling rate");
+				}
+				break;
+			case 2://stereo
+				switch(frequency){
+					case 11025:
+						ret = WavSoundImpl<ting::s16, 2, 11025>::New(data);
+						break;
+					case 22050:
+						ret = WavSoundImpl<ting::s16, 2, 22050>::New(data);
+						break;
+					case 44100:
+						ret = WavSoundImpl<ting::s16, 2, 44100>::New(data);
+						break;
+					default:
+						throw Exc("WavSound::LoadWAV(): unsupported sampling rate");
+				}
+				break;
+			default:
+				throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");
+		}//~switch(chans)
 	}else{
 		throw Exc("WavSound::LoadWAV(): unsupported bit depth");
 	}
