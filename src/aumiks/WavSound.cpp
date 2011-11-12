@@ -43,6 +43,97 @@ template <class TSampleType, unsigned chans, unsigned freq, unsigned outputChans
 	static inline void Put(const TSampleType*& src, ting::s32*& dst);
 };
 
+
+
+//========== Mono 44100 output
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		TSampleType tmp = s32(*src);
+		++src;
+		tmp =+ s32(*src);
+		//NOTE: no need to divide by two, mono should be louder, since only one speaker
+//		tmp /= 2;
+		++src;
+		
+		*dst = tmp;
+		++dst;
+		*dst = tmp;
+		++dst;
+		*dst = tmp;
+		++dst;
+		*dst = tmp;
+		++dst;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		TSampleType tmp = s32(*src);
+		++src;
+		tmp =+ s32(*src);
+		//NOTE: no need to divide by two, mono should be louder, since only one speaker
+//		tmp /= 2;
+		++src;
+		
+		*dst = tmp;
+		++dst;
+		*dst = tmp;
+		++dst;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = s32(*src);
+		++dst;
+		
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 44100>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		TSampleType tmp = s32(*src);
+		++src;
+		tmp =+ s32(*src);
+		//NOTE: no need to divide by two, mono should be louder, since only one speaker
+//		tmp /= 2;
+		++src;
+		
+		*dst = tmp;
+		++dst;
+	}
+};
+
+//========== Stereo 44100 output
+
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
 		*dst = ting::s32(*src);
@@ -194,12 +285,11 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 		virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<2, 22050>(this, mixBuf);
 		}
-		
+*/
 		//override
 		virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<1, 44100>(this, mixBuf);
 		}
- */
 		
 		//override
 		virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){

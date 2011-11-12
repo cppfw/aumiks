@@ -37,6 +37,72 @@ THE SOFTWARE. */
 
 using namespace aumiks;
 
+
+
+namespace{
+
+unsigned BufferSizeInFrames(unsigned bufferSizeMillis, E_Format format){
+	unsigned framesPerSecond;
+	
+	//NOTE: for simplicity of conversion from lower sample rates to higher ones,
+	//      the size of output buffer should be that it would hold no fractional
+	//      parts of source samples when they are mixed to it.
+	unsigned granularity;
+	
+	switch(format){
+		case MONO_16_11025:
+		case STEREO_16_11025:
+			framesPerSecond = 11025;
+			granularity = 1;
+			break;
+		case MONO_16_22050:
+		case STEREO_16_22050:
+			framesPerSecond = 22050;
+			granularity = 2;
+			break;
+		case MONO_16_44100:
+		case STEREO_16_44100:
+			framesPerSecond = 44100;
+			granularity = 4;
+			break;
+		default:
+			throw aumiks::Exc("unknown sound format");
+	}
+	
+	unsigned ret = framesPerSecond * bufferSizeMillis / 1000;
+	return ret + (granularity - ret % granularity);
+}
+
+
+
+unsigned BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
+	unsigned framesPerSecond = BufferSizeInFrames(bufferSizeMillis, format);
+	
+	unsigned ret;
+	
+	switch(format){
+		
+		case MONO_16_11025:
+		case MONO_16_22050:
+		case MONO_16_44100:
+			ret = framesPerSecond;
+			break;
+		case STEREO_16_11025:
+		case STEREO_16_22050:
+		case STEREO_16_44100:
+			ret = 2 * framesPerSecond;
+			break;
+		default:
+			throw aumiks::Exc("unknown sound format");
+	}
+	
+	return ret;
+}
+
+}//~namespace
+
+
+
 Lib::Lib(unsigned bufferSizeMillis, aumiks::E_Format format) :
 		thread(bufferSizeMillis, format)
 {
@@ -79,7 +145,7 @@ void Lib::PlayChannel(ting::Ref<Channel> ch){
 
 
 Lib::SoundThread::SoundThread(unsigned bufferSizeMillis, E_Format format) :
-		audioBackend(PulseAudioBackend::New(bufferSizeMillis, format)),
+		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format)),
 		mixerBuffer(SoundThread::CreateMixerBuffer(bufferSizeMillis, format))
 {
 //	TRACE(<< "SoundThread(): invoked" << std::endl)
@@ -101,8 +167,8 @@ namespace aumiks{
 class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
 	MixerBuffer44100Stereo16(unsigned bufferSizeMillis) :
 			MixerBuffer(
-					aumiks::Lib::BufferSizeInSamples(bufferSizeMillis, STEREO_16_44100), //size in s32
-					aumiks::Lib::BufferSizeInSamples(bufferSizeMillis, STEREO_16_44100) * 2 //size in bytes
+					BufferSizeInSamples(bufferSizeMillis, STEREO_16_44100), //size in s32
+					BufferSizeInSamples(bufferSizeMillis, STEREO_16_44100) * 2 //size in bytes
 				)
 	{}
 	
@@ -112,25 +178,6 @@ class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
 		if(ch->stopFlag)
 			return true;
 		return ch->FillSmpBuf44100Stereo16(this->smpBuf);
-	}
-	
-	//override
-	virtual void CopyFromMixBufToPlayBuf(){
-		ASSERT((this->mixBuf.Size() * 2) == this->playBuf.Size())
-
-		const ting::s32 *src = this->mixBuf.Begin();
-		ting::u8* dst = this->playBuf.Begin();
-		for(; src != this->mixBuf.End(); ++src, ++dst){
-			ting::s32 tmp = *src;
-			ting::ClampTop(tmp, 0x7fff);
-			ting::ClampBottom(tmp, -0x7fff);
-
-			ASSERT(dst < this->playBuf.End())
-			*dst = ting::u8(tmp);
-			++dst;
-			ASSERT(dst < this->playBuf.End())
-			*dst = ting::u8(tmp >> 8);
-		}
 	}
 	
 public:
@@ -143,6 +190,30 @@ public:
 
 
 
+class MixerBuffer44100Mono16 : public Lib::MixerBuffer{
+	MixerBuffer44100Mono16(unsigned bufferSizeMillis) :
+			MixerBuffer(
+					BufferSizeInSamples(bufferSizeMillis, STEREO_16_44100), //size in s32
+					BufferSizeInSamples(bufferSizeMillis, STEREO_16_44100) * 2 //size in bytes
+				)
+	{}
+	
+	//override
+	virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		ASSERT(ch.IsValid())
+		if(ch->stopFlag)
+			return true;
+		return ch->FillSmpBuf44100Mono16(this->smpBuf);
+	}
+	
+public:
+	inline static ting::Ptr<MixerBuffer44100Mono16> New(unsigned bufferSizeMillis){
+		return ting::Ptr<MixerBuffer44100Mono16>(
+				new MixerBuffer44100Mono16(bufferSizeMillis)
+			);
+	}
+};
+
 //TODO: add mixerBuffer classes for all formats
 }
 
@@ -151,8 +222,8 @@ public:
 //static
 ting::Ptr<Lib::MixerBuffer> Lib::SoundThread::CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format){
 	switch(format){
-		//TODO:
-		
+		case aumiks::MONO_16_44100:
+			return MixerBuffer44100Mono16::New(bufferSizeMillis);
 		case aumiks::STEREO_16_44100:
 			return MixerBuffer44100Stereo16::New(bufferSizeMillis);
 		default:
@@ -220,49 +291,6 @@ void Lib::SoundThread::Run(){
 
 
 
-unsigned Lib::BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
-	unsigned samplesPerSecond;
-	
-	//NOTE: for simplicity of conversion from lower sample rates to higher ones,
-	//      the size of output buffer should be that it would hold no fractional
-	//      parts of source samples when they are mixed to it.
-	unsigned granularity;
-	
-	switch(format){
-		case MONO_16_11025:
-			samplesPerSecond = 11025;
-			granularity = 1;
-			break;
-		case STEREO_16_11025:
-			samplesPerSecond = 2 * 11025;
-			granularity = 1;
-			break;
-		case MONO_16_22050:
-			samplesPerSecond = 22050;
-			granularity = 2;
-			break;
-		case STEREO_16_22050:
-			samplesPerSecond = 2 * 22050;
-			granularity = 4;
-			break;
-		case MONO_16_44100:
-			samplesPerSecond = 44100;
-			granularity = 4;
-			break;
-		case STEREO_16_44100:
-			samplesPerSecond = 2 * 44100;
-			granularity = 8;
-			break;
-		default:
-			throw aumiks::Exc("unknown sound format");
-	}
-	
-	unsigned ret = samplesPerSecond * bufferSizeMillis / 1000;
-	return ret + (granularity - ret % granularity);
-}
-
-
-
 void aumiks::Lib::MixerBuffer::MixSmpBufToMixBuf(){
 	ASSERT(this->smpBuf.Size() == this->mixBuf.Size())
 	
@@ -275,3 +303,24 @@ void aumiks::Lib::MixerBuffer::MixSmpBufToMixBuf(){
 }
 
 
+
+void aumiks::Lib::MixerBuffer::CopyFromMixBufToPlayBuf(){
+	//playBuf size is in bytes and we have 2 bytes per sample always.
+	ASSERT((this->mixBuf.Size() * 2) == this->playBuf.Size())
+
+	const ting::s32 *src = this->mixBuf.Begin();
+	ting::u8* dst = this->playBuf.Begin();
+	for(; src != this->mixBuf.End(); ++src){
+		ting::s32 tmp = *src;
+		ting::ClampTop(tmp, 0x7fff);
+		ting::ClampBottom(tmp, -0x7fff);
+
+		ASSERT(this->playBuf.Begin() <= dst && dst <= this->playBuf.End() - 1)
+		*dst = ting::u8(tmp);
+		++dst;
+		ASSERT(this->playBuf.Begin() <= dst && dst <= this->playBuf.End() - 1)
+		*dst = ting::u8(tmp >> 8);
+		++dst;
+	}
+	ASSERT(dst == this->playBuf.End())
+}

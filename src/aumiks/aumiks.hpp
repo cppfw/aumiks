@@ -58,6 +58,7 @@ namespace aumiks{
 //forward declarations
 class Lib;
 class Channel;
+class MixerBuffer44100Mono16;
 class MixerBuffer44100Stereo16;
 class PulseAudioBackend;
 
@@ -76,7 +77,6 @@ enum E_Format{
 
 class Lib : public ting::Singleton<Lib>{
 	friend class aumiks::Channel;
-	friend class aumiks::MixerBuffer44100Stereo16;
 	friend class aumiks::PulseAudioBackend;
 	
 public:
@@ -137,7 +137,7 @@ public:
 		//return true if channel has finished playing and should be removed from playing channels pool
 		bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch);
 
-		virtual void CopyFromMixBufToPlayBuf() = 0;
+		void CopyFromMixBufToPlayBuf();
 		
 	private:
 		virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
@@ -181,8 +181,6 @@ private:
 	};
 
 	SoundThread thread;
-	
-	static unsigned BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format);
 };
 
 
@@ -191,6 +189,7 @@ private:
 class Channel : public ting::RefCounted{
 	friend class Lib;
 	friend class Lib::SoundThread;
+	friend class aumiks::MixerBuffer44100Mono16;
 	friend class aumiks::MixerBuffer44100Stereo16;
 
 	ting::Inited<volatile bool, false> isPlaying;
