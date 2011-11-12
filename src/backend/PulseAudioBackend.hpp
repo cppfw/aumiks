@@ -51,12 +51,29 @@ class PulseAudioBackend : public aumiks::Lib::AudioBackend{
 		
 		unsigned bufferSizeInBytes;
 		switch(format){
-			//TODO:
+			case aumiks::MONO_16_11025:
+				TRACE(<< "Requested format: Mono 11025" << std::endl)
+				ss.channels = 1;
+				ss.rate = 11025;
+				bufferSizeInBytes = bufferSizeFrames * 2;//2 bytes per sample, 1 sample per frame
+				break;
+			case aumiks::STEREO_16_11025:
+				TRACE(<< "Requested format: Stereo 11025" << std::endl)
+				ss.channels = 2;
+				ss.rate = 11025;
+				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 samples per frame
+				break;
+			case aumiks::MONO_16_22050:
+				TRACE(<< "Requested format: Mono 22050" << std::endl)
+				ss.channels = 1;
+				ss.rate = 22050;
+				bufferSizeInBytes = bufferSizeFrames * 2;//2 bytes per sample, 1 sample per frame
+				break;
 			case aumiks::STEREO_16_22050:
 				TRACE(<< "Requested format: Stereo 22050" << std::endl)
 				ss.channels = 2;
 				ss.rate = 22050;
-				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 sample per frame
+				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 samples per frame
 				break;
 			case aumiks::MONO_16_44100:
 				TRACE(<< "Requested format: Mono 44100" << std::endl)
