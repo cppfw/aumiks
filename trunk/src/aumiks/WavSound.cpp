@@ -51,7 +51,6 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
 		*dst = ting::s32(*src);
 		++dst;
-		
 		++src;
 	}
 };
@@ -244,37 +243,19 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 22050>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		tmp += s32(*src);
-		++src;
-		tmp /= 2;
-		
-		*dst = tmp;
-		++dst;
-		*dst = tmp;
-		++dst;
+		FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>::Put(src, dst);
 	}
 };
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1, 22050>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = ting::s32(*src);
-		++dst;
-		++src;
+		FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 11025>::Put(src, dst);
 	}
 };
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 22050>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		tmp += s32(*src);
-		++src;
-		tmp /= 2;
-		
-		*dst = tmp;
-		++dst;
+		FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>::Put(src, dst);
 	}
 };
 
@@ -336,47 +317,19 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 22050>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = s32(*src);
-		++dst;
-		++src;
-		*dst = s32(*src);
-		++dst;
-		++src;
+		FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 11025>::Put(src, dst);
 	}
 };
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 22050>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		tmp += s32(*src);
-		tmp /= 2;
-		++src;
-		
-		*dst = tmp;
-		++dst;
-		*dst = tmp;
-		++dst;
+		FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>::Put(src, dst);
 	}
 };
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 22050>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp1 = s32(*src);
-		++src;
-		s32 tmp2 = s32(*src);
-		++src;
-		tmp1 += s32(*src);
-		tmp1 /= 2;
-		++src;
-		tmp2 += s32(*src);
-		tmp2 /= 2;
-		++src;
-		
-		*dst = tmp1;
-		++dst;
-		*dst = tmp2;
-		++dst;
+		FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 11025>::Put(src, dst);
 	}
 };
 
@@ -386,16 +339,7 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		
-		++src;
+		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 22050>::Put(src, dst);
 	}
 };
 
@@ -426,38 +370,19 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		tmp += s32(*src);
-		tmp /= 2;
-		++src;
-		
-		*dst = tmp;
-		++dst;
-		*dst = tmp;
-		++dst;
+		FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>::Put(src, dst);
 	}
 };
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = s32(*src);
-		++dst;
-		
-		++src;
+		FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 11025>::Put(src, dst);
 	}
 };
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		tmp += s32(*src);
-		tmp /= 2;
-		++src;
-		
-		*dst = tmp;
-		++dst;
+		FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>::Put(src, dst);
 	}
 };
 
@@ -519,35 +444,13 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		
-		++src;
+		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 22050>::Put(src, dst);
 	}
 };
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		
-		*dst = tmp;
-		++dst;
-		*dst = s32(*src);
-		++dst;
-		
-		*dst = tmp;
-		++dst;
-		*dst = s32(*src);
-		++dst;
-		
-		++src;
+		FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 22050>::Put(src, dst);
 	}
 };
 
@@ -559,12 +462,7 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = s32(*src);
-		++dst;
-		++src;
-		*dst = s32(*src);
-		++dst;
-		++src;
+		FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 11025>::Put(src, dst);
 	}
 };
 
