@@ -45,6 +45,87 @@ template <class TSampleType, unsigned chans, unsigned freq, unsigned outputChans
 
 
 
+//========== Mono 22050 output
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 22050>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = ting::s32(*src);
+		++dst;
+		*dst = ting::s32(*src);
+		++dst;
+		
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 22050>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		s32 tmp = s32(*src);
+		++src;
+		tmp += s32(*src);
+		tmp /= 2;
+		++src;
+		
+		*dst = tmp;
+		++dst;
+		*dst = tmp;
+		++dst;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1, 22050>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		*dst = ting::s32(*src);
+		++dst;
+		++src;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 22050>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		s32 tmp = s32(*src);
+		++src;
+		tmp += s32(*src);
+		tmp /= 2;
+		++src;
+		
+		*dst = tmp;
+		++dst;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1, 22050>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		s32 tmp = s32(*src);
+		++src;
+		tmp += s32(*src);
+		tmp /= 2;
+		++src;
+		
+		*dst = tmp;
+		++dst;
+	}
+};
+
+template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 22050>{
+	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+		s32 tmp = s32(*src);
+		++src;
+		tmp += s32(*src);
+		++src;
+		tmp += s32(*src);
+		++src;
+		tmp += s32(*src);
+		++src;
+		tmp /= 4;
+		
+		*dst = tmp;
+		++dst;
+	}
+};
+
+
+
 //========== Stereo 22050 output
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 22050>{
@@ -64,7 +145,7 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 22050>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		TSampleType tmp = s32(*src);
+		s32 tmp = s32(*src);
 		++src;
 		
 		*dst = tmp;
@@ -159,11 +240,10 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		TSampleType tmp = s32(*src);
+		s32 tmp = s32(*src);
 		++src;
-		tmp =+ s32(*src);
-		//NOTE: no need to divide by two, mono should be louder, since only one speaker
-//		tmp /= 2;
+		tmp += s32(*src);
+		tmp /= 2;
 		++src;
 		
 		*dst = tmp;
@@ -190,11 +270,10 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		TSampleType tmp = s32(*src);
+		s32 tmp = s32(*src);
 		++src;
-		tmp =+ s32(*src);
-		//NOTE: no need to divide by two, mono should be louder, since only one speaker
-//		tmp /= 2;
+		tmp += s32(*src);
+		tmp /= 2;
 		++src;
 		
 		*dst = tmp;
@@ -215,11 +294,10 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		TSampleType tmp = s32(*src);
+		s32 tmp = s32(*src);
 		++src;
-		tmp =+ s32(*src);
-		//NOTE: no need to divide by two, mono should be louder, since only one speaker
-//		tmp /= 2;
+		tmp += s32(*src);
+		tmp /= 2;
 		++src;
 		
 		*dst = tmp;
@@ -254,7 +332,7 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		TSampleType tmp = s32(*src);
+		s32 tmp = s32(*src);
 		++src;
 		
 		*dst = tmp;
@@ -298,7 +376,7 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2
 
 template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 44100>{
 	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		TSampleType tmp = s32(*src);
+		s32 tmp = s32(*src);
 		++src;
 		
 		*dst = tmp;
@@ -368,12 +446,12 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 		virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<2, 11025>(this, mixBuf);
 		}
-		
+*/		
 		//override
 		virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<1, 22050>(this, mixBuf);
 		}
-*/
+
 		//override
 		virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){
 			return WavSoundImpl::FillSmpBuf<2, 22050>(this, mixBuf);
