@@ -124,11 +124,6 @@ Lib::~Lib(){
 void Lib::PlayChannel(ting::Ref<Channel> ch){
 	ASSERT(ch.IsValid())
 
-	//TODO: remove from here and add to mixing procedure
-	if(this->thread.isMuted){
-		return;
-	}
-
 	{
 		ting::Mutex::Guard mut(this->thread.chPoolMutex);
 		if(ch->IsPlaying())
@@ -157,6 +152,10 @@ bool Lib::MixerBuffer::MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
 		return true;
 
 	bool ret = this->FillSmpBuf(ch);
+	
+	if(this->isMuted){
+		return ret;
+	}
 	
 	//TODO: call channel processing
 	
@@ -348,6 +347,7 @@ void Lib::SoundThread::Run(){
 		for(TChIter i = this->chPool.begin(); i != this->chPool.end();){
 			if(this->mixerBuffer->MixToMixBuf(*i)){
 				(*i)->isPlaying = false;//clear playing flag
+				(*i)->OnStop();//notify channel that it has stopped playing
 				i = this->chPool.erase(i);
 			}else{
 				++i;

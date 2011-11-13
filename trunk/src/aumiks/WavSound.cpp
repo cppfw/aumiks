@@ -578,6 +578,7 @@ private:
 							*dst = 0;
 						}
 						ch->curPos = 0;
+						ch->numLoops = 1;//leave numLoops in default state
 						return true;
 					}else{
 						src = ch->wavSound->data.Begin();
