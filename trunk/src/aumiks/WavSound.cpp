@@ -610,7 +610,7 @@ private:
 	//    ==============================
 	
 	//override
-	virtual Ref<WavSound::Channel> CreateChannel()const{
+	virtual Ref<WavSound::Channel> CreateWavChannel()const{
 		return Channel::New(Ref<const WavSoundImpl>(this));
 	}
 	
