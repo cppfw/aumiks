@@ -259,6 +259,7 @@ class Sound : public ting::RefCounted{
 protected:
 	Sound(){}
 public:
+	virtual ting::Ref<aumiks::Channel> CreateChannel()const = 0;
 };
 
 

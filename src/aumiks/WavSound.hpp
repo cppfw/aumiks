@@ -66,10 +66,10 @@ public:
 	};
 
 public:
-	virtual Ref<WavSound::Channel> CreateChannel()const = 0;
+	virtual Ref<WavSound::Channel> CreateWavChannel()const = 0;
 
 	inline Ref<WavSound::Channel> Play(u8 volume = u8(-1), unsigned numLoops = 1)const{
-		Ref<WavSound::Channel> ret = this->CreateChannel();
+		Ref<WavSound::Channel> ret = this->CreateWavChannel();
 		ret->SetVolume(volume);
 		ret->Play(numLoops);
 		return ret;
@@ -77,6 +77,12 @@ public:
 
 	static Ref<WavSound> LoadWAV(const std::string& fileName);
 	static Ref<WavSound> LoadWAV(File& fi);
+	
+	
+	//override
+	virtual Ref<aumiks::Channel> CreateChannel()const{
+		return this->CreateWavChannel();
+	}
 };
 
 
