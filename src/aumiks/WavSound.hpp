@@ -50,16 +50,28 @@ protected:
 public:
 	class Channel : public aumiks::Channel{
 	protected:
+		ting::Inited<unsigned, 1> numLoops;//0 means loop infinitely
+		
 		ting::Inited<unsigned, 0> curPos;//current index in samples into sound data buffer
+		
+	public:
+		/**
+		 * @brief play channel
+         * @param numLoops - number of time the sound should be repeated. 0 means repeat infinitely.
+         */
+		inline void Play(unsigned numLoops = 1){
+			this->numLoops = numLoops;
+			this->aumiks::Channel::Play();
+		}
 	};
 
 public:
 	virtual Ref<WavSound::Channel> CreateChannel()const = 0;
 
-	inline Ref<WavSound::Channel> Play(u8 volume = u8(-1))const{
+	inline Ref<WavSound::Channel> Play(u8 volume = u8(-1), unsigned numLoops = 1)const{
 		Ref<WavSound::Channel> ret = this->CreateChannel();
 		ret->SetVolume(volume);
-		ret->Play();
+		ret->Play(numLoops);
 		return ret;
 	}
 
