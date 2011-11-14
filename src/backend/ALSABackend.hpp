@@ -41,7 +41,7 @@ THE SOFTWARE. */
 
 #include "../Exc.hpp"
 
-namespace aumiks{
+namespace{
 
 class ALSABackend : public AudioBackend{
 	snd_pcm_t *handle;

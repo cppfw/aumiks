@@ -40,7 +40,7 @@ THE SOFTWARE. */
 
 #include "AudioBackend.hpp"
 
-namespace aumiks{
+namespace{
 
 class ESoundBackend : public AudioBackend{
 	int handle;
