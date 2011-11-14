@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009-2011 Ivan Gagis
+Copyright (c) 2011 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,15 @@ THE SOFTWARE. */
 
 #pragma once
 
+//TODO: remove this line
+#define WIN32
 
+#ifndef WIN32
+#error "compiling in non-Win32 environment"
+#endif
 
-#include <pulse/simple.h>
-#include <pulse/error.h>
+#include <dsound.h>
+#include <cstring>
 
 #include "../aumiks/aumiks.hpp"
 #include "../aumiks/Exc.hpp"
@@ -38,10 +43,37 @@ THE SOFTWARE. */
 
 namespace{
 
-class PulseAudioBackend : public aumiks::Lib::AudioBackend{
-	pa_simple *handle;
+class DirectSoundBackend : public aumiks::Lib::AudioBackend{
+	struct DirectSound{
+		LPDIRECTSOUND8 ds;//LP prefix means long pointer
+		
+		DirectSound(){
+			if(DirectSoundCreate8(NULL, &this->ds, NULL) != DS_OK){
+				throw aumiks::Exc("DirectSound object creation failed");
+			}
+			
+			//TODO: create separate window?
+			HWND hwnd = GetForegroundWindow();
+			if(hwnd == NULL){
+				IDirectSound_Release(this->ds);
+				throw aumiks::Exc("DirectSound: no foreground window found");
+			}
+			
+			if(this->ds->SetCooperativeLevel(hwnd, DSSCL_PRIORITY) != DS_OK){
+				IDirectSound_Release(this->ds);
+				throw aumiks::Exc("DirectSound: setting cooperative level failed");
+			}
+		}
+		~DirectSound(){
+			IDirectSound_Release(this->ds);
+		}
+	} ds;
 
-	PulseAudioBackend(unsigned bufferSizeFrames, aumiks::E_Format format){
+	
+	
+	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format){
+		//TODO: rewrite for DirectSound
+		
 		//TODO: get actual buffer size from pulseaudio
 		
 		TRACE(<< "opening device" << std::endl)
@@ -140,14 +172,14 @@ class PulseAudioBackend : public aumiks::Lib::AudioBackend{
 
 public:
 
-	~PulseAudioBackend(){
+	~DirectSoundBackend(){
 		ASSERT(this->handle)
 		pa_simple_free(this->handle);
 	}
 	
-	inline static ting::Ptr<PulseAudioBackend> New(unsigned bufferSizeMillis, aumiks::E_Format format){
-		return ting::Ptr<PulseAudioBackend>(
-				new PulseAudioBackend(bufferSizeMillis, format)
+	inline static ting::Ptr<DirectSoundBackend> New(unsigned bufferSizeMillis, aumiks::E_Format format){
+		return ting::Ptr<DirectSoundBackend>(
+				new DirectSoundBackend(bufferSizeMillis, format)
 			);
 	}
 };
