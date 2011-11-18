@@ -128,6 +128,9 @@ void Lib::PlayChannel(ting::Ref<Channel> ch){
 		ting::Mutex::Guard mut(this->thread.chPoolMutex);
 		if(ch->IsPlaying())
 			return;//already playing
+		
+		//TODO: init effects added to the channel
+		
 		this->thread.chPoolToAdd.push_back(ch);//queue channel to be added to playing pool
 		ch->isPlaying = true;//mark channel as playing
 	}
@@ -148,16 +151,17 @@ Lib::SoundThread::SoundThread(ting::u16 bufferSizeMillis, E_Format format) :
 
 
 bool Lib::MixerBuffer::MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
-	if(ch->stopFlag)
+	if(ch->stopFlag){
 		return true;
+	}
 
 	bool ret = this->FillSmpBuf(ch);
+
+	//TODO: call channel effects
 	
 	if(this->isMuted){
 		return ret;
 	}
-	
-	//TODO: call channel processing
 	
 	this->MixSmpBufToMixBuf();
 	return ret;
