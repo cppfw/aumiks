@@ -1,5 +1,6 @@
 subdirs :=
 subdirs += playwav
+subdirs += playparallel
 
 
 
