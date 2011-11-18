@@ -61,12 +61,32 @@ class Channel;
 
 
 
+class Effect : public ting::RefCounted{
+public:
+	//TODO:
+	
+	/**
+	 * @brief called every time when the Channel is about to start playing.
+	 * Called from separate thread.
+     */
+	virtual void Init_ts(){}
+	
+	virtual bool ApplyToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool ApplyToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool ApplyToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool ApplyToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool ApplyToSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+};
+
+
 //base channel class
 class Channel : public ting::RefCounted{
 	friend class aumiks::Lib;
 
 	ting::Inited<volatile bool, false> isPlaying;
 
+	//TODO: keep list of effects
 protected:
 	ting::Inited<volatile bool, false> stopFlag;
 
@@ -103,12 +123,12 @@ protected:
 private:
 	//this function is called by SoundThread when it needs more data to play.
 	//return true to remove channel from playing channels list
-	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){return true;}
-	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){return true;}
+	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){return true;}
 };
 
 
