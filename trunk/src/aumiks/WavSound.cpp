@@ -598,16 +598,18 @@ private:
 					//this was the last repeat of playing
 					
 					if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
-						for(; tailIter != tail.End(); ++tailIter){
-							ASSERT(tail.Size() > 0)
-							ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
-							*tailIter = 0;//fill the rest of sound tail with silence
-						}
+						if(tailIter != tail.Begin()){//if we have copied something to the tail buffer
+							for(; tailIter != tail.End(); ++tailIter){
+								ASSERT(tail.Size() > 0)
+								ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
+								*tailIter = 0;//fill the rest of sound tail with silence
+							}
 
-						const TSampleType *s = tail.Begin();
-						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
-						ASSERT((buf.Begin() <= dst && dst <= buf.End() - 1) || dst == buf.End())
+							const TSampleType *s = tail.Begin();
+							ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+							FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
+							ASSERT((buf.Begin() <= dst && dst <= buf.End() - 1) || dst == buf.End())
+						}
 					}
 					
 					//fill the rest of the sample buffer with zeros
@@ -628,25 +630,32 @@ private:
 					}
 					
 					if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
-						//fill the rest of the tail with data from beginning of the sound
-						do{
+						if(tailIter != tail.Begin()){//if we have copied something to the tail buffer
+							//fill the rest of the tail with data from beginning of the sound
+							do{
+								src = ch->wavSound->data.Begin();
+								ASSERT(ch->curPos == 0)
+
+								for(; tailIter != tail.End() && src != ch->wavSound->data.End(); ++src, ++tailIter){
+									ASSERT(tail.Size() > 0)
+									ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
+									ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+									*tailIter = *src;
+									++ch->curPos;
+								}
+							}while(tailIter != tail.End());
+
+							const TSampleType *s = tail.Begin();
+							ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+							FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
+						}else{
 							src = ch->wavSound->data.Begin();
 							ASSERT(ch->curPos == 0)
-
-							for(; tailIter != tail.End() && src != ch->wavSound->data.End(); ++src, ++tailIter){
-								ASSERT(tail.Size() > 0)
-								ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
-								ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
-								*tailIter = *src;
-								++ch->curPos;
-							}
-						}while(tailIter != tail.End());
-
-						const TSampleType *s = tail.Begin();
-						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
+						}
 					}else{
 						ASSERT(tail.Size() == 0)
+						src = ch->wavSound->data.Begin();
+						ASSERT(ch->curPos == 0)
 					}
 					continue;//for(;;)
 				}
