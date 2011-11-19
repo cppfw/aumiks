@@ -1,18 +1,29 @@
 #include "../../src/aumiks/WavSound.hpp"
 
 #include <ting/FSFile.hpp>
+#include <ting/utils.hpp>
 
 
 
 class VolumeEffect : public aumiks::Effect{
+	ting::Inited<volatile ting::u8, ting::u8(-1)> vol;
 public:
-	volatile ting::u8 vol;
+	inline void SetVolume(ting::u8 vol){
+		this->vol = vol;
+	}
 	
 	//override
 	virtual bool ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){
-		for(ting::s32* i = buf.Begin(); i != buf.End(); ++i){
-			*i = (*i) * this->vol / ting::u8(-1);
+		ting::u8 vol = this->vol; //save volatile value
+		if(vol == ting::u8(-1)){
+			//do nothing
+			return true;
 		}
+		
+		for(ting::s32* i = buf.Begin(); i != buf.End(); ++i){
+			*i = (*i) * vol / ting::u8(-1);
+		}
+		
 		return true;
 	}
 	
@@ -32,26 +43,27 @@ int main(int argc, char *argv[]){
 	
 	ting::Ref<aumiks::WavSound::Channel> ch = snd->CreateWavChannel();
 	
-	ting::Ref<VolumeEffect> vol = VolumeEffect::New();
-	vol->vol = 0xff;
+	ting::Ref<VolumeEffect> eff = VolumeEffect::New();
 	
-	ch->AddEffect(vol);
+	ch->AddEffect(eff);
 	
 	ch->Play(0);//infinite loop
 	
 	ting::s8 d = -1;
 	ting::s8 step = 20;
+	ting::u8 vol = 0xff;
 	for(unsigned i = 0; i != 100; ++i){
 //		TRACE(<< "Loop" << std::endl)
 		ting::Thread::Sleep(100);
 		
-		if(vol->vol < step && d < 0){
+		if(vol < step && d < 0){
 			d = 1;
 		}
-		if(vol->vol > (0xff - step) && d > 0){
+		if(vol > (0xff - step) && d > 0){
 			d = -1;
 		}
-		vol->vol += d * step;
+		vol += d * step;
+		eff->SetVolume(vol);
 	}
 	
 	return 0;
