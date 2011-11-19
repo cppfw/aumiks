@@ -555,8 +555,11 @@ private:
 				bufFramesTillEndOfSound = framesTillEndOfSound * (outputFreq / freq);
 			}else{
 				ASSERT((freq / outputFreq == 1) || (freq / outputFreq == 2) || (freq / outputFreq == 4))
-				ASSERT(framesTillEndOfSound % (freq / outputFreq) == 0)//make sure there is a proper granularity
+//				ASSERT(framesTillEndOfSound % (freq / outputFreq) == 0)//make sure there is a proper granularity
 				bufFramesTillEndOfSound = framesTillEndOfSound / (freq / outputFreq);
+				//NOTE: this is the number of integral frames. Because the source sound is of higher
+				//      sampling rate than playback we might have to take into account the
+				//      fraction of a playback frame later.
 			}
 
 //			TRACE(<< "framesTillEndOfSound = " << framesTillEndOfSound << std::endl)
@@ -564,33 +567,88 @@ private:
 //			TRACE(<< "framesTillEndOfBuffer = " << framesTillEndOfBuffer << std::endl)
 				
 			//if sound end will be reached
-			if(bufFramesTillEndOfSound <= framesTillEndOfBuffer){
-				for(; src != ch->wavSound->data.End();){
+			if(bufFramesTillEndOfSound < framesTillEndOfBuffer){
+				ting::s32* end = dst + (bufFramesTillEndOfSound * outputChans);
+				for(; dst != end;){
 					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
 					ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
 					FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
 				}
-				
 				ch->curPos = 0;
 				
-				if(ch->numLoops > 0){
-					--ch->numLoops;
-					if(ch->numLoops == 0){
-						//fill the rest of the buffer with zeros
-						for(; dst != buf.End(); ++dst){
-							*dst = 0;
-						}
-						ch->numLoops = 1;//leave numLoops in default state
-						return true;
-					}else{
-						src = ch->wavSound->data.Begin();
-						continue;
+				//NOTE: in cases when outputFreq is below freq we might need to deal with sound tail
+				//      if it does not match the full frame of output buffer.
+				
+				//Hope that in cases when this buffer is is not used (freq / outputFreq == 0), it should be optimized out by compiler
+				ting::StaticBuffer<TSampleType, (freq / outputFreq) * chans > tail;
+				TSampleType* tailIter = tail.Begin();
+				
+				if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
+					for(; src != ch->wavSound->data.End(); ++src, ++tailIter){
+						ASSERT(tail.Size() > 0)
+						ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
+						ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+						*tailIter = *src;
 					}
 				}else{
-					ASSERT(ch->numLoops == 0)
-					//loop infinitely
-					src = ch->wavSound->data.Begin();
-					continue;
+					ASSERT(tail.Size() == 0)
+				}
+				
+				if(ch->numLoops == 1){
+					//this was the last repeat of playing
+					
+					if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
+						for(; tailIter != tail.End(); ++tailIter){
+							ASSERT(tail.Size() > 0)
+							ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
+							*tailIter = 0;//fill the rest of sound tail with silence
+						}
+
+						const TSampleType *s = tail.Begin();
+						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
+						ASSERT((buf.Begin() <= dst && dst <= buf.End() - 1) || dst == buf.End())
+					}
+					
+					//fill the rest of the sample buffer with zeros
+					for(; dst != buf.End(); ++dst){
+						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+						*dst = 0;
+					}
+					ASSERT(ch->curPos == 0)
+					ASSERT(ch->numLoops == 1)//Leaving ch->numLoops in default state
+					return true;
+				}else{
+					//if repeating
+					
+					//decrement loops counter if needed
+					if(ch->numLoops != 0){
+						ASSERT(ch->numLoops > 1)
+						--ch->numLoops;
+					}
+					
+					if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
+						//fill the rest of the tail with data from beginning of the sound
+						do{
+							src = ch->wavSound->data.Begin();
+							ASSERT(ch->curPos == 0)
+
+							for(; tailIter != tail.End() && src != ch->wavSound->data.End(); ++src, ++tailIter){
+								ASSERT(tail.Size() > 0)
+								ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
+								ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+								*tailIter = *src;
+								++ch->curPos;
+							}
+						}while(tailIter != tail.End());
+
+						const TSampleType *s = tail.Begin();
+						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+						FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
+					}else{
+						ASSERT(tail.Size() == 0)
+					}
+					continue;//for(;;)
 				}
 			}else{//no end of sound will be reached
 				ASSERT(framesTillEndOfBuffer * outputChans == unsigned(buf.End() - dst))
@@ -622,14 +680,7 @@ private:
 	WavSoundImpl(const ting::Buffer<ting::u8>& d){
 		ASSERT(d.Size() % (chans * sizeof(TSampleType)) == 0)
 
-		unsigned numSamples = d.Size() / sizeof(TSampleType);
-		unsigned granularity = ((freq / 11025) * chans);//in samples
-		unsigned tail = 0;
-		if(numSamples % granularity > 0){
-			tail = granularity - numSamples % granularity;
-		}
-		
-		this->data.Init(numSamples + tail);
+		this->data.Init(d.Size() / sizeof(TSampleType));
 
 		const ting::u8* src = d.Begin();
 		TSampleType* dst = this->data.Begin();
@@ -642,10 +693,6 @@ private:
 			}
 			ASSERT(this->data.Begin() <= dst && dst < this->data.End())
 			*dst = tmp;
-		}
-		ASSERT(dst + tail == this->data.End())
-		for(;dst != this->data.End(); ++dst){
-			*dst = 0;
 		}
 	}
 
