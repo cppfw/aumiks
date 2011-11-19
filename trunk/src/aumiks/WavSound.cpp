@@ -624,7 +624,7 @@ private:
 
 		unsigned numSamples = d.Size() / sizeof(TSampleType);
 		unsigned granularity = ((freq / 11025) * chans);//in samples
-		unsigned tail;
+		unsigned tail = 0;
 		if(numSamples % granularity > 0){
 			tail = granularity - numSamples % granularity;
 		}
