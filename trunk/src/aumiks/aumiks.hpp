@@ -63,15 +63,28 @@ class Channel;
 
 class Effect : public ting::RefCounted{
 public:
-	//TODO:
-	
 	/**
-	 * @brief called every time when the Channel is about to start playing.
+	 * @brief Called every time when the Channel is about to start playing.
 	 * Called from separate thread.
      */
 	virtual void Init_ts(){}
 	
+	/**
+	 * @brief Called when effect is removed from channel.
+	 * This method is called when this effect is about to be removed from channel.
+	 * It is also called when the channel holding this effect is being destroyed.
+     */
+	virtual void OnRemoveFromChannel_ts(){}
+	
+	/**
+	 * @brief Called when effect is to be applied to a portion of a playing sound.
+     * @param buf - buffer containing portion of sound data.
+     * @return true if effect has finished. TODO: explain more
+	 * @return false otherwise.
+     */
 	virtual bool ApplyToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	
+	//TODO: add doxygen docs for each method
 	virtual bool ApplyToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){return true;}
 	virtual bool ApplyToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){return true;}
 	virtual bool ApplyToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){return true;}
@@ -80,21 +93,81 @@ public:
 };
 
 
+
 //base channel class
 class Channel : public ting::RefCounted{
 	friend class aumiks::Lib;
+//	friend class aumiks::Lib::MixerBuffer;
 
 	ting::Inited<volatile bool, false> isPlaying;
+	
+	bool soundStopped;//used to indicate that sound has finished playing, but effects are still playing.
 
-	//TODO: keep list of effects
+	ting::Inited<volatile bool, false> stopFlag;//indicates that playing should stop immediately
+	
+	//list of effects
+	typedef std::vector<ting::Ref<aumiks::Effect> > T_EffectsList;
+	typedef T_EffectsList::iterator T_EffectsIter;
+	T_EffectsList effects;
+	
+	inline bool ApplyEffectsToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){
+		bool ret = true;
+		//return true if all effects returned true;
+		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			ret &= (*i)->ApplyToSmpBuf11025Mono16(buf);
+		}
+		return ret;
+	}
+	inline bool ApplyEffectsToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){
+		bool ret = true;
+		//return true if all effects returned true;
+		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			ret &= (*i)->ApplyToSmpBuf11025Stereo16(buf);
+		}
+		return ret;
+	}
+	inline bool ApplyEffectsToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){
+		bool ret = true;
+		//return true if all effects returned true;
+		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			ret &= (*i)->ApplyToSmpBuf22050Mono16(buf);
+		}
+		return ret;
+	}
+	inline bool ApplyEffectsToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){
+		bool ret = true;
+		//return true if all effects returned true;
+		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			ret &= (*i)->ApplyToSmpBuf22050Stereo16(buf);
+		}
+		return ret;
+	}
+	inline bool ApplyEffectsToSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){
+		bool ret = true;
+		//return true if all effects returned true;
+		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			ret &= (*i)->ApplyToSmpBuf44100Mono16(buf);
+		}
+		return ret;
+	}
+	inline bool ApplyEffectsToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){
+		bool ret = true;
+		//return true if all effects returned true;
+		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			ret &= (*i)->ApplyToSmpBuf44100Stereo16(buf);
+		}
+		return ret;
+	}
+	
 protected:
-	ting::Inited<volatile bool, false> stopFlag;
-
 	ting::Inited<volatile ting::u8, ting::u8(-1)> volume;
+	
+	ting::Inited<volatile ting::s8, 0> panning;
 	
 	Channel(){}
 	
 public:
+	~Channel();
 
 	inline bool IsPlaying()const{
 		return this->isPlaying;
@@ -110,6 +183,10 @@ public:
 		this->volume = vol;
 	}
 	
+	//TODO: protect by mutex
+	inline void AddEffect(const ting::Ref<aumiks::Effect>& effect){
+		this->effects.push_back(effect);
+	}
 protected:
 	/**
 	 * @brief Called when channel has been added to pool of playing channels.
@@ -211,6 +288,25 @@ public:
 			return ch->FillSmpBuf44100Stereo16(this->smpBuf);
 		}
 		
+		inline bool ApplyEffectsToSmpBuf11025Mono16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->ApplyEffectsToSmpBuf11025Mono16(this->smpBuf);
+		}
+		inline bool ApplyEffectsToSmpBuf11025Stereo16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->ApplyEffectsToSmpBuf11025Stereo16(this->smpBuf);
+		}
+		inline bool ApplyEffectsToSmpBuf22050Mono16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->ApplyEffectsToSmpBuf22050Mono16(this->smpBuf);
+		}
+		inline bool ApplyEffectsToSmpBuf22050Stereo16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->ApplyEffectsToSmpBuf22050Stereo16(this->smpBuf);
+		}
+		inline bool ApplyEffectsToSmpBuf44100Mono16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->ApplyEffectsToSmpBuf44100Mono16(this->smpBuf);
+		}
+		inline bool ApplyEffectsToSmpBuf44100Stereo16(const ting::Ref<aumiks::Channel>& ch){
+			return ch->ApplyEffectsToSmpBuf44100Stereo16(this->smpBuf);
+		}
+		
 		ting::Array<ting::s32> mixBuf;
 		ting::Array<ting::s32> smpBuf;
 		ting::Array<ting::u8> playBuf;
@@ -230,6 +326,8 @@ public:
 		void CopyFromMixBufToPlayBuf();
 		
 		virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
+		
+		virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
 		
 		void MixSmpBufToMixBuf();
 	};
