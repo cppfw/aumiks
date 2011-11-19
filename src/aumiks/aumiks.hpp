@@ -160,8 +160,6 @@ class Channel : public ting::RefCounted{
 	}
 	
 protected:
-	ting::Inited<volatile ting::u8, ting::u8(-1)> volume;
-	
 	ting::Inited<volatile ting::s8, 0> panning;
 	
 	Channel(){}
@@ -177,10 +175,6 @@ public:
 
 	inline void Stop(){
 		this->stopFlag = true;
-	}
-
-	inline void SetVolume(ting::u8 vol){
-		this->volume = vol;
 	}
 	
 	//TODO: protect by mutex

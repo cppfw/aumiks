@@ -68,9 +68,8 @@ public:
 public:
 	virtual Ref<WavSound::Channel> CreateWavChannel()const = 0;
 
-	inline Ref<WavSound::Channel> Play(u8 volume = u8(-1), unsigned numLoops = 1)const{
+	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{
 		Ref<WavSound::Channel> ret = this->CreateWavChannel();
-		ret->SetVolume(volume);
 		ret->Play(numLoops);
 		return ret;
 	}
