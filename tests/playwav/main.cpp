@@ -9,7 +9,8 @@ void Play(const std::string& fileName){
 
 	ASSERT(snd)
 	
-	ting::Ref<aumiks::Channel> ch = snd->Play();
+	ting::Ref<aumiks::WavSound::Channel> ch = snd->CreateWavChannel();
+	ch->Play(2);
 	
 	while(ch->IsPlaying()){
 //		TRACE(<< "Loop" << std::endl)
