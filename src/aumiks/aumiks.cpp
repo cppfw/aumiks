@@ -121,6 +121,15 @@ Lib::~Lib(){
 
 
 
+Channel::~Channel(){
+	//notify all effects
+	for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+		(*i)->OnRemoveFromChannel_ts();
+	}
+}
+
+
+
 void Lib::PlayChannel(ting::Ref<Channel> ch){
 	ASSERT(ch.IsValid())
 
@@ -133,6 +142,7 @@ void Lib::PlayChannel(ting::Ref<Channel> ch){
 		
 		this->thread.chPoolToAdd.push_back(ch);//queue channel to be added to playing pool
 		ch->isPlaying = true;//mark channel as playing
+		ch->soundStopped = false;//init sound stopped flag
 	}
 
 	//in case the thread is hanging on the queue, wake it up by sending the nop message.
@@ -155,9 +165,16 @@ bool Lib::MixerBuffer::MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
 		return true;
 	}
 
-	bool ret = this->FillSmpBuf(ch);
-
-	//TODO: call channel effects
+	if(!ch->soundStopped){
+		ch->soundStopped = this->FillSmpBuf(ch);
+	}else{
+		//clear smp buffer
+		memset(this->smpBuf.Begin(), 0, this->smpBuf.SizeInBytes());
+	}
+	
+	//call channel effects
+	bool ret = this->ApplyEffectsToSmpBuf(ch);
+	ret &= ch->soundStopped;
 	
 	if(this->isMuted){
 		return ret;
@@ -181,6 +198,11 @@ class MixerBuffer11025Mono16 : public Lib::MixerBuffer{
 		return this->FillSmpBuf11025Mono16(ch);
 	}
 	
+	//override
+	virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return this->ApplyEffectsToSmpBuf11025Mono16(ch);
+	}
+	
 public:
 	inline static ting::Ptr<MixerBuffer11025Mono16> New(unsigned bufferSizeMillis){
 		return ting::Ptr<MixerBuffer11025Mono16>(
@@ -201,6 +223,10 @@ class MixerBuffer11025Stereo16 : public Lib::MixerBuffer{
 		return this->FillSmpBuf11025Stereo16(ch);
 	}
 	
+	//override
+	virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return this->ApplyEffectsToSmpBuf11025Stereo16(ch);
+	}
 public:
 	inline static ting::Ptr<MixerBuffer11025Stereo16> New(unsigned bufferSizeMillis){
 		return ting::Ptr<MixerBuffer11025Stereo16>(
@@ -221,6 +247,10 @@ class MixerBuffer22050Mono16 : public Lib::MixerBuffer{
 		return this->FillSmpBuf22050Mono16(ch);
 	}
 	
+	//override
+	virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return this->ApplyEffectsToSmpBuf22050Mono16(ch);
+	}
 public:
 	inline static ting::Ptr<MixerBuffer22050Mono16> New(unsigned bufferSizeMillis){
 		return ting::Ptr<MixerBuffer22050Mono16>(
@@ -241,6 +271,10 @@ class MixerBuffer22050Stereo16 : public Lib::MixerBuffer{
 		return this->FillSmpBuf22050Stereo16(ch);
 	}
 	
+	//override
+	virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return this->ApplyEffectsToSmpBuf22050Stereo16(ch);
+	}
 public:
 	inline static ting::Ptr<MixerBuffer22050Stereo16> New(unsigned bufferSizeMillis){
 		return ting::Ptr<MixerBuffer22050Stereo16>(
@@ -261,6 +295,10 @@ class MixerBuffer44100Mono16 : public Lib::MixerBuffer{
 		return this->FillSmpBuf44100Mono16(ch);
 	}
 	
+	//override
+	virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return this->ApplyEffectsToSmpBuf44100Mono16(ch);
+	}
 public:
 	inline static ting::Ptr<MixerBuffer44100Mono16> New(unsigned bufferSizeMillis){
 		return ting::Ptr<MixerBuffer44100Mono16>(
@@ -281,6 +319,10 @@ class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
 		return this->FillSmpBuf44100Stereo16(ch);
 	}
 	
+	//override
+	virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+		return this->ApplyEffectsToSmpBuf44100Stereo16(ch);
+	}
 public:
 	inline static ting::Ptr<MixerBuffer44100Stereo16> New(unsigned bufferSizeMillis){
 		return ting::Ptr<MixerBuffer44100Stereo16>(

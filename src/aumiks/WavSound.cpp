@@ -570,6 +570,9 @@ private:
 					ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
 					FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
 				}
+				
+				ch->curPos = 0;
+				
 				if(ch->numLoops > 0){
 					--ch->numLoops;
 					if(ch->numLoops == 0){
@@ -577,7 +580,6 @@ private:
 						for(; dst != buf.End(); ++dst){
 							*dst = 0;
 						}
-						ch->curPos = 0;
 						ch->numLoops = 1;//leave numLoops in default state
 						return true;
 					}else{
@@ -591,6 +593,7 @@ private:
 					continue;
 				}
 			}else{//no end of sound will be reached
+				ASSERT(framesTillEndOfBuffer * outputChans == unsigned(buf.End() - dst))
 				for(; dst != buf.End();){
 					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
 					ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
