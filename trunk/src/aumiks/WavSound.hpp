@@ -60,7 +60,7 @@ public:
          * @param numLoops - number of time the sound should be repeated. 0 means repeat infinitely.
          */
 		inline void Play(unsigned numLoops = 1){
-			this->numLoops = numLoops;
+			this->numLoops = numLoops;//not protected by mutex, but should not cause any serious problems
 			this->aumiks::Channel::Play();
 		}
 	};

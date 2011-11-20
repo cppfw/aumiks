@@ -11,6 +11,7 @@
       </df>
       <df name="backend">
         <in>ALSABackend.hpp</in>
+        <in>DirectSoundBackend.hpp</in>
         <in>ESoundBackend.hpp</in>
         <in>PulseAudioBackend.hpp</in>
       </df>
@@ -24,8 +25,18 @@
       </df>
     </df>
     <df name="tests" root="../tests">
+      <df name="effects">
+        <df name=".svn">
+        </df>
+        <in>main.cpp</in>
+      </df>
+      <df name="playparallel">
+        <in>main.cpp</in>
+      </df>
       <df name="playwav">
         <in>main.cpp</in>
+      </df>
+      <df name="samples">
       </df>
     </df>
     <logicalFolder name="ExternalFiles"
