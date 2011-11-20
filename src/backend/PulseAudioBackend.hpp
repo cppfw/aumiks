@@ -42,8 +42,6 @@ class PulseAudioBackend : public aumiks::Lib::AudioBackend{
 	pa_simple *handle;
 
 	PulseAudioBackend(unsigned bufferSizeFrames, aumiks::E_Format format){
-		//TODO: get actual buffer size from pulseaudio
-		
 		TRACE(<< "opening device" << std::endl)
 
 		pa_sample_spec ss;

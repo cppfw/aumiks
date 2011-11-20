@@ -110,6 +110,12 @@ class Channel : public ting::RefCounted{
 	typedef T_EffectsList::iterator T_EffectsIter;
 	T_EffectsList effects;
 	
+	inline void IniteEffects(){
+		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			(*i)->Init_ts();
+		}
+	}
+	
 	inline bool ApplyEffectsToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){
 		bool ret = true;
 		//return true if all effects returned true;
@@ -177,8 +183,15 @@ public:
 		this->stopFlag = true;
 	}
 	
-	//TODO: protect by mutex
 	inline void AddEffect(const ting::Ref<aumiks::Effect>& effect){
+		
+		//NOTE: this check does not give 100% safety, since we are dealing with multithreading,
+		//      but should catch misuse errors on debugging stage.
+		ASSERT(!this->IsPlaying())
+		if(this->IsPlaying()){
+			throw aumiks::Exc("unable to add an effect to a playing channel");
+		}
+		
 		this->effects.push_back(effect);
 	}
 protected:
@@ -356,8 +369,6 @@ private:
 		void Run();
 		
 	private:
-		
-		//TODO: create mixer buffer based on actual buffer size and format from the backend
 		static ting::Ptr<MixerBuffer> CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format);
 	};
 
