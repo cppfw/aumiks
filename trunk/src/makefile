@@ -115,10 +115,10 @@ endif
 #  Libs and lib directories
 #============================
 ifeq ($(platform), maemo_linux)
-    libs := 
+    libs := -lting
 endif
 ifeq ($(platform), linux)
-    libs := `pkg-config libpulse-simple --libs`
+    libs := -lting `pkg-config libpulse-simple --libs`
 endif
 ifeq ($(platform), win32)
     libs := 
