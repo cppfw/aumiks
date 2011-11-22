@@ -82,6 +82,8 @@ public:
      * @return true if effect has finished. TODO: explain more
 	 * @return false otherwise.
      */
+	//TODO: what if effect has suppressed sound (fade out) and further sound playing is pointless
+	//      what if sound has stopped, but effect has a delay and should stop later
 	virtual bool ApplyToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){return true;}
 	
 	//TODO: add doxygen docs for each method

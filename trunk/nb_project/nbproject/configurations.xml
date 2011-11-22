@@ -26,8 +26,6 @@
     </df>
     <df name="tests" root="../tests">
       <df name="effects">
-        <df name=".svn">
-        </df>
         <in>main.cpp</in>
       </df>
       <df name="playparallel">
