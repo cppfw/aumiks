@@ -222,6 +222,14 @@ enum E_Format{
 
 
 
+unsigned BytesPerFrame(E_Format format);
+
+
+
+unsigned SamplesPerFrame(E_Format format);
+
+
+
 class Lib : public ting::Singleton<Lib>{
 	friend class aumiks::Channel;
 	
@@ -248,10 +256,8 @@ public:
 	 */
 	Lib(ting::u16 bufferSizeMillis = 100, aumiks::E_Format format = STEREO_16_22050);
 	
-	~Lib();
-	
 	inline void SetMuted(bool muted){
-		this->thread.mixerBuffer->isMuted = muted;
+		this->mixerBuffer->isMuted = muted;
 	}
 
 	inline void SetUnmuted(bool unmuted){
@@ -267,7 +273,7 @@ public:
 	}
 
 	inline bool IsMuted()const{
-		return this->thread.mixerBuffer->isMuted;
+		return this->mixerBuffer->isMuted;
 	}
 
 public:
@@ -275,10 +281,9 @@ public:
 	class MixerBuffer{
 		friend class aumiks::Lib;
 	protected:
-		MixerBuffer(unsigned mixBufSize) :
-				mixBuf(mixBufSize),
-				smpBuf(mixBufSize),
-				playBuf(mixBufSize * 2) //2 bytes per sample (16 bit)
+		MixerBuffer(size_t mixBufSizeInSamples) :
+				mixBuf(mixBufSizeInSamples),
+				smpBuf(mixBufSizeInSamples)
 		{}
 
 		inline bool FillSmpBuf11025Mono16(const ting::Ref<aumiks::Channel>& ch){
@@ -321,7 +326,6 @@ public:
 		
 		ting::Array<ting::s32> mixBuf;
 		ting::Array<ting::s32> smpBuf;
-		ting::Array<ting::u8> playBuf;
 
 		ting::Inited<volatile bool, false> isMuted;
 	public:
@@ -346,44 +350,39 @@ public:
 
 	//base class for audio backends
 	class AudioBackend{
-		friend class aumiks::Lib;
-		
-		virtual void Write(const ting::Buffer<ting::u8>& buf) = 0;
 	protected:
+		inline void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
+			aumiks::Lib::Inst().FillPlayBuf_ts(playBuf);
+		}
+		
 		inline AudioBackend(){}
 	public:
 		virtual ~AudioBackend(){}
 	};
 private:
-	class SoundThread : public ting::MsgThread{
-	public:
-		const ting::Ptr<AudioBackend> audioBackend;
-		const ting::Ptr<MixerBuffer> mixerBuffer;
-		
-		ting::Mutex chPoolMutex;
-		
-		typedef std::list<ting::Ref<aumiks::Channel> > T_ChPool;
-		typedef T_ChPool::iterator T_ChIter;
-		T_ChPool chPool;
+	void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf);
+	
+	ting::Mutex chPoolMutex;
 
-		T_ChPool chPoolToAdd;
-		
-		typedef std::pair<ting::Ref<aumiks::Channel>, ting::Ref<aumiks::Effect> > T_ChannelEffectPair;
-		typedef std::list<T_ChannelEffectPair> T_ChannelEffectPairsList;
-		typedef T_ChannelEffectPairsList::iterator T_ChannelEffectPairsIter;
-		T_ChannelEffectPairsList effectsToAdd;
-		T_ChannelEffectPairsList effectsToRemove;
+	typedef std::list<ting::Ref<aumiks::Channel> > T_ChPool;
+	typedef T_ChPool::iterator T_ChIter;
+	T_ChPool chPool;
 
-		SoundThread(ting::u16 bufferSizeMillis, E_Format format);
+	T_ChPool chPoolToAdd;
 
-		//override
-		void Run();
-		
-	private:
-		static ting::Ptr<MixerBuffer> CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format);
-	};
+	typedef std::pair<ting::Ref<aumiks::Channel>, ting::Ref<aumiks::Effect> > T_ChannelEffectPair;
+	typedef std::list<T_ChannelEffectPair> T_ChannelEffectPairsList;
+	typedef T_ChannelEffectPairsList::iterator T_ChannelEffectPairsIter;
+	T_ChannelEffectPairsList effectsToAdd;
+	T_ChannelEffectPairsList effectsToRemove;
+	
+	const ting::Ptr<MixerBuffer> mixerBuffer;
+	
+	static ting::Ptr<MixerBuffer> CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format);
 
-	SoundThread thread;
+	//backend must be initialized after all the essential parts of aumiks are initialized,
+	//because after the backend object is created, it starts calling the FillPlayBuf_ts() method periodically.
+	const ting::Ptr<AudioBackend> audioBackend;
 };
 
 
