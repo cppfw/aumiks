@@ -447,7 +447,7 @@ void Lib::SoundThread::Run(){
 //		TRACE(<< "chPool.size() = " << this->chPool.size() << std::endl)
 		M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)
 
-		this->mixerBuffer->CopyFromMixBufToPlayBuf();
+		this->mixerBuffer->CopyToPlayBuf(this->mixerBuffer->playBuf);
 
 		M_AUMIKS_TRACE(<< "SoundThread::Run(): writing data..." << std::endl)
 
@@ -473,23 +473,23 @@ void aumiks::Lib::MixerBuffer::MixSmpBufToMixBuf(){
 
 
 
-void aumiks::Lib::MixerBuffer::CopyFromMixBufToPlayBuf(){
+void aumiks::Lib::MixerBuffer::CopyToPlayBuf(ting::Buffer<ting::u8>& playBuf){
 	//playBuf size is in bytes and we have 2 bytes per sample always.
-	ASSERT((this->mixBuf.Size() * 2) == this->playBuf.Size())
+	ASSERT((this->mixBuf.Size() * 2) == playBuf.Size())
 
 	const ting::s32 *src = this->mixBuf.Begin();
-	ting::u8* dst = this->playBuf.Begin();
+	ting::u8* dst = playBuf.Begin();
 	for(; src != this->mixBuf.End(); ++src){
 		ting::s32 tmp = *src;
 		ting::ClampTop(tmp, 0x7fff);
 		ting::ClampBottom(tmp, -0x7fff);
 
-		ASSERT(this->playBuf.Begin() <= dst && dst <= this->playBuf.End() - 1)
+		ASSERT(playBuf.Begin() <= dst && dst <= playBuf.End() - 1)
 		*dst = ting::u8(tmp);
 		++dst;
-		ASSERT(this->playBuf.Begin() <= dst && dst <= this->playBuf.End() - 1)
+		ASSERT(playBuf.Begin() <= dst && dst <= playBuf.End() - 1)
 		*dst = ting::u8(tmp >> 8);
 		++dst;
 	}
-	ASSERT(dst == this->playBuf.End())
+	ASSERT(dst == playBuf.End())
 }
