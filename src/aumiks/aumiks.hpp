@@ -60,21 +60,15 @@ class Lib;
 class Channel;
 
 
-
+//TODO: add doxygen docs everywhere
 class Effect : public ting::RefCounted{
 public:
 	/**
 	 * @brief Called every time when the Channel is about to start playing.
 	 * Called from separate thread.
+	 * Default implementation does nothing. Override this method if needed.
      */
 	virtual void Init_ts(){}
-	
-	/**
-	 * @brief Called when effect is removed from channel.
-	 * This method is called when this effect is about to be removed from channel.
-	 * It is also called when the channel holding this effect is being destroyed.
-     */
-	virtual void OnRemoveFromChannel_ts(){}
 	
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
@@ -181,7 +175,6 @@ protected:
 	Channel(){}
 	
 public:
-	~Channel();
 
 	inline bool IsPlaying()const{
 		return this->isPlaying;
