@@ -105,7 +105,7 @@ class Channel : public ting::RefCounted{
 	typedef T_EffectsList::iterator T_EffectsIter;
 	T_EffectsList effects;
 	
-	inline void IniteEffects(){
+	inline void InitEffects(){
 		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
 			(*i)->Init_ts();
 		}
