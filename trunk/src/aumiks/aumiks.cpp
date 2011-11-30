@@ -76,26 +76,7 @@ unsigned BufferSizeInFrames(unsigned bufferSizeMillis, E_Format format){
 
 
 unsigned BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
-	unsigned framesPerSecond = BufferSizeInFrames(bufferSizeMillis, format);
-	
-	unsigned ret;
-	
-	switch(format){
-		case MONO_16_11025:
-		case MONO_16_22050:
-		case MONO_16_44100:
-			ret = framesPerSecond;
-			break;
-		case STEREO_16_11025:
-		case STEREO_16_22050:
-		case STEREO_16_44100:
-			ret = 2 * framesPerSecond;
-			break;
-		default:
-			throw aumiks::Exc("unknown sound format");
-	}
-	
-	return ret;
+	return BufferSizeInFrames(bufferSizeMillis, format) * aumiks::SamplesPerFrame(format);
 }
 
 }//~namespace
@@ -103,21 +84,9 @@ unsigned BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
 
 
 Lib::Lib(ting::u16 bufferSizeMillis, aumiks::E_Format format) :
-		thread(bufferSizeMillis, format)
-{
-	this->thread.Start();
-}
-
-
-
-Lib::~Lib(){
-//	TRACE(<< "aumiks::~Lib(): enter" << std::endl)
-	//need to stop thread before closing the device
-	//because it can attempt write data after the device is closed
-	this->thread.PushQuitMessage();
-	this->thread.Join();
-//	TRACE(<< "aumiks::~Lib(): exit" << std::endl)
-}
+		mixerBuffer(Lib::CreateMixerBuffer(BufferSizeInSamples(bufferSizeMillis, format), format)),
+		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
+{}
 
 
 
@@ -125,13 +94,10 @@ void Lib::AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<au
 	ASSERT(ch.IsValid())
 
 	{
-		ting::Mutex::Guard mut(this->thread.chPoolMutex);
+		ting::Mutex::Guard mut(this->chPoolMutex);
 		
-		this->thread.effectsToAdd.push_back(SoundThread::T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
+		this->effectsToAdd.push_back(T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
 	}
-
-	//in case the thread is hanging on the queue, wake it up by sending the nop message.
-	this->thread.PushNopMessage();
 }
 
 
@@ -140,13 +106,10 @@ void Lib::RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::R
 	ASSERT(ch.IsValid())
 
 	{
-		ting::Mutex::Guard mut(this->thread.chPoolMutex);
+		ting::Mutex::Guard mut(this->chPoolMutex);
 		
-		this->thread.effectsToRemove.push_back(SoundThread::T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
+		this->effectsToRemove.push_back(T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
 	}
-
-	//in case the thread is hanging on the queue, wake it up by sending the nop message.
-	this->thread.PushNopMessage();
 }
 
 
@@ -155,28 +118,16 @@ void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 	ASSERT(ch.IsValid())
 
 	{
-		ting::Mutex::Guard mut(this->thread.chPoolMutex);
+		ting::Mutex::Guard mut(this->chPoolMutex);
 		if(ch->IsPlaying())
 			return;//already playing
 		
 		ch->InitEffects();
 		
-		this->thread.chPoolToAdd.push_back(ch);//queue channel to be added to playing pool
+		this->chPoolToAdd.push_back(ch);//queue channel to be added to playing pool
 		ch->isPlaying = true;//mark channel as playing
 		ch->soundStopped = false;//init sound stopped flag
 	}
-
-	//in case the thread is hanging on the queue, wake it up by sending the nop message.
-	this->thread.PushNopMessage();
-}
-
-
-
-Lib::SoundThread::SoundThread(ting::u16 bufferSizeMillis, E_Format format) :
-		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format)),
-		mixerBuffer(SoundThread::CreateMixerBuffer(bufferSizeMillis, format))
-{
-//	TRACE(<< "SoundThread(): invoked" << std::endl)
 }
 
 
@@ -210,8 +161,8 @@ bool Lib::MixerBuffer::MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
 namespace{
 
 class MixerBuffer11025Mono16 : public Lib::MixerBuffer{
-	MixerBuffer11025Mono16(unsigned bufferSizeMillis) :
-			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, MONO_16_11025))
+	MixerBuffer11025Mono16(unsigned bufferSizeInSamples) :
+			MixerBuffer(bufferSizeInSamples)
 	{}
 	
 	//override
@@ -225,9 +176,9 @@ class MixerBuffer11025Mono16 : public Lib::MixerBuffer{
 	}
 	
 public:
-	inline static ting::Ptr<MixerBuffer11025Mono16> New(unsigned bufferSizeMillis){
+	inline static ting::Ptr<MixerBuffer11025Mono16> New(unsigned bufferSizeInSamples){
 		return ting::Ptr<MixerBuffer11025Mono16>(
-				new MixerBuffer11025Mono16(bufferSizeMillis)
+				new MixerBuffer11025Mono16(bufferSizeInSamples)
 			);
 	}
 };
@@ -235,8 +186,8 @@ public:
 
 
 class MixerBuffer11025Stereo16 : public Lib::MixerBuffer{
-	MixerBuffer11025Stereo16(unsigned bufferSizeMillis) :
-			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, STEREO_16_11025))
+	MixerBuffer11025Stereo16(unsigned bufferSizeInSamples) :
+			MixerBuffer(bufferSizeInSamples)
 	{}
 	
 	//override
@@ -249,9 +200,9 @@ class MixerBuffer11025Stereo16 : public Lib::MixerBuffer{
 		return this->ApplyEffectsToSmpBuf11025Stereo16(ch);
 	}
 public:
-	inline static ting::Ptr<MixerBuffer11025Stereo16> New(unsigned bufferSizeMillis){
+	inline static ting::Ptr<MixerBuffer11025Stereo16> New(unsigned bufferSizeInSamples){
 		return ting::Ptr<MixerBuffer11025Stereo16>(
-				new MixerBuffer11025Stereo16(bufferSizeMillis)
+				new MixerBuffer11025Stereo16(bufferSizeInSamples)
 			);
 	}
 };
@@ -259,8 +210,8 @@ public:
 
 
 class MixerBuffer22050Mono16 : public Lib::MixerBuffer{
-	MixerBuffer22050Mono16(unsigned bufferSizeMillis) :
-			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, MONO_16_22050))
+	MixerBuffer22050Mono16(unsigned bufferSizeInSamples) :
+			MixerBuffer(bufferSizeInSamples)
 	{}
 	
 	//override
@@ -273,9 +224,9 @@ class MixerBuffer22050Mono16 : public Lib::MixerBuffer{
 		return this->ApplyEffectsToSmpBuf22050Mono16(ch);
 	}
 public:
-	inline static ting::Ptr<MixerBuffer22050Mono16> New(unsigned bufferSizeMillis){
+	inline static ting::Ptr<MixerBuffer22050Mono16> New(unsigned bufferSizeInSamples){
 		return ting::Ptr<MixerBuffer22050Mono16>(
-				new MixerBuffer22050Mono16(bufferSizeMillis)
+				new MixerBuffer22050Mono16(bufferSizeInSamples)
 			);
 	}
 };
@@ -283,8 +234,8 @@ public:
 
 
 class MixerBuffer22050Stereo16 : public Lib::MixerBuffer{
-	MixerBuffer22050Stereo16(unsigned bufferSizeMillis) :
-			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, STEREO_16_22050))
+	MixerBuffer22050Stereo16(unsigned bufferSizeInSamples) :
+			MixerBuffer(bufferSizeInSamples)
 	{}
 	
 	//override
@@ -297,9 +248,9 @@ class MixerBuffer22050Stereo16 : public Lib::MixerBuffer{
 		return this->ApplyEffectsToSmpBuf22050Stereo16(ch);
 	}
 public:
-	inline static ting::Ptr<MixerBuffer22050Stereo16> New(unsigned bufferSizeMillis){
+	inline static ting::Ptr<MixerBuffer22050Stereo16> New(unsigned bufferSizeInSamples){
 		return ting::Ptr<MixerBuffer22050Stereo16>(
-				new MixerBuffer22050Stereo16(bufferSizeMillis)
+				new MixerBuffer22050Stereo16(bufferSizeInSamples)
 			);
 	}
 };
@@ -307,8 +258,8 @@ public:
 
 
 class MixerBuffer44100Mono16 : public Lib::MixerBuffer{
-	MixerBuffer44100Mono16(unsigned bufferSizeMillis) :
-			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, MONO_16_44100))
+	MixerBuffer44100Mono16(unsigned bufferSizeInSamples) :
+			MixerBuffer(bufferSizeInSamples)
 	{}
 	
 	//override
@@ -321,9 +272,9 @@ class MixerBuffer44100Mono16 : public Lib::MixerBuffer{
 		return this->ApplyEffectsToSmpBuf44100Mono16(ch);
 	}
 public:
-	inline static ting::Ptr<MixerBuffer44100Mono16> New(unsigned bufferSizeMillis){
+	inline static ting::Ptr<MixerBuffer44100Mono16> New(unsigned bufferSizeInSamples){
 		return ting::Ptr<MixerBuffer44100Mono16>(
-				new MixerBuffer44100Mono16(bufferSizeMillis)
+				new MixerBuffer44100Mono16(bufferSizeInSamples)
 			);
 	}
 };
@@ -331,8 +282,8 @@ public:
 
 
 class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
-	MixerBuffer44100Stereo16(unsigned bufferSizeMillis) :
-			MixerBuffer(BufferSizeInSamples(bufferSizeMillis, STEREO_16_44100))
+	MixerBuffer44100Stereo16(unsigned bufferSizeInSamples) :
+			MixerBuffer(bufferSizeInSamples)
 	{}
 	
 	//override
@@ -345,9 +296,9 @@ class MixerBuffer44100Stereo16 : public Lib::MixerBuffer{
 		return this->ApplyEffectsToSmpBuf44100Stereo16(ch);
 	}
 public:
-	inline static ting::Ptr<MixerBuffer44100Stereo16> New(unsigned bufferSizeMillis){
+	inline static ting::Ptr<MixerBuffer44100Stereo16> New(unsigned bufferSizeInSamples){
 		return ting::Ptr<MixerBuffer44100Stereo16>(
-				new MixerBuffer44100Stereo16(bufferSizeMillis)
+				new MixerBuffer44100Stereo16(bufferSizeInSamples)
 			);
 	}
 };
@@ -357,20 +308,20 @@ public:
 
 
 //static
-ting::Ptr<Lib::MixerBuffer> Lib::SoundThread::CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format){
+ting::Ptr<Lib::MixerBuffer> Lib::CreateMixerBuffer(unsigned bufferSizeInSamples, E_Format format){
 	switch(format){
 		case aumiks::MONO_16_11025:
-			return MixerBuffer11025Mono16::New(bufferSizeMillis);
+			return MixerBuffer11025Mono16::New(bufferSizeInSamples);
 		case aumiks::STEREO_16_11025:
-			return MixerBuffer11025Stereo16::New(bufferSizeMillis);
+			return MixerBuffer11025Stereo16::New(bufferSizeInSamples);
 		case aumiks::MONO_16_22050:
-			return MixerBuffer22050Mono16::New(bufferSizeMillis);
+			return MixerBuffer22050Mono16::New(bufferSizeInSamples);
 		case aumiks::STEREO_16_22050:
-			return MixerBuffer22050Stereo16::New(bufferSizeMillis);
+			return MixerBuffer22050Stereo16::New(bufferSizeInSamples);
 		case aumiks::MONO_16_44100:
-			return MixerBuffer44100Mono16::New(bufferSizeMillis);
+			return MixerBuffer44100Mono16::New(bufferSizeInSamples);
 		case aumiks::STEREO_16_44100:
-			return MixerBuffer44100Stereo16::New(bufferSizeMillis);
+			return MixerBuffer44100Stereo16::New(bufferSizeInSamples);
 		default:
 			throw aumiks::Exc("Unknown sound output format requested");
 	}
@@ -378,86 +329,66 @@ ting::Ptr<Lib::MixerBuffer> Lib::SoundThread::CreateMixerBuffer(unsigned bufferS
 
 
 
-void Lib::SoundThread::Run(){
-	M_AUMIKS_TRACE(<< "Thread started" << std::endl)
+void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
+	//Check matching of mixBuf size and playBuf size, 16 bits per sample
+	ASSERT_INFO(
+			this->mixerBuffer->mixBuf.Size() * 2 == playBuf.Size(),
+			"playBuf.Size() = " << playBuf.Size() << " mixBuf.Size() = " << this->mixerBuffer->mixBuf.Size()
+		)
 	
+	//clean mixBuf
+	this->mixerBuffer->CleanMixBuf();
 
-	while(!this->quitFlag){
-		//If there is nothing to play then just hang on the message queue.
-		//When new channel is added to the list a NOP message will be sent to
-		//the queue. Otherwise, handle the pending messages if any and continue mixing.
-		if(this->chPool.size() == 0){
-			M_AUMIKS_TRACE(<< "SoundThread::Run(): going to hang on GetMsg()" << std::endl)
-			this->queue.GetMsg()->Handle();
-			M_AUMIKS_TRACE(<< "SoundThread::Run(): GetMsg() returned, message handled" << std::endl)
+	{//add queued channels to playing pool and effects to channels
+		ting::Mutex::Guard mut(this->chPoolMutex);//lock mutex
+
+		M_AUMIKS_TRACE(<< "chPoolToAdd.size() = " << this->chPoolToAdd.size() << std::endl)
+		while(this->chPoolToAdd.size() != 0){
+			ting::Ref<aumiks::Channel> ch = this->chPoolToAdd.front();
+			this->chPoolToAdd.pop_front();
+			this->chPool.push_back(ch);
+			ch->OnStart();//notify channel that it was just started
+		}
+
+		//add effects to channels
+		while(this->effectsToAdd.size() != 0){
+			T_ChannelEffectPair& p = this->effectsToAdd.front();
+			ASSERT(p.first)
+			ASSERT(p.second)
+
+			aumiks::Lib::AddEffectToChannelSync(p.first, p.second);
+
+			this->effectsToAdd.pop_front();
+		}
+
+		//remove effects from channels
+		while(this->effectsToRemove.size() != 0){
+			T_ChannelEffectPair &p = this->effectsToRemove.front();
+			ASSERT(p.first)
+			ASSERT(p.second)
+
+			aumiks::Lib::RemoveEffectFromChannelSync(p.first, p.second);
+
+			this->effectsToRemove.pop_front();
+		}
+	}
+
+	//mix channels to mixbuf
+	for(T_ChIter i = this->chPool.begin(); i != this->chPool.end();){
+		if(this->mixerBuffer->MixToMixBuf(*i)){
+			(*i)->isPlaying = false;//clear playing flag
+			(*i)->OnStop();//notify channel that it has stopped playing
+			i = this->chPool.erase(i);
 		}else{
-			while(ting::Ptr<ting::Message> m = this->queue.PeekMsg()){
-				m->Handle();
-			}
+			++i;
 		}
-
-		//clean mixBuf
-		this->mixerBuffer->CleanMixBuf();
-
-		{//add queued channels to playing pool and effects to channels
-			ting::Mutex::Guard mut(this->chPoolMutex);//lock mutex
-			
-			M_AUMIKS_TRACE(<< "chPoolToAdd.size() = " << this->chPoolToAdd.size() << std::endl)
-			while(this->chPoolToAdd.size() != 0){
-				ting::Ref<aumiks::Channel> ch = this->chPoolToAdd.front();
-				this->chPoolToAdd.pop_front();
-				this->chPool.push_back(ch);
-				ch->OnStart();//notify channel that it was just started
-			}
-			
-			//add effects to channels
-			while(this->effectsToAdd.size() != 0){
-				T_ChannelEffectPair& p = this->effectsToAdd.front();
-				ASSERT(p.first)
-				ASSERT(p.second)
-				
-				aumiks::Lib::AddEffectToChannelSync(p.first, p.second);
-				
-				this->effectsToAdd.pop_front();
-			}
-			
-			//remove effects from channels
-			while(this->effectsToRemove.size() != 0){
-				T_ChannelEffectPair &p = this->effectsToRemove.front();
-				ASSERT(p.first)
-				ASSERT(p.second)
-				
-				aumiks::Lib::RemoveEffectFromChannelSync(p.first, p.second);
-				
-				this->effectsToRemove.pop_front();
-			}
-		}
-
-		//mix channels to mixbuf
-		for(T_ChIter i = this->chPool.begin(); i != this->chPool.end();){
-			if(this->mixerBuffer->MixToMixBuf(*i)){
-				(*i)->isPlaying = false;//clear playing flag
-				(*i)->OnStop();//notify channel that it has stopped playing
-				i = this->chPool.erase(i);
-			}else{
-				++i;
-			}
-		}
+	}
 
 //		TRACE(<< "chPool.size() = " << this->chPool.size() << std::endl)
-		M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)
+	M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)
 
-		this->mixerBuffer->CopyToPlayBuf(this->mixerBuffer->playBuf);
-
-		M_AUMIKS_TRACE(<< "SoundThread::Run(): writing data..." << std::endl)
-
-		//write data
-		this->audioBackend->Write(this->mixerBuffer->playBuf);
-	}//~while
-
-//	TRACE(<< "SoundThread::Run(): exiting" << std::endl)
+	this->mixerBuffer->CopyToPlayBuf(playBuf);
 }
-
 
 
 void aumiks::Lib::MixerBuffer::MixSmpBufToMixBuf(){
@@ -493,3 +424,26 @@ void aumiks::Lib::MixerBuffer::CopyToPlayBuf(ting::Buffer<ting::u8>& playBuf){
 	}
 	ASSERT(dst == playBuf.End())
 }
+
+
+
+unsigned aumiks::BytesPerFrame(E_Format format){
+	return 2 * SamplesPerFrame(format); //we only support 16 bits per sample
+}
+
+
+unsigned aumiks::SamplesPerFrame(E_Format format){
+	switch(format){
+		case aumiks::MONO_16_11025:
+		case aumiks::MONO_16_22050:
+		case aumiks::MONO_16_44100:
+			return 1;
+		case aumiks::STEREO_16_11025:
+		case aumiks::STEREO_16_22050:
+		case aumiks::STEREO_16_44100:
+			return 2;
+		default:
+			throw aumiks::Exc("Unknown sound output format");
+	}
+}
+

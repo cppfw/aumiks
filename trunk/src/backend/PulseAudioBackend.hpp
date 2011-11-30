@@ -31,64 +31,58 @@ THE SOFTWARE. */
 #include <pulse/simple.h>
 #include <pulse/error.h>
 
-#include "../aumiks/aumiks.hpp"
-#include "../aumiks/Exc.hpp"
-
+#include "WriteBasedBackend.hpp"
 
 
 namespace{
 
-class PulseAudioBackend : public aumiks::Lib::AudioBackend{
+class PulseAudioBackend : public WriteBasedBackend{
 	pa_simple *handle;
 
-	PulseAudioBackend(unsigned bufferSizeFrames, aumiks::E_Format format){
+	PulseAudioBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
+			WriteBasedBackend(bufferSizeFrames * aumiks::BytesPerFrame(format))
+	{
 		TRACE(<< "opening device" << std::endl)
 
 		pa_sample_spec ss;
 		ss.format = PA_SAMPLE_S16NE;//Native endian
 		
-		unsigned bufferSizeInBytes;
 		switch(format){
 			case aumiks::MONO_16_11025:
 				TRACE(<< "Requested format: Mono 11025" << std::endl)
 				ss.channels = 1;
 				ss.rate = 11025;
-				bufferSizeInBytes = bufferSizeFrames * 2;//2 bytes per sample, 1 sample per frame
 				break;
 			case aumiks::STEREO_16_11025:
 				TRACE(<< "Requested format: Stereo 11025" << std::endl)
 				ss.channels = 2;
 				ss.rate = 11025;
-				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 samples per frame
 				break;
 			case aumiks::MONO_16_22050:
 				TRACE(<< "Requested format: Mono 22050" << std::endl)
 				ss.channels = 1;
 				ss.rate = 22050;
-				bufferSizeInBytes = bufferSizeFrames * 2;//2 bytes per sample, 1 sample per frame
 				break;
 			case aumiks::STEREO_16_22050:
 				TRACE(<< "Requested format: Stereo 22050" << std::endl)
 				ss.channels = 2;
 				ss.rate = 22050;
-				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 samples per frame
 				break;
 			case aumiks::MONO_16_44100:
 				TRACE(<< "Requested format: Mono 44100" << std::endl)
 				ss.channels = 1;
 				ss.rate = 44100;
-				bufferSizeInBytes = bufferSizeFrames * 2;//2 bytes per sample, 1 sample per frame
 				break;
 			case aumiks::STEREO_16_44100:
 				TRACE(<< "Requested format: Stereo 44100" << std::endl)
 				ss.channels = 2;
 				ss.rate = 44100;
-				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 samples per frame
 				break;
 			default:
 				throw aumiks::Exc("unknown sound output format requested");
 		}
 
+		unsigned bufferSizeInBytes = bufferSizeFrames * aumiks::BytesPerFrame(format);
 		pa_buffer_attr ba;
 		ba.fragsize = bufferSizeInBytes;
 		ba.tlength = bufferSizeInBytes;
@@ -117,6 +111,8 @@ class PulseAudioBackend : public aumiks::Lib::AudioBackend{
 			TRACE(<< "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl)
 			throw aumiks::Exc("error opening PulseAudio connection");
 		}
+		
+		this->Start();//start thread
 	}
 	
 	//override
@@ -130,7 +126,7 @@ class PulseAudioBackend : public aumiks::Lib::AudioBackend{
 				0 // no error return
 			) < 0)
 		{
-			//TODO: handle error somehow
+			//TODO: handle error somehow, throw exception
 			//ignore error
 			TRACE(<< "pa_simple_write(): error" << std::endl)
         }
@@ -139,13 +135,15 @@ class PulseAudioBackend : public aumiks::Lib::AudioBackend{
 public:
 
 	~PulseAudioBackend(){
+		this->StopThread();
+		
 		ASSERT(this->handle)
 		pa_simple_free(this->handle);
 	}
 	
-	inline static ting::Ptr<PulseAudioBackend> New(unsigned bufferSizeMillis, aumiks::E_Format format){
+	inline static ting::Ptr<PulseAudioBackend> New(unsigned bufferSizeFrames, aumiks::E_Format format){
 		return ting::Ptr<PulseAudioBackend>(
-				new PulseAudioBackend(bufferSizeMillis, format)
+				new PulseAudioBackend(bufferSizeFrames, format)
 			);
 	}
 };
