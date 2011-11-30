@@ -159,7 +159,7 @@ void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 		if(ch->IsPlaying())
 			return;//already playing
 		
-		ch->IniteEffects();
+		ch->InitEffects();
 		
 		this->thread.chPoolToAdd.push_back(ch);//queue channel to be added to playing pool
 		ch->isPlaying = true;//mark channel as playing
