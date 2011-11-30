@@ -99,7 +99,6 @@ public:
 //base channel class
 class Channel : public ting::RefCounted{
 	friend class aumiks::Lib;
-//	friend class aumiks::Lib::MixerBuffer;
 
 	ting::Inited<volatile bool, false> isPlaying;
 	
@@ -108,13 +107,22 @@ class Channel : public ting::RefCounted{
 	ting::Inited<volatile bool, false> stopFlag;//indicates that playing should stop immediately
 	
 	//list of effects
-	typedef std::vector<ting::Ref<aumiks::Effect> > T_EffectsList;
+	typedef std::list<ting::Ref<aumiks::Effect> > T_EffectsList;
 	typedef T_EffectsList::iterator T_EffectsIter;
 	T_EffectsList effects;
 	
 	inline void IniteEffects(){
 		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
 			(*i)->Init_ts();
+		}
+	}
+	
+	inline void RemoveEffect(const ting::Ref<Effect>& e){
+		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			if((*i) == e){
+				this->effects.erase(i);
+				break;
+			}
 		}
 	}
 	
@@ -185,17 +193,10 @@ public:
 		this->stopFlag = true;
 	}
 	
-	inline void AddEffect(const ting::Ref<aumiks::Effect>& effect){
-		
-		//NOTE: this check does not give 100% safety, since we are dealing with multithreading,
-		//      but should catch misuse errors on debugging stage.
-		ASSERT(!this->IsPlaying())
-		if(this->IsPlaying()){
-			throw aumiks::Exc("unable to add an effect to a playing channel");
-		}
-		
-		this->effects.push_back(effect);
-	}
+	inline void AddEffect_ts(const ting::Ref<aumiks::Effect>& effect);
+	
+	inline void RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect);
+	
 protected:
 	/**
 	 * @brief Called when channel has been added to pool of playing channels.
@@ -233,6 +234,19 @@ enum E_Format{
 class Lib : public ting::Singleton<Lib>{
 	friend class aumiks::Channel;
 	
+	void AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff);
+	
+	void RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff);
+	
+	void PlayChannel_ts(const ting::Ref<Channel>& ch);
+	
+	static inline void RemoveEffectFromChannelSync(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
+		ch->RemoveEffect(eff);
+	}
+	
+	static inline void AddEffectToChannelSync(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
+		ch->effects.push_back(eff);
+	}
 public:
 	/**
 	 * @brief Create sound library singleton instance.
@@ -244,9 +258,7 @@ public:
 	Lib(ting::u16 bufferSizeMillis = 100, aumiks::E_Format format = STEREO_16_22050);
 	
 	~Lib();
-
-	void PlayChannel(ting::Ref<Channel> ch);
-
+	
 	inline void SetMuted(bool muted){
 		this->thread.mixerBuffer->isMuted = muted;
 	}
@@ -359,11 +371,17 @@ private:
 		
 		ting::Mutex chPoolMutex;
 		
-		typedef std::list<ting::Ref<aumiks::Channel> > TChPool;
-		typedef TChPool::iterator TChIter;
-		TChPool chPool;
+		typedef std::list<ting::Ref<aumiks::Channel> > T_ChPool;
+		typedef T_ChPool::iterator T_ChIter;
+		T_ChPool chPool;
 
-		TChPool chPoolToAdd;
+		T_ChPool chPoolToAdd;
+		
+		typedef std::pair<ting::Ref<aumiks::Channel>, ting::Ref<aumiks::Effect> > T_ChannelEffectPair;
+		typedef std::list<T_ChannelEffectPair> T_ChannelEffectPairsList;
+		typedef T_ChannelEffectPairsList::iterator T_ChannelEffectPairsIter;
+		T_ChannelEffectPairsList effectsToAdd;
+		T_ChannelEffectPairsList effectsToRemove;
 
 		SoundThread(ting::u16 bufferSizeMillis, E_Format format);
 
@@ -390,7 +408,25 @@ public:
 
 
 inline void Channel::Play(){
-	aumiks::Lib::Inst().PlayChannel(ting::Ref<aumiks::Channel>(this));
+	aumiks::Lib::Inst().PlayChannel_ts(ting::Ref<aumiks::Channel>(this));
+}
+
+
+
+inline void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
+	aumiks::Lib::Inst().AddEffectToChannel_ts(
+			ting::Ref<Channel>(this),
+			effect
+		);
+}
+
+
+
+inline void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
+	aumiks::Lib::Inst().RemoveEffectFromChannel_ts(
+			ting::Ref<Channel>(this),
+			effect
+		);
 }
 
 

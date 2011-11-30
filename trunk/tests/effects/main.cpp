@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
 	
 	ting::Ref<VolumeEffect> eff = VolumeEffect::New();
 	
-	ch->AddEffect(eff);
+	ch->AddEffect_ts(eff);
 	
 	ch->Play(0);//infinite loop
 	
