@@ -130,7 +130,41 @@ Channel::~Channel(){
 
 
 
-void Lib::PlayChannel(ting::Ref<Channel> ch){
+void Lib::AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
+	ASSERT(ch.IsValid())
+
+	{
+		ting::Mutex::Guard mut(this->thread.chPoolMutex);
+		
+		//TODO: assert that effect is not added yet
+		
+		this->thread.effectsToAdd.push_back(SoundThread::T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
+	}
+
+	//in case the thread is hanging on the queue, wake it up by sending the nop message.
+	this->thread.PushNopMessage();
+}
+
+
+
+void Lib::RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
+	ASSERT(ch.IsValid())
+
+	{
+		ting::Mutex::Guard mut(this->thread.chPoolMutex);
+		
+		//TODO: assert that effect is added
+		
+		this->thread.effectsToRemove.push_back(SoundThread::T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
+	}
+
+	//in case the thread is hanging on the queue, wake it up by sending the nop message.
+	this->thread.PushNopMessage();
+}
+
+
+
+void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 	ASSERT(ch.IsValid())
 
 	{
@@ -378,8 +412,9 @@ void Lib::SoundThread::Run(){
 		//clean mixBuf
 		this->mixerBuffer->CleanMixBuf();
 
-		{//add queued channels to playing pool
+		{//add queued channels to playing pool and effects to channels
 			ting::Mutex::Guard mut(this->chPoolMutex);//lock mutex
+			
 			M_AUMIKS_TRACE(<< "chPoolToAdd.size() = " << this->chPoolToAdd.size() << std::endl)
 			while(this->chPoolToAdd.size() != 0){
 				ting::Ref<aumiks::Channel> ch = this->chPoolToAdd.front();
@@ -387,10 +422,32 @@ void Lib::SoundThread::Run(){
 				this->chPool.push_back(ch);
 				ch->OnStart();//notify channel that it was just started
 			}
+			
+			//add effects to channels
+			while(this->effectsToAdd.size() != 0){
+				T_ChannelEffectPair& p = this->effectsToAdd.front();
+				ASSERT(p.first)
+				ASSERT(p.second)
+				
+				aumiks::Lib::AddEffectToChannelSync(p.first, p.second);
+				
+				this->effectsToAdd.pop_front();
+			}
+			
+			//remove effects from channels
+			while(this->effectsToRemove.size() != 0){
+				T_ChannelEffectPair &p = this->effectsToRemove.front();
+				ASSERT(p.first)
+				ASSERT(p.second)
+				
+				aumiks::Lib::RemoveEffectFromChannelSync(p.first, p.second);
+				
+				this->effectsToRemove.pop_front();
+			}
 		}
 
 		//mix channels to mixbuf
-		for(TChIter i = this->chPool.begin(); i != this->chPool.end();){
+		for(T_ChIter i = this->chPool.begin(); i != this->chPool.end();){
 			if(this->mixerBuffer->MixToMixBuf(*i)){
 				(*i)->isPlaying = false;//clear playing flag
 				(*i)->OnStop();//notify channel that it has stopped playing
