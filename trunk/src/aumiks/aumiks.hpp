@@ -170,8 +170,6 @@ class Channel : public ting::RefCounted{
 	}
 	
 protected:
-	ting::Inited<volatile ting::s8, 0> panning;
-	
 	Channel(){}
 	
 public:
