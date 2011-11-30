@@ -121,22 +121,11 @@ Lib::~Lib(){
 
 
 
-Channel::~Channel(){
-	//notify all effects
-	for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-		(*i)->OnRemoveFromChannel_ts();
-	}
-}
-
-
-
 void Lib::AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
 	ASSERT(ch.IsValid())
 
 	{
 		ting::Mutex::Guard mut(this->thread.chPoolMutex);
-		
-		//TODO: assert that effect is not added yet
 		
 		this->thread.effectsToAdd.push_back(SoundThread::T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
 	}
@@ -152,8 +141,6 @@ void Lib::RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::R
 
 	{
 		ting::Mutex::Guard mut(this->thread.chPoolMutex);
-		
-		//TODO: assert that effect is added
 		
 		this->thread.effectsToRemove.push_back(SoundThread::T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
 	}
