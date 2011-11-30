@@ -278,7 +278,7 @@ public:
 		MixerBuffer(unsigned mixBufSize) :
 				mixBuf(mixBufSize),
 				smpBuf(mixBufSize),
-				playBuf(mixBufSize * 2) //2 bytes per sample
+				playBuf(mixBufSize * 2) //2 bytes per sample (16 bit)
 		{}
 
 		inline bool FillSmpBuf11025Mono16(const ting::Ref<aumiks::Channel>& ch){
@@ -335,7 +335,7 @@ public:
 		//return true if channel has finished playing and should be removed from playing channels pool
 		bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch);
 
-		void CopyFromMixBufToPlayBuf();
+		void CopyToPlayBuf(ting::Buffer<ting::u8>& playBuf);
 		
 		virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
 		
