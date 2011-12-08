@@ -60,8 +60,10 @@ class Lib;
 class Channel;
 
 
+
 //TODO: add doxygen docs everywhere
 class Effect : public ting::RefCounted{
+	friend class aumiks::Channel;
 public:
 	/**
 	 * @brief Called every time when the Channel is about to start playing.
@@ -71,21 +73,50 @@ public:
 	virtual void Init_ts(){}
 	
 	/**
+	 * @brief A result which should be returned by effect application method.
+	 */
+	//TODO: rewise the enum values and logic
+	enum E_Result{
+		/**
+		 * @brief Normal result.
+		 * Return this if no any special actions needed after Effect application.
+		 * Note, that even if sound has finished playing the channel will continue to
+		 * play if at least one effect returns NORMAL result.
+		 */
+		NORMAL,
+		
+		/**
+		 * @brief Effect has finished.
+		 * Return this if effect has finished, but sound should still continue playing if it
+		 * has not finished yet.
+		 */
+		FINISHED,
+		
+		/**
+		 * @brief Effect has suppressed sound.
+		 * Return this value if effect has fully suppressed the sound and there is no reason to
+		 * continue sound playing since it will further result in silence due to this effect.
+		 */
+		SUPPRESSED
+	};
+	
+	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
      * @param buf - buffer containing portion of sound data.
-     * @return true if effect has finished. TODO: explain more
-	 * @return false otherwise.
+	 * @param soundStopped - true if sound has finished playing, false otherwise.
+     * @return One of the E_Result values. See E_Result description for more info.
      */
-	//TODO: what if effect has suppressed sound (fade out) and further sound playing is pointless
-	//      what if sound has stopped, but effect has a delay and should stop later
-	virtual bool ApplyToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual E_Result ApplyToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
 	
 	//TODO: add doxygen docs for each method
-	virtual bool ApplyToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){return true;}
-	virtual bool ApplyToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){return true;}
-	virtual bool ApplyToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){return true;}
-	virtual bool ApplyToSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){return true;}
-	virtual bool ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual E_Result ApplyToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
+	virtual E_Result ApplyToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
+	virtual E_Result ApplyToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
+	virtual E_Result ApplyToSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
+	virtual E_Result ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
+	
+private:
+	template <unsigned freq, unsigned chans> inline E_Result ApplyToSmpBufImpl(ting::Buffer<ting::s32>& buf, bool soundStopped);
 };
 
 
@@ -120,54 +151,26 @@ class Channel : public ting::RefCounted{
 		}
 	}
 	
-	inline bool ApplyEffectsToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){
-		bool ret = true;
-		//return true if all effects returned true;
+	template <unsigned freq, unsigned chans> inline bool ApplyEffectsToSmpBuf(ting::Buffer<ting::s32>& buf){
+		bool ret = this->soundStopped;
+		//TODO: rewise the logic
 		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			ret &= (*i)->ApplyToSmpBuf11025Mono16(buf);
+			switch((*i)->ApplyToSmpBufImpl<freq, chans>(buf, this->soundStopped)){
+				case Effect::NORMAL:
+					ret = false;//at least one effect is still effective, return false
+					break;
+				case Effect::FINISHED:
+					break;
+				case Effect::SUPPRESSED:
+					return true; //no need to apply remaining effects and no need to continue sound playing
+				default:
+					ASSERT(false)
+					break;
+			}
 		}
 		return ret;
 	}
-	inline bool ApplyEffectsToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){
-		bool ret = true;
-		//return true if all effects returned true;
-		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			ret &= (*i)->ApplyToSmpBuf11025Stereo16(buf);
-		}
-		return ret;
-	}
-	inline bool ApplyEffectsToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){
-		bool ret = true;
-		//return true if all effects returned true;
-		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			ret &= (*i)->ApplyToSmpBuf22050Mono16(buf);
-		}
-		return ret;
-	}
-	inline bool ApplyEffectsToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){
-		bool ret = true;
-		//return true if all effects returned true;
-		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			ret &= (*i)->ApplyToSmpBuf22050Stereo16(buf);
-		}
-		return ret;
-	}
-	inline bool ApplyEffectsToSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){
-		bool ret = true;
-		//return true if all effects returned true;
-		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			ret &= (*i)->ApplyToSmpBuf44100Mono16(buf);
-		}
-		return ret;
-	}
-	inline bool ApplyEffectsToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){
-		bool ret = true;
-		//return true if all effects returned true;
-		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			ret &= (*i)->ApplyToSmpBuf44100Stereo16(buf);
-		}
-		return ret;
-	}
+
 	
 protected:
 	Channel(){}
@@ -276,7 +279,7 @@ public:
 		return this->mixerBuffer->isMuted;
 	}
 
-public:
+private:
 	//Base class for mixer buffers of different formats
 	class MixerBuffer{
 		friend class aumiks::Lib;
@@ -286,43 +289,7 @@ public:
 				smpBuf(mixBufSizeInSamples)
 		{}
 
-		inline bool FillSmpBuf11025Mono16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->FillSmpBuf11025Mono16(this->smpBuf);
-		}
-		inline bool FillSmpBuf11025Stereo16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->FillSmpBuf11025Stereo16(this->smpBuf);
-		}
-		inline bool FillSmpBuf22050Mono16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->FillSmpBuf22050Mono16(this->smpBuf);
-		}
-		inline bool FillSmpBuf22050Stereo16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->FillSmpBuf22050Stereo16(this->smpBuf);
-		}
-		inline bool FillSmpBuf44100Mono16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->FillSmpBuf44100Mono16(this->smpBuf);
-		}
-		inline bool FillSmpBuf44100Stereo16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->FillSmpBuf44100Stereo16(this->smpBuf);
-		}
-		
-		inline bool ApplyEffectsToSmpBuf11025Mono16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->ApplyEffectsToSmpBuf11025Mono16(this->smpBuf);
-		}
-		inline bool ApplyEffectsToSmpBuf11025Stereo16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->ApplyEffectsToSmpBuf11025Stereo16(this->smpBuf);
-		}
-		inline bool ApplyEffectsToSmpBuf22050Mono16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->ApplyEffectsToSmpBuf22050Mono16(this->smpBuf);
-		}
-		inline bool ApplyEffectsToSmpBuf22050Stereo16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->ApplyEffectsToSmpBuf22050Stereo16(this->smpBuf);
-		}
-		inline bool ApplyEffectsToSmpBuf44100Mono16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->ApplyEffectsToSmpBuf44100Mono16(this->smpBuf);
-		}
-		inline bool ApplyEffectsToSmpBuf44100Stereo16(const ting::Ref<aumiks::Channel>& ch){
-			return ch->ApplyEffectsToSmpBuf44100Stereo16(this->smpBuf);
-		}
+		template <unsigned freq, unsigned chans> inline bool FillSmpBufImpl(const ting::Ref<aumiks::Channel>& ch);
 		
 		ting::Array<ting::s32> mixBuf;
 		ting::Array<ting::s32> smpBuf;
@@ -346,8 +313,37 @@ public:
 		virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
 		
 		void MixSmpBufToMixBuf();
+		
+		template <unsigned freq, unsigned chans> inline bool ApplyEffectsToSmpBufImpl(const ting::Ref<aumiks::Channel>& ch){
+			return ch->ApplyEffectsToSmpBuf<freq, chans>(this->smpBuf);
+		}
 	};
 
+	template <unsigned freq, unsigned chans> class MixerBufferImpl : public Lib::MixerBuffer{
+		MixerBufferImpl(unsigned bufferSizeInSamples) :
+				MixerBuffer(bufferSizeInSamples)
+		{}
+
+		//override
+		virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+			return this->FillSmpBufImpl<freq, chans>(ch);
+		}
+
+		//override
+		virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch){
+			return this->ApplyEffectsToSmpBufImpl<freq, chans>(ch);
+		}
+
+	public:
+		inline static ting::Ptr<MixerBufferImpl> New(unsigned bufferSizeInSamples){
+			return ting::Ptr<MixerBufferImpl>(
+					new MixerBufferImpl(bufferSizeInSamples)
+				);
+		}
+	};
+
+
+public:	
 	//base class for audio backends
 	class AudioBackend{
 	protected:
@@ -385,6 +381,47 @@ private:
 	const ting::Ptr<AudioBackend> audioBackend;
 };
 
+
+
+template <> inline bool Lib::MixerBuffer::FillSmpBufImpl<11025, 1>(const ting::Ref<aumiks::Channel>& ch){
+	return ch->FillSmpBuf11025Mono16(this->smpBuf);
+}
+template <> inline bool Lib::MixerBuffer::FillSmpBufImpl<11025, 2>(const ting::Ref<aumiks::Channel>& ch){
+	return ch->FillSmpBuf11025Stereo16(this->smpBuf);
+}
+template <> inline bool Lib::MixerBuffer::FillSmpBufImpl<22050, 1>(const ting::Ref<aumiks::Channel>& ch){
+	return ch->FillSmpBuf22050Mono16(this->smpBuf);
+}
+template <> inline bool Lib::MixerBuffer::FillSmpBufImpl<22050, 2>(const ting::Ref<aumiks::Channel>& ch){
+	return ch->FillSmpBuf22050Stereo16(this->smpBuf);
+}
+template <> inline bool Lib::MixerBuffer::FillSmpBufImpl<44100, 1>(const ting::Ref<aumiks::Channel>& ch){
+	return ch->FillSmpBuf44100Mono16(this->smpBuf);
+}
+template <> inline bool Lib::MixerBuffer::FillSmpBufImpl<44100, 2>(const ting::Ref<aumiks::Channel>& ch){
+	return ch->FillSmpBuf44100Stereo16(this->smpBuf);
+}
+
+
+template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<11025, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToSmpBuf11025Mono16(buf, soundStopped);
+}
+template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<11025, 2>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToSmpBuf11025Stereo16(buf, soundStopped);
+}
+template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<22050, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToSmpBuf22050Mono16(buf, soundStopped);
+}
+template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<22050, 2>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToSmpBuf22050Stereo16(buf, soundStopped);
+}
+template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<44100, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToSmpBuf44100Mono16(buf, soundStopped);
+}
+template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<44100, 2>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToSmpBuf44100Stereo16(buf, soundStopped);
+}
+		
 
 
 //base class for all sounds

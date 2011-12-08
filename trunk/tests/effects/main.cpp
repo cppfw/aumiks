@@ -13,18 +13,18 @@ public:
 	}
 	
 	//override
-	virtual bool ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){
+	virtual aumiks::Effect::E_Result ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
 		ting::u8 vol = this->vol; //save volatile value
 		if(vol == ting::u8(-1)){
 			//do nothing
-			return true;
+			return aumiks::Effect::FINISHED;//TODO: return what?
 		}
 		
 		for(ting::s32* i = buf.Begin(); i != buf.End(); ++i){
 			*i = (*i) * vol / ting::u8(-1);
 		}
 		
-		return true;
+		return aumiks::Effect::FINISHED;//TODO: return what?
 	}
 	
 	static inline ting::Ref<VolumeEffect> New(){
