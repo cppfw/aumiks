@@ -14,6 +14,7 @@
         <in>DirectSoundBackend.hpp</in>
         <in>ESoundBackend.hpp</in>
         <in>PulseAudioBackend.hpp</in>
+        <in>WriteBasedBackend.hpp</in>
       </df>
       <df name="obj">
         <df name="1">
