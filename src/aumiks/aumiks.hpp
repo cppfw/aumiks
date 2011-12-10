@@ -75,29 +75,36 @@ public:
 	/**
 	 * @brief A result which should be returned by effect application method.
 	 */
-	//TODO: rewise the enum values and logic
 	enum E_Result{
 		/**
-		 * @brief Normal result.
-		 * Return this if no any special actions needed after Effect application.
-		 * Note, that even if sound has finished playing the channel will continue to
-		 * play if at least one effect returns NORMAL result.
+		 * @brief Normal result after applying the effect.
+		 * Return this if no any special actions needed after Effect applying.
+		 * This value means that the effect does not require immediate sound stopping or
+		 * continuation of channel playing after the sound is finished.
+		 * So, returning this value indicates, that this effect does not affect the channel
+		 * playing life time in any way.
 		 */
 		NORMAL,
 		
 		/**
-		 * @brief Effect has finished.
-		 * Return this if effect has finished, but sound should still continue playing if it
-		 * has not finished yet.
+		 * @brief Effect is still producing output.
+		 * Return this if effect is producing output. If some of the effects added to the channel returns this value
+		 * then the sound channel will be kept playing even if the original sound has finished.
+		 * This is useful for such effects which produce some output even
+		 * after the sound has ceased. For example and echo effect produces several echoes of the sound after the
+		 * original sound has finished. This value is overridden by STOP_SOUND value, i.e. if some other effect added to this channel
+		 * has returned STOP_SOUND then the channel playing will be stopped, no matter if this effect returns CONTINUE.
 		 */
-		FINISHED,
+		CONTINUE,
 		
 		/**
-		 * @brief Effect has suppressed sound.
+		 * @brief Effect has request to stop the sound.
 		 * Return this value if effect has fully suppressed the sound and there is no reason to
 		 * continue sound playing since it will further result in silence due to this effect.
+		 * For example the "fade out" effect may return this value when the sound is fully faded out.
+		 * So, returning STOP_SOUND will result in immediate stopping of channel playing.
 		 */
-		SUPPRESSED
+		STOP_SOUND
 	};
 	
 	/**
@@ -106,14 +113,14 @@ public:
 	 * @param soundStopped - true if sound has finished playing, false otherwise.
      * @return One of the E_Result values. See E_Result description for more info.
      */
-	virtual E_Result ApplyToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
+	virtual E_Result ApplyToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
 	//TODO: add doxygen docs for each method
-	virtual E_Result ApplyToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
-	virtual E_Result ApplyToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
-	virtual E_Result ApplyToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
-	virtual E_Result ApplyToSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
-	virtual E_Result ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return FINISHED;}
+	virtual E_Result ApplyToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
 private:
 	template <unsigned freq, unsigned chans> inline E_Result ApplyToSmpBufImpl(ting::Buffer<ting::s32>& buf, bool soundStopped);
@@ -153,22 +160,29 @@ class Channel : public ting::RefCounted{
 	
 	template <unsigned freq, unsigned chans> inline bool ApplyEffectsToSmpBuf(ting::Buffer<ting::s32>& buf){
 		bool ret = this->soundStopped;
-		//TODO: rewise the logic
+		bool stopRequested = false;
+
 		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
 			switch((*i)->ApplyToSmpBufImpl<freq, chans>(buf, this->soundStopped)){
 				case Effect::NORMAL:
-					ret = false;//at least one effect is still effective, return false
 					break;
-				case Effect::FINISHED:
+				case Effect::CONTINUE:
+					ret = false; //at least one of the effects has requested to continue the channel playing
 					break;
-				case Effect::SUPPRESSED:
-					return true; //no need to apply remaining effects and no need to continue sound playing
+				case Effect::STOP_SOUND:
+					//Set the stop requested flag.
+					//It is still necessary to apply remaining effects, since current filled sample buffer
+					//will still be played, no matter that the channel playing will be stopped.
+					//This is why we use flag instead of immediately returning true here, because the for-loop
+					//needs to be finished.
+					stopRequested = true;
+					break;
 				default:
 					ASSERT(false)
 					break;
 			}
 		}
-		return ret;
+		return ret || stopRequested;
 	}
 
 	

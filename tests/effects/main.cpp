@@ -17,14 +17,14 @@ public:
 		ting::u8 vol = this->vol; //save volatile value
 		if(vol == ting::u8(-1)){
 			//do nothing
-			return aumiks::Effect::FINISHED;//TODO: return what?
+			return aumiks::Effect::NORMAL;
 		}
 		
 		for(ting::s32* i = buf.Begin(); i != buf.End(); ++i){
 			*i = (*i) * vol / ting::u8(-1);
 		}
 		
-		return aumiks::Effect::FINISHED;//TODO: return what?
+		return aumiks::Effect::NORMAL;
 	}
 	
 	static inline ting::Ref<VolumeEffect> New(){
