@@ -94,9 +94,9 @@ void Lib::AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<au
 	ASSERT(ch.IsValid())
 
 	{
-		ting::Mutex::Guard mut(this->chPoolMutex);
+		ting::Mutex::Guard mut(this->mutex);
 		
-		this->effectsToAdd.push_back(T_ChannelEffectPair(ch, eff));//queue channel for affect addition
+		this->effectsToAddToChan.push_back(T_ChannelEffectPair(ch, eff));//queue channel for affect addition
 	}
 }
 
@@ -106,9 +106,9 @@ void Lib::RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::R
 	ASSERT(ch.IsValid())
 
 	{
-		ting::Mutex::Guard mut(this->chPoolMutex);
+		ting::Mutex::Guard mut(this->mutex);
 		
-		this->effectsToRemove.push_back(T_ChannelEffectPair(ch, eff));//queue channel for single effect removal
+		this->effectsToRemoveFromChan.push_back(T_ChannelEffectPair(ch, eff));//queue channel for single effect removal
 	}
 }
 
@@ -118,7 +118,7 @@ void Lib::RemoveAllEffectsFromChannel_ts(const ting::Ref<Channel>& ch){
 	ASSERT(ch.IsValid())
 
 	{
-		ting::Mutex::Guard mut(this->chPoolMutex);
+		ting::Mutex::Guard mut(this->mutex);
 		
 		this->effectsToClear.push_back(ch);//queue channel for removal of all effects
 	}
@@ -130,7 +130,7 @@ void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 	ASSERT(ch.IsValid())
 
 	{
-		ting::Mutex::Guard mut(this->chPoolMutex);
+		ting::Mutex::Guard mut(this->mutex);
 		if(ch->IsPlaying())
 			return;//already playing
 		
@@ -203,7 +203,7 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 	this->mixerBuffer->CleanMixBuf();
 
 	{//add queued channels to playing pool and effects to channels
-		ting::Mutex::Guard mut(this->chPoolMutex);//lock mutex
+		ting::Mutex::Guard mut(this->mutex);//lock mutex
 
 		M_AUMIKS_TRACE(<< "chPoolToAdd.size() = " << this->channelsToAdd.size() << std::endl)
 		while(this->channelsToAdd.size() != 0){
@@ -214,25 +214,25 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 		}
 
 		//add effects to channels
-		while(this->effectsToAdd.size() != 0){
-			T_ChannelEffectPair& p = this->effectsToAdd.front();
+		while(this->effectsToAddToChan.size() != 0){
+			T_ChannelEffectPair& p = this->effectsToAddToChan.front();
 			ASSERT(p.first)
 			ASSERT(p.second)
 
 			aumiks::Lib::AddEffectToChannelSync(p.first, p.second);
 
-			this->effectsToAdd.pop_front();
+			this->effectsToAddToChan.pop_front();
 		}
 
 		//remove effects from channels
-		while(this->effectsToRemove.size() != 0){
-			T_ChannelEffectPair &p = this->effectsToRemove.front();
+		while(this->effectsToRemoveFromChan.size() != 0){
+			T_ChannelEffectPair &p = this->effectsToRemoveFromChan.front();
 			ASSERT(p.first)
 			ASSERT(p.second)
 
 			aumiks::Lib::RemoveEffectFromChannelSync(p.first, p.second);
 
-			this->effectsToRemove.pop_front();
+			this->effectsToRemoveFromChan.pop_front();
 		}
 		
 		//remove all effects from channels
@@ -240,7 +240,31 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 			this->effectsToClear.front()->effects.clear();
 			this->effectsToClear.pop_front();
 		}
-	}
+		
+		//add global effects
+		while(this->effectsToAdd.size() != 0){
+			this->effects.push_back(this->effectsToAdd.front());
+			this->effectsToAdd.pop_front();
+		}
+		
+		//remove global effects
+		while(this->effectsToRemove.size() != 0){
+			for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+				if(*i == this->effectsToRemove.front()){
+					this->effects.erase(i);
+					break;
+				}
+			}
+			
+			this->effectsToRemove.pop_front();
+		}
+		
+		//clear global effects if requested
+		if(this->clearEffects){
+			this->effects.clear();
+			this->clearEffects = false;
+		}
+	}//~mutex guard
 
 	//mix channels to mixbuf
 	for(T_ChannelIter i = this->chPool.begin(); i != this->chPool.end();){
@@ -252,6 +276,8 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 			++i;
 		}
 	}
+	
+	//TODO: apply global effects
 
 //		TRACE(<< "chPool.size() = " << this->chPool.size() << std::endl)
 	M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)

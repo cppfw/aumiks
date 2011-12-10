@@ -71,7 +71,13 @@ class AudioBackend;
  */
 class Effect : public ting::RefCounted{
 	friend class aumiks::Channel;
+	friend class aumiks::Lib;
+	
+	typedef std::list<ting::Ref<aumiks::Effect> > T_EffectsList;
+	typedef T_EffectsList::iterator T_EffectsIter;
+	
 public:
+
 	/**
 	 * @brief Called every time when the Channel is about to start playing.
 	 * Called from separate thread.
@@ -172,19 +178,17 @@ class Channel : public ting::RefCounted{
 
 	ting::Inited<volatile bool, false> stopFlag;//indicates that playing should stop immediately
 	
-	//list of effects
-	typedef std::list<ting::Ref<aumiks::Effect> > T_EffectsList;
-	typedef T_EffectsList::iterator T_EffectsIter;
-	T_EffectsList effects;
+private:
+	Effect::T_EffectsList effects;
 	
 	inline void InitEffects(){
-		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
 			(*i)->Init_ts();
 		}
 	}
 	
 	inline void RemoveEffect(const ting::Ref<Effect>& e){
-		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
 			if((*i) == e){
 				this->effects.erase(i);
 				break;
@@ -196,7 +200,7 @@ class Channel : public ting::RefCounted{
 		bool ret = this->soundStopped;
 		bool stopRequested = false;
 
-		for(T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
 			switch((*i)->ApplyToSmpBufImpl<freq, chans>(buf, this->soundStopped)){
 				case Effect::NORMAL:
 					break;
@@ -536,7 +540,7 @@ private:
 private:
 	void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf);
 	
-	ting::Mutex chPoolMutex;
+	ting::Mutex mutex;
 
 	typedef std::list<ting::Ref<aumiks::Channel> > T_ChannelList;
 	typedef T_ChannelList::iterator T_ChannelIter;
@@ -544,11 +548,57 @@ private:
 
 	T_ChannelList channelsToAdd;
 
+	Effect::T_EffectsList effects;//list of effects applied to final mixing buffer
+	
+	Effect::T_EffectsList effectsToAdd;
+	Effect::T_EffectsList effectsToRemove;
+	
+	ting::Inited<bool, false> clearEffects;//flag indicating that removing of all effects requested
+	
+public:
+	/**
+	 * @brief Add global effect.
+	 * Adds the effect to the list of global effects which are applied to the
+	 * final mixing buffer after all the playing channels are mixed.
+     * @param effect - effect to add.
+     */
+	inline void AddEffect_ts(const ting::Ref<Effect>& effect){
+		ASSERT(effect.IsValid())
+		
+		{
+			ting::Mutex::Guard mutexGuard(this->mutex);
+			
+			this->effectsToAdd.push_back(effect);
+		}
+	}
+	
+	/**
+	 * @brief Remove global effect.
+	 * Removes the effect from the list of global effects which are applied to the
+	 * final mixing buffer after all the playing channels are mixed.
+     * @param effect - effect to remove.
+     */
+	inline void RemoveEffect_ts(const ting::Ref<Effect>& effect){
+		ASSERT(effect.IsValid())
+		
+		{
+			ting::Mutex::Guard mutexGuard(this->mutex);
+			
+			this->effectsToRemove.push_back(effect);
+		}
+	}
+	
+	inline void RemoveAllEffects_ts(){
+		ting::Mutex::Guard mutexGuard(this->mutex);
+		
+		this->clearEffects = true;
+	}
+private:
 	typedef std::pair<ting::Ref<aumiks::Channel>, ting::Ref<aumiks::Effect> > T_ChannelEffectPair;
 	typedef std::list<T_ChannelEffectPair> T_ChannelEffectPairsList;
 	typedef T_ChannelEffectPairsList::iterator T_ChannelEffectPairsIter;
-	T_ChannelEffectPairsList effectsToAdd;
-	T_ChannelEffectPairsList effectsToRemove;
+	T_ChannelEffectPairsList effectsToAddToChan;
+	T_ChannelEffectPairsList effectsToRemoveFromChan;
 	
 	//list of channels from which it is requested to remove all effects
 	T_ChannelList effectsToClear;
