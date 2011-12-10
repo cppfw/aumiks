@@ -277,7 +277,8 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 		}
 	}
 	
-	//TODO: apply global effects
+	//apply global effects
+	this->mixerBuffer->ApplyEffectsToMixBuf();
 
 //		TRACE(<< "chPool.size() = " << this->chPool.size() << std::endl)
 	M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)

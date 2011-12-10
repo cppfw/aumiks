@@ -13,7 +13,7 @@ public:
 	}
 	
 	//override
-	virtual aumiks::Effect::E_Result ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	virtual aumiks::Effect::E_Result ApplyToBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
 		ting::u8 vol = this->vol; //save volatile value
 		if(vol == ting::u8(-1)){
 			//do nothing
