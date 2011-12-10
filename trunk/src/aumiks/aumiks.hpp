@@ -61,7 +61,12 @@ class Channel;
 
 
 
-//TODO: add doxygen docs everywhere
+/**
+ * @brief Base class for effect classes which can be applied to a playing sound.
+ * The effects should derive from this class and re-implement the virtual methods
+ * which are called to apply the effect to a sound when it is played.
+ * The effects can be added to the playing channel.
+ */
 class Effect : public ting::RefCounted{
 	friend class aumiks::Channel;
 public:
@@ -109,17 +114,41 @@ public:
 	
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
+	 * Depending on the output sound format the corresponding method is called.
      * @param buf - buffer containing portion of sound data.
 	 * @param soundStopped - true if sound has finished playing, false otherwise.
      * @return One of the E_Result values. See E_Result description for more info.
      */
 	virtual E_Result ApplyToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
-	//TODO: add doxygen docs for each method
+	/**
+	 * @brief Called when effect is to be applied to a portion of a playing sound.
+	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+     */
 	virtual E_Result ApplyToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	
+	/**
+	 * @brief Called when effect is to be applied to a portion of a playing sound.
+	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+     */
 	virtual E_Result ApplyToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	
+	/**
+	 * @brief Called when effect is to be applied to a portion of a playing sound.
+	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+     */
 	virtual E_Result ApplyToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	
+	/**
+	 * @brief Called when effect is to be applied to a portion of a playing sound.
+	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+     */
 	virtual E_Result ApplyToSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	
+	/**
+	 * @brief Called when effect is to be applied to a portion of a playing sound.
+	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+     */
 	virtual E_Result ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
 private:
@@ -128,7 +157,10 @@ private:
 
 
 
-//base channel class
+/**
+ * @brief Base class of a channel for playing the sound.
+ * Usually, the effects are created by Sound class implementations using CreateChannel() method.
+ */
 class Channel : public ting::RefCounted{
 	friend class aumiks::Lib;
 
@@ -191,18 +223,41 @@ protected:
 	
 public:
 
+	/**
+	 * @brief Check if sound is currently playing.
+     * @return true if channel is playing.
+	 * @return false otherwise.
+     */
 	inline bool IsPlaying()const{
 		return this->isPlaying;
 	}
 
+	/**
+	 * @brief Start playing of this channel.
+     */
 	inline void Play();
 
+	/**
+	 * @brief Stop playing of this channel.
+     */
 	inline void Stop(){
 		this->stopFlag = true;
 	}
 	
+	/**
+	 * @brief Add effect to the channel.
+	 * It is allowed to add effects during channel playing.
+	 * The single effect instance can only be added to one channel. Adding single
+	 * Effect instance to more than one channel will result in undefined behavior.
+     * @param effect - the effect to add.
+     */
 	inline void AddEffect_ts(const ting::Ref<aumiks::Effect>& effect);
 	
+	/**
+	 * @brief Remove effect from the channel.
+	 * It is allowed to remove effects during channel playing.
+     * @param effect - effect to remove.
+     */
 	inline void RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect);
 	
 protected:
@@ -215,38 +270,122 @@ protected:
 	 * @brief Called when channel has been removed from pool of playing channels.
 	 */
 	virtual void OnStop(){}
-private:
-	//this function is called by SoundThread when it needs more data to play.
-	//return true to remove channel from playing channels list
+
+	/**
+	 * @brief This function is called when more data to play is needed.
+	 * Override this method in your Channel implementation.
+	 * Depending on the selected output format (sampling rate, mono/stereo) the corresponding method is called.
+	 * The return value indicates whether the sound has finished playing or not.
+	 * Note, that channel playing may continue even if sound has stopped playing, this is
+	 * possible if there are any effects added to this channel which keeps playing, for example
+	 * an echo effect.
+     * @param buf - the sample buffer to fill with the data to play.
+     * @return true if sound playing has finished.
+	 * @return false otherwise.
+     */
 	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	
+	/**
+	 * @brief This function is called when more data to play is needed.
+	 * See description of Channel::FillSmpBuf11025Mono16() method.
+     */
 	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	
+	/**
+	 * @brief This function is called when more data to play is needed.
+	 * See description of Channel::FillSmpBuf11025Mono16() method.
+     */
 	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	
+	/**
+	 * @brief This function is called when more data to play is needed.
+	 * See description of Channel::FillSmpBuf11025Mono16() method.
+     */
 	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	
+	/**
+	 * @brief This function is called when more data to play is needed.
+	 * See description of Channel::FillSmpBuf11025Mono16() method.
+     */
 	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	
+	/**
+	 * @brief This function is called when more data to play is needed.
+	 * See description of Channel::FillSmpBuf11025Mono16() method.
+     */
 	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){return true;}
 };
 
 
 
+/**
+ * @brief Sound output format.
+ * Enumeration defining possible sound output formats.
+ * All currently supported formats are 16 bits per sample.
+ */
 enum E_Format{
+	/**
+	 * @brief Mono 11025 Hz.
+	 */
 	MONO_16_11025,
+	
+	/**
+	 * @brief Mono 22050 Hz.
+	 */
 	MONO_16_22050,
+	
+	/**
+	 * @brief Mono 44100 Hz.
+	 */
 	MONO_16_44100,
+	
+	/**
+	 * @brief Stereo 11025 Hz.
+	 */
 	STEREO_16_11025,
+	
+	/**
+	 * @brief Stereo 22050 Hz.
+	 */
 	STEREO_16_22050,
+	
+	/**
+	 * @brief Stereo 44100 Hz.
+	 */
 	STEREO_16_44100
 };
 
 
 
+/**
+ * @brief Returns frame size for given sound output format.
+ * Returns number of bytes per frame for given sound output format.
+ * The sound frame is the sound data for a single sampling rate tick.
+ * Each frame consists of number of channels samples (e.g. mono: 1 frame = 1 sample, stereo: 1 frame = 2 samples).
+ * @param format - format to return the frame size of.
+ * @return the size of the frame in bytes.
+ */
 unsigned BytesPerFrame(E_Format format);
 
 
 
+/**
+ * @brief Returns number of samples per frame for given sound output format.
+ * In fact, this function returns number of channels of the given sound output format.
+ * @param format - format for which to return the frame size in samples.
+ * @return size of the frame in samples.
+ */
 unsigned SamplesPerFrame(E_Format format);
 
 
 
+/**
+ * @brief aumiks library singleton class.
+ * This is a main class of the aumiks library.
+ * Before using the library one has to create a single instance of the Lib class.
+ * It will perform necessary sound output initializations and open sound output device.
+ * Destroying the object will close the sound output device and clean all the resources.
+ */
 class Lib : public ting::Singleton<Lib>{
 	friend class aumiks::Channel;
 	
@@ -268,27 +407,53 @@ public:
 	 * @brief Create sound library singleton instance.
 	 * Creates singleton instance of sound library object and
 	 * opens sound device.
-	 * @param bufferSizeMillis - size of desired playing buffer in milliseconds.
+	 * @param bufferSizeMillis - size of desired playing buffer in milliseconds. Use smaller buffers for higher latency.
+	 *                           Note, that very small buffer may result in bigger overhead and lags. The same applies to very big buffer sizes.
 	 * @param format - format of sound output.
 	 */
 	Lib(ting::u16 bufferSizeMillis = 100, aumiks::E_Format format = STEREO_16_22050);
 	
+	/**
+	 * @brief Mute sound output.
+	 * Mute the sound output. This is the same as the resulting sound volume would be set to zero.
+	 * I.e. all the computational resources for sound mixing etc. are still being consumed when sound is muted.
+     * @param muted - pass true to mute the sound, false to un-mute.
+     */
 	inline void SetMuted(bool muted){
 		this->mixerBuffer->isMuted = muted;
 	}
 
+	/**
+	 * @brief Unmute the sound.
+	 * Inversion of Lib::SetMuted() method.
+	 * See description of Lib::SetMuted() method for more info.
+     * @param unmuted - true to un-mute the sound, false to mute.
+     */
 	inline void SetUnmuted(bool unmuted){
 		this->SetMuted(!unmuted);
 	}
 
+	/**
+	 * @brief Mute the sound.
+	 * See description of Lib::SetMuted() method for more info.
+	 */
 	inline void Mute(){
 		this->SetMuted(true);
 	}
 
+	/**
+	 * @brief Un-mute the sound.
+	 * See description of Lib::SetMuted() method for more info.
+	 */
 	inline void Unmute(){
 		this->SetMuted(false);
 	}
 
+	/**
+	 * @brief Check if sound output is muted or not.
+     * @return true if sound output is muted.
+	 * @return false otherwise.
+     */
 	inline bool IsMuted()const{
 		return this->mixerBuffer->isMuted;
 	}
@@ -359,6 +524,7 @@ private:
 
 public:	
 	//base class for audio backends
+	//TODO: make it private somehow
 	class AudioBackend{
 	protected:
 		inline void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
@@ -397,6 +563,7 @@ private:
 
 
 
+//Full template specializations
 template <> inline bool Lib::MixerBuffer::FillSmpBufImpl<11025, 1>(const ting::Ref<aumiks::Channel>& ch){
 	return ch->FillSmpBuf11025Mono16(this->smpBuf);
 }
@@ -417,6 +584,8 @@ template <> inline bool Lib::MixerBuffer::FillSmpBufImpl<44100, 2>(const ting::R
 }
 
 
+
+//Full template specializations
 template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<11025, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
 	return this->ApplyToSmpBuf11025Mono16(buf, soundStopped);
 }
@@ -438,11 +607,21 @@ template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<44100, 2>(ting::Bu
 		
 
 
-//base class for all sounds
+/**
+ * @brief Base class for sounds.
+ * A sound object is an object which holds all the initial data required to play a particular sound.
+ * Sound object is normally used to create an instances of a channel to play that sound.
+ */
 class Sound : public ting::RefCounted{
 protected:
 	Sound(){}
 public:
+	
+	/**
+	 * @brief Channel factory method.
+	 * Creates an instance of the channel which can later be used to play that sound.
+     * @return a newly created instance of the channel for this sound.
+     */
 	virtual ting::Ref<aumiks::Channel> CreateChannel()const = 0;
 };
 
