@@ -260,6 +260,7 @@ public:
      */
 	inline void RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect);
 	
+	//TODO: make a method for removing all effects, it should be thread safe of course
 protected:
 	/**
 	 * @brief Called when channel has been added to pool of playing channels.
@@ -457,6 +458,9 @@ public:
 	inline bool IsMuted()const{
 		return this->mixerBuffer->isMuted;
 	}
+	
+	
+	//TODO: implement adding global effects, which are applied to the resulting mixing buffer
 
 private:
 	//Base class for mixer buffers of different formats
