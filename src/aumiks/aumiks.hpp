@@ -123,44 +123,46 @@ public:
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * Depending on the output sound format the corresponding method is called.
+	 * Note, that when effect is used as a global effect, then the return value from
+	 * this method is ignored. It only matters when effect is added to channel.
      * @param buf - buffer containing portion of sound data.
 	 * @param soundStopped - true if sound has finished playing, false otherwise.
      * @return One of the E_Result values. See E_Result description for more info.
      */
-	virtual E_Result ApplyToSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
      */
-	virtual E_Result ApplyToSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
      */
-	virtual E_Result ApplyToSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
      */
-	virtual E_Result ApplyToSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
      */
-	virtual E_Result ApplyToSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
      */
-	virtual E_Result ApplyToSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
 	
 private:
-	template <unsigned freq, unsigned chans> inline E_Result ApplyToSmpBufImpl(ting::Buffer<ting::s32>& buf, bool soundStopped);
+	template <unsigned freq, unsigned chans> inline E_Result ApplyToBufImpl(ting::Buffer<ting::s32>& buf, bool soundStopped);
 };
 
 
@@ -201,7 +203,7 @@ private:
 		bool stopRequested = false;
 
 		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			switch((*i)->ApplyToSmpBufImpl<freq, chans>(buf, this->soundStopped)){
+			switch((*i)->ApplyToBufImpl<freq, chans>(buf, this->soundStopped)){
 				case Effect::NORMAL:
 					break;
 				case Effect::CONTINUE:
@@ -507,6 +509,8 @@ private:
 		
 		virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
 		
+		virtual void ApplyEffectsToMixBuf() = 0;
+		
 		void MixSmpBufToMixBuf();
 		
 		template <unsigned freq, unsigned chans> inline bool ApplyEffectsToSmpBufImpl(const ting::Ref<aumiks::Channel>& ch){
@@ -529,6 +533,10 @@ private:
 			return this->ApplyEffectsToSmpBufImpl<freq, chans>(ch);
 		}
 
+		//override
+		virtual void ApplyEffectsToMixBuf(){
+			aumiks::Lib::Inst().ApplyEffectsToMixBuf<freq, chans>(this->mixBuf);
+		}
 	public:
 		inline static ting::Ptr<MixerBufferImpl> New(unsigned bufferSizeInSamples){
 			return ting::Ptr<MixerBufferImpl>(
@@ -549,6 +557,12 @@ private:
 	T_ChannelList channelsToAdd;
 
 	Effect::T_EffectsList effects;//list of effects applied to final mixing buffer
+	
+	template <unsigned freq, unsigned chans> inline void ApplyEffectsToMixBuf(ting::Buffer<ting::s32>& mixBuf){
+		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			(*i)->ApplyToBufImpl<freq, chans>(mixBuf, false);
+		}
+	}
 	
 	Effect::T_EffectsList effectsToAdd;
 	Effect::T_EffectsList effectsToRemove;
@@ -652,23 +666,23 @@ template <> inline bool Lib::MixerBuffer::FillSmpBufImpl<44100, 2>(const ting::R
 
 
 //Full template specializations
-template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<11025, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
-	return this->ApplyToSmpBuf11025Mono16(buf, soundStopped);
+template <> inline Effect::E_Result Effect::ApplyToBufImpl<11025, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToBuf11025Mono16(buf, soundStopped);
 }
-template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<11025, 2>(ting::Buffer<ting::s32>& buf, bool soundStopped){
-	return this->ApplyToSmpBuf11025Stereo16(buf, soundStopped);
+template <> inline Effect::E_Result Effect::ApplyToBufImpl<11025, 2>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToBuf11025Stereo16(buf, soundStopped);
 }
-template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<22050, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
-	return this->ApplyToSmpBuf22050Mono16(buf, soundStopped);
+template <> inline Effect::E_Result Effect::ApplyToBufImpl<22050, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToBuf22050Mono16(buf, soundStopped);
 }
-template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<22050, 2>(ting::Buffer<ting::s32>& buf, bool soundStopped){
-	return this->ApplyToSmpBuf22050Stereo16(buf, soundStopped);
+template <> inline Effect::E_Result Effect::ApplyToBufImpl<22050, 2>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToBuf22050Stereo16(buf, soundStopped);
 }
-template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<44100, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
-	return this->ApplyToSmpBuf44100Mono16(buf, soundStopped);
+template <> inline Effect::E_Result Effect::ApplyToBufImpl<44100, 1>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToBuf44100Mono16(buf, soundStopped);
 }
-template <> inline Effect::E_Result Effect::ApplyToSmpBufImpl<44100, 2>(ting::Buffer<ting::s32>& buf, bool soundStopped){
-	return this->ApplyToSmpBuf44100Stereo16(buf, soundStopped);
+template <> inline Effect::E_Result Effect::ApplyToBufImpl<44100, 2>(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	return this->ApplyToBuf44100Stereo16(buf, soundStopped);
 }
 		
 
