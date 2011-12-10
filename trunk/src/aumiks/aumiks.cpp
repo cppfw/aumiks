@@ -96,7 +96,7 @@ void Lib::AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<au
 	{
 		ting::Mutex::Guard mut(this->chPoolMutex);
 		
-		this->effectsToAdd.push_back(T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
+		this->effectsToAdd.push_back(T_ChannelEffectPair(ch, eff));//queue channel for affect addition
 	}
 }
 
@@ -108,7 +108,19 @@ void Lib::RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::R
 	{
 		ting::Mutex::Guard mut(this->chPoolMutex);
 		
-		this->effectsToRemove.push_back(T_ChannelEffectPair(ch, eff));//queue channel to be added to playing pool
+		this->effectsToRemove.push_back(T_ChannelEffectPair(ch, eff));//queue channel for single effect removal
+	}
+}
+
+
+
+void Lib::RemoveAllEffectsFromChannel_ts(const ting::Ref<Channel>& ch){
+	ASSERT(ch.IsValid())
+
+	{
+		ting::Mutex::Guard mut(this->chPoolMutex);
+		
+		this->effectsToClear.push_back(ch);//queue channel for removal of all effects
 	}
 }
 
@@ -124,7 +136,7 @@ void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 		
 		ch->InitEffects();
 		
-		this->chPoolToAdd.push_back(ch);//queue channel to be added to playing pool
+		this->channelsToAdd.push_back(ch);//queue channel to be added to playing pool
 		ch->isPlaying = true;//mark channel as playing
 		ch->soundStopped = false;//init sound stopped flag
 	}
@@ -193,10 +205,10 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 	{//add queued channels to playing pool and effects to channels
 		ting::Mutex::Guard mut(this->chPoolMutex);//lock mutex
 
-		M_AUMIKS_TRACE(<< "chPoolToAdd.size() = " << this->chPoolToAdd.size() << std::endl)
-		while(this->chPoolToAdd.size() != 0){
-			ting::Ref<aumiks::Channel> ch = this->chPoolToAdd.front();
-			this->chPoolToAdd.pop_front();
+		M_AUMIKS_TRACE(<< "chPoolToAdd.size() = " << this->channelsToAdd.size() << std::endl)
+		while(this->channelsToAdd.size() != 0){
+			ting::Ref<aumiks::Channel> ch = this->channelsToAdd.front();
+			this->channelsToAdd.pop_front();
 			this->chPool.push_back(ch);
 			ch->OnStart();//notify channel that it was just started
 		}
@@ -222,10 +234,16 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 
 			this->effectsToRemove.pop_front();
 		}
+		
+		//remove all effects from channels
+		while(this->effectsToClear.size() != 0){
+			this->effectsToClear.front()->effects.clear();
+			this->effectsToClear.pop_front();
+		}
 	}
 
 	//mix channels to mixbuf
-	for(T_ChIter i = this->chPool.begin(); i != this->chPool.end();){
+	for(T_ChannelIter i = this->chPool.begin(); i != this->chPool.end();){
 		if(this->mixerBuffer->MixToMixBuf(*i)){
 			(*i)->isPlaying = false;//clear playing flag
 			(*i)->OnStop();//notify channel that it has stopped playing

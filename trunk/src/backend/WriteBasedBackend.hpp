@@ -37,7 +37,7 @@ THE SOFTWARE. */
 
 namespace{
 
-class WriteBasedBackend : public aumiks::Lib::AudioBackend, public ting::MsgThread{
+class WriteBasedBackend : public aumiks::AudioBackend, public ting::MsgThread{
 	ting::Array<ting::u8> playBuf;
 protected:
 	WriteBasedBackend(size_t playBufSizeInBytes) :

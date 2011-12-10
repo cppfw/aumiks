@@ -55,9 +55,11 @@ THE SOFTWARE. */
 namespace aumiks{
 
 
+
 //forward declarations
 class Lib;
 class Channel;
+class AudioBackend;
 
 
 
@@ -260,7 +262,10 @@ public:
      */
 	inline void RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect);
 	
-	//TODO: make a method for removing all effects, it should be thread safe of course
+	/**
+	 * @brief Remove all effects from channel.
+     */
+	inline void RemoveAllEffects_ts();
 protected:
 	/**
 	 * @brief Called when channel has been added to pool of playing channels.
@@ -389,10 +394,13 @@ unsigned SamplesPerFrame(E_Format format);
  */
 class Lib : public ting::Singleton<Lib>{
 	friend class aumiks::Channel;
+	friend class aumiks::AudioBackend;
 	
 	void AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff);
 	
 	void RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff);
+	
+	void RemoveAllEffectsFromChannel_ts(const ting::Ref<Channel>& ch);
 	
 	void PlayChannel_ts(const ting::Ref<Channel>& ch);
 	
@@ -525,36 +533,25 @@ private:
 		}
 	};
 
-
-public:	
-	//base class for audio backends
-	//TODO: make it private somehow
-	class AudioBackend{
-	protected:
-		inline void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
-			aumiks::Lib::Inst().FillPlayBuf_ts(playBuf);
-		}
-		
-		inline AudioBackend(){}
-	public:
-		virtual ~AudioBackend(){}
-	};
 private:
 	void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf);
 	
 	ting::Mutex chPoolMutex;
 
-	typedef std::list<ting::Ref<aumiks::Channel> > T_ChPool;
-	typedef T_ChPool::iterator T_ChIter;
-	T_ChPool chPool;
+	typedef std::list<ting::Ref<aumiks::Channel> > T_ChannelList;
+	typedef T_ChannelList::iterator T_ChannelIter;
+	T_ChannelList chPool;
 
-	T_ChPool chPoolToAdd;
+	T_ChannelList channelsToAdd;
 
 	typedef std::pair<ting::Ref<aumiks::Channel>, ting::Ref<aumiks::Effect> > T_ChannelEffectPair;
 	typedef std::list<T_ChannelEffectPair> T_ChannelEffectPairsList;
 	typedef T_ChannelEffectPairsList::iterator T_ChannelEffectPairsIter;
 	T_ChannelEffectPairsList effectsToAdd;
 	T_ChannelEffectPairsList effectsToRemove;
+	
+	//list of channels from which it is requested to remove all effects
+	T_ChannelList effectsToClear;
 	
 	const ting::Ptr<MixerBuffer> mixerBuffer;
 	
@@ -563,6 +560,21 @@ private:
 	//backend must be initialized after all the essential parts of aumiks are initialized,
 	//because after the backend object is created, it starts calling the FillPlayBuf_ts() method periodically.
 	const ting::Ptr<AudioBackend> audioBackend;
+};
+
+
+
+//base class for audio backends
+//TODO: make it private somehow
+class AudioBackend{
+protected:
+	inline void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
+		aumiks::Lib::Inst().FillPlayBuf_ts(playBuf);
+	}
+
+	inline AudioBackend(){}
+public:
+	virtual ~AudioBackend(){}
 };
 
 
@@ -650,6 +662,14 @@ inline void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 	aumiks::Lib::Inst().RemoveEffectFromChannel_ts(
 			ting::Ref<Channel>(this),
 			effect
+		);
+}
+
+
+
+inline void Channel::RemoveAllEffects_ts(){
+	aumiks::Lib::Inst().RemoveAllEffectsFromChannel_ts(
+			ting::Ref<Channel>(this)
 		);
 }
 
