@@ -20,9 +20,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
+// Homepage: http://aumiks.googlecode.com
+
 /**
  * @author Ivan Gagis <igagis@gmail.com>
  */
+
+
 
 #pragma once
 
@@ -472,9 +476,6 @@ public:
 	inline bool IsMuted()const{
 		return this->mixerBuffer->isMuted;
 	}
-	
-	
-	//TODO: implement adding global effects, which are applied to the resulting mixing buffer
 
 private:
 	//Base class for mixer buffers of different formats
