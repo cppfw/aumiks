@@ -35,7 +35,8 @@ THE SOFTWARE. */
 #include "aumiks.hpp"
 
 #ifdef WIN32
-#include "../backend/XAudio2Backend.hpp"
+#include "../backend/DirectSoundBackend.hpp"
+//#include "../backend/XAudio2Backend.hpp"
 
 #elif defined(__linux__)
 #include "../backend/PulseAudioBackend.hpp"
@@ -98,7 +99,7 @@ unsigned BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
 Lib::Lib(ting::u16 bufferSizeMillis, aumiks::E_Format format) :
 		mixerBuffer(Lib::CreateMixerBuffer(BufferSizeInSamples(bufferSizeMillis, format), format)),
 #ifdef WIN32
-		audioBackend(XAudio2Backend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
+		audioBackend(DirectSoundBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
 #elif defined(__linux__)
 		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
 #else
