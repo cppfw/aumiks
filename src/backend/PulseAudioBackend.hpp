@@ -131,7 +131,7 @@ class PulseAudioBackend : public WriteBasedBackend{
 			//TODO: handle error somehow, throw exception
 			//ignore error
 			TRACE(<< "pa_simple_write(): error" << std::endl)
-        }
+		}
 	}
 
 public:

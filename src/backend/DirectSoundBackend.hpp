@@ -26,9 +26,6 @@ THE SOFTWARE. */
 
 #pragma once
 
-//TODO: remove this line
-#define WIN32
-
 #ifndef WIN32
 #error "compiling in non-Win32 environment"
 #endif
@@ -43,7 +40,7 @@ THE SOFTWARE. */
 
 namespace{
 
-class DirectSoundBackend : public aumiks::Lib::AudioBackend{
+class DirectSoundBackend : public aumiks::AudioBackend{
 	struct DirectSound{
 		LPDIRECTSOUND8 ds;//LP prefix means long pointer
 		
@@ -52,16 +49,18 @@ class DirectSoundBackend : public aumiks::Lib::AudioBackend{
 				throw aumiks::Exc("DirectSound object creation failed");
 			}
 			
-			//TODO: create separate window?
-			HWND hwnd = GetForegroundWindow();
-			if(hwnd == NULL){
+			try{
+				HWND hwnd = GetDesktopWindow();
+				if(hwnd == NULL){
+					throw aumiks::Exc("DirectSound: no foreground window found");
+				}
+
+				if(this->ds->SetCooperativeLevel(hwnd, DSSCL_PRIORITY) != DS_OK){
+					throw aumiks::Exc("DirectSound: setting cooperative level failed");
+				}
+			}catch(...){
 				IDirectSound_Release(this->ds);
-				throw aumiks::Exc("DirectSound: no foreground window found");
-			}
-			
-			if(this->ds->SetCooperativeLevel(hwnd, DSSCL_PRIORITY) != DS_OK){
-				IDirectSound_Release(this->ds);
-				throw aumiks::Exc("DirectSound: setting cooperative level failed");
+				throw;
 			}
 		}
 		~DirectSound(){
@@ -74,7 +73,27 @@ class DirectSoundBackend : public aumiks::Lib::AudioBackend{
 	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format){
 		//TODO: rewrite for DirectSound
 		
-		//TODO: get actual buffer size from pulseaudio
+DSBUFFERDESC bd;
+  LPDIRECTSOUNDBUFFER ppdsb, psdsb;
+  WAVEFORMATEX wf;
+
+  memset (&bd, 0, sizeof (DSBUFFERDESC));
+  bd.dwSize = sizeof (DSBUFFERDESC);
+  bd.dwFlags = DSBCAPS_PRIMARYBUFFER;
+  bd.dwBufferBytes = 0;     //must be 0 for primary buffer
+  bd.lpwfxFormat = NULL;    //must be null for primary buffer
+
+  memset (&wf, 0, sizeof (WAVEFORMATEX));
+  wf.wFormatTag = WAVE_FORMAT_PCM;
+  wf.nChannels = 2;
+  wf.nSamplesPerSec = 44100;
+  wf.wBitsPerSample = 16;
+  wf.nBlockAlign = 4;
+  wf.nAvgBytesPerSec = 176400;
+
+  if (SUCCEEDED (pds->CreateSoundBuffer (&bd, &ppdsb, NULL))){
+    ppdsb->SetFormat (&wf);
+  }
 		
 		TRACE(<< "opening device" << std::endl)
 
@@ -152,29 +171,11 @@ class DirectSoundBackend : public aumiks::Lib::AudioBackend{
 			throw aumiks::Exc("error opening PulseAudio connection");
 		}
 	}
-	
-	//override
-	void Write(const ting::Buffer<ting::u8>& buf){
-//		ASSERT(buf.Size() == this->BufferSizeInBytes())
-
-		if(pa_simple_write(
-				this->handle,
-				buf.Begin(),
-				size_t(buf.SizeInBytes()),
-				0 // no error return
-			) < 0)
-		{
-			//TODO: handle error somehow
-			//ignore error
-			TRACE(<< "pa_simple_write(): error" << std::endl)
-        }
-	}
 
 public:
 
 	~DirectSoundBackend(){
-		ASSERT(this->handle)
-		pa_simple_free(this->handle);
+		//TODO:
 	}
 	
 	inline static ting::Ptr<DirectSoundBackend> New(unsigned bufferSizeMillis, aumiks::E_Format format){
