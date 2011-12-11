@@ -9,24 +9,26 @@ libFileName=libaumiks.so
 baseDir=debian/out/$packageName
 mkdir -p $baseDir
 
+#==========
 #copy files
+
+#copy header files
 incDir=$baseDir/usr/include/aumiks
 mkdir -p $incDir
-
 cp src/aumiks/*.hpp $incDir
 
-
+#create symbolic .so link to latest .so name
 libDir=$baseDir/usr/lib
 mkdir -p $libDir
-
 ln -s /usr/lib/$libFileName.$soName $libDir/$libFileName
-
 
 #copy pkg-config .pc file
 pkgConfigDir=$libDir/pkgconfig/
 mkdir -p $pkgConfigDir
 cp pkg-config/*.pc $pkgConfigDir
 
+#====================
+#Generate deb package
 
 #create dir where the output 'control' will be placed
 mkdir -p $baseDir/DEBIAN
