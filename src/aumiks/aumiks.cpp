@@ -34,9 +34,18 @@ THE SOFTWARE. */
 
 #include "aumiks.hpp"
 
+#ifdef WIN32
+#include "../backend/XAudio2Backend.hpp"
+
+#elif defined(__linux__)
 #include "../backend/PulseAudioBackend.hpp"
 //#include "backend/ALSABackend.hpp"
 //#include "backend/ESoundBackend.hpp"
+
+#else
+#error "Unknown OS"
+#endif
+
 
 using namespace aumiks;
 
@@ -88,7 +97,13 @@ unsigned BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
 
 Lib::Lib(ting::u16 bufferSizeMillis, aumiks::E_Format format) :
 		mixerBuffer(Lib::CreateMixerBuffer(BufferSizeInSamples(bufferSizeMillis, format), format)),
+#ifdef WIN32
+		audioBackend(XAudio2Backend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
+#elif defined(__linux__)
 		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
+#else
+#error "undefined OS"
+#endif
 {}
 
 
