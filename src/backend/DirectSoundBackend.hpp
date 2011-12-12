@@ -42,10 +42,10 @@ namespace{
 
 class DirectSoundBackend : public aumiks::AudioBackend{
 	struct DirectSound{
-		LPDIRECTSOUND8 ds;//LP prefix means long pointer
+		LPDIRECTSOUND ds;//LP prefix means long pointer
 		
 		DirectSound(){
-			if(DirectSoundCreate8(NULL, &this->ds, NULL) != DS_OK){
+			if(DirectSoundCreate(NULL, &this->ds, NULL) != DS_OK){
 				throw aumiks::Exc("DirectSound object creation failed");
 			}
 			
@@ -68,14 +68,26 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 		}
 	} ds;
 
+	struct DirectSoundBuffer{
+	}
 	
 	
 	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format){
-		//TODO: rewrite for DirectSound
-		
-DSBUFFERDESC bd;
-  LPDIRECTSOUNDBUFFER ppdsb, psdsb;
-  WAVEFORMATEX wf;
+		WAVEFORMATEX wf;
+		memset(&wf, 0, sizeof(WAVEFORMATEX));
+
+		wf.nChannels = aumiks::SamplesPerFrame(format);
+		wf.nSamplesPerSec = aumiks::SamplingRate(format);
+
+		wf.wFormatTag = WAVE_FORMAT_PCM;
+		wf.wBitsPerSample = 16;
+		wf.nBlockAlign = wf.nChannels * (wf.wBitsPerSample / 8);
+		wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;;
+
+
+		DSBUFFERDESC bd;
+		LPDIRECTSOUNDBUFFER ppdsb, psdsb;
+  
 
   memset (&bd, 0, sizeof (DSBUFFERDESC));
   bd.dwSize = sizeof (DSBUFFERDESC);
@@ -83,19 +95,14 @@ DSBUFFERDESC bd;
   bd.dwBufferBytes = 0;     //must be 0 for primary buffer
   bd.lpwfxFormat = NULL;    //must be null for primary buffer
 
-  memset (&wf, 0, sizeof (WAVEFORMATEX));
-  wf.wFormatTag = WAVE_FORMAT_PCM;
-  wf.nChannels = 2;
-  wf.nSamplesPerSec = 44100;
-  wf.wBitsPerSample = 16;
-  wf.nBlockAlign = 4;
-  wf.nAvgBytesPerSec = 176400;
+  
 
   if (SUCCEEDED (pds->CreateSoundBuffer (&bd, &ppdsb, NULL))){
     ppdsb->SetFormat (&wf);
   }
 		
-		TRACE(<< "opening device" << std::endl)
+
+
 
 		pa_sample_spec ss;
 		ss.format = PA_SAMPLE_S16NE;//Native endian

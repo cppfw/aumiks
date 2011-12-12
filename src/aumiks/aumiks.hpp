@@ -396,6 +396,14 @@ unsigned SamplesPerFrame(E_Format format);
 
 
 /**
+ * @brief Returns sampling rate for given sound output format.
+ * @return Sampling rate in Hz.
+ */
+unsigned SamplingRate(E_Format format);
+
+
+
+/**
  * @brief aumiks library singleton class.
  * This is a main class of the aumiks library.
  * Before using the library one has to create a single instance of the Lib class.
