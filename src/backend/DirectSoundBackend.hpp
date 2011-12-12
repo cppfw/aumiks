@@ -109,7 +109,7 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 			//init buffer with silence, i.e. fill it with 0'es
 			{
 				LPVOID addr1, addr2;
-				LPDWORD size1, size2;
+				DWORD size1, size2;
 				
 				//lock the entire buffer
 				if(this->dsb->Lock(
@@ -135,7 +135,10 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 				memset(addr1, 0, size1);
 				
 				//unlock the buffer
-				this->dsb->Unlock(addr1, size1, addr2, 0);
+				if(this->dsb->Unlock(addr1, size1, addr2, 0) != DS_OK){
+					this->dsb->Release();
+					throw aumiks::Exc("DirectSound: unlocking buffer failed");
+				}
 			}
 			
 			this->dsb->SetCurrentPosition(0);
