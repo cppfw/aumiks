@@ -73,7 +73,11 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 	struct DirectSoundBuffer{
 		LPDIRECTSOUNDBUFFER dsb; //LP stands for long pointer
 		
-		DirectSoundBuffer(DirectSound& ds, unsigned bufferSizeFrames, aumiks::E_Format format){
+		unsigned halfSize;
+		
+		DirectSoundBuffer(DirectSound& ds, unsigned bufferSizeFrames, aumiks::E_Format format) :
+				halfSize(aumiks::BytesPerFrame(format) * bufferSizeFrames)
+		{
 			WAVEFORMATEX wf;
 			memset(&wf, 0, sizeof(WAVEFORMATEX));
 
@@ -91,7 +95,7 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 			
 			dsbdesc.dwSize = sizeof(DSBUFFERDESC); 
 			dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GLOBALFOCUS; 
-			dsbdesc.dwBufferBytes = 2 * aumiks::BytesPerFrame(format) * bufferSizeFrames;
+			dsbdesc.dwBufferBytes = 2 * this->halfSize;
 			dsbdesc.lpwfxFormat = &wf; 
 			
 			if(dsbdesc.dwBufferBytes < DSBSIZE_MIN || DSBSIZE_MAX < dsbdesc.dwBufferBytes){
@@ -101,6 +105,40 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 			if(ds.ds->CreateSoundBuffer(&dsbdesc, &this->dsb, NULL) != DS_OK){
 				throw aumiks::Exc("DirectSound: creating sound buffer failed");
 			}
+			
+			//init buffer with silence, i.e. fill it with 0'es
+			{
+				LPVOID addr1, addr2;
+				LPDWORD size1, size2;
+				
+				//lock the entire buffer
+				if(this->dsb->Lock(
+						0,
+						0, //ignored because of the DSBLOCK_ENTIREBUFFER flag
+						&addr1,
+						&size1,
+						&addr2,
+						&size2,
+						DSBLOCK_ENTIREBUFFER
+					) != DS_OK)
+				{
+					this->dsb->Release();
+					throw aumiks::Exc("DirectSound: locking buffer failed");
+				}
+				
+				ASSERT(addr1 != NULL)
+				ASSERT(size1 == 2 * this->halfSize)
+				ASSERT(addr2 == NULL)
+				ASSERT(size2 == 0)
+				
+				//set buffer to 0'es
+				memset(addr1, 0, size1);
+				
+				//unlock the buffer
+				this->dsb->Unlock(addr1, size1, addr2, 0);
+			}
+			
+			this->dsb->SetCurrentPosition(0);
 		}
 		
 		~DirectSoundBuffer(){
