@@ -52,10 +52,10 @@ class WinEvent : public ting::Waitable{
 		return this->eventForWaitable;
 	}
 
-	u32 flagsMask;//flags to wait for
+	ting::u32 flagsMask;//flags to wait for
 
 	//override
-	virtual void SetWaitingEvents(u32 flagsToWaitFor){
+	virtual void SetWaitingEvents(ting::u32 flagsToWaitFor){
 		//Only possible flag values are READ and 0 (NOT_READY)
 		if(flagsToWaitFor != 0 && flagsToWaitFor != ting::Waitable::READ){
 			ASSERT_INFO(false, "flagsToWaitFor = " << flagsToWaitFor)
