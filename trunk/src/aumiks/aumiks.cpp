@@ -362,3 +362,18 @@ unsigned aumiks::SamplesPerFrame(E_Format format){
 	}
 }
 
+unsigned aumiks::SamplingRate(E_Format format){
+	switch(format){
+		case aumiks::MONO_16_11025:
+		case aumiks::STEREO_16_11025:
+			return 11025;
+		case aumiks::MONO_16_22050:
+		case aumiks::STEREO_16_22050:
+			return 22050;
+		case aumiks::MONO_16_44100:
+		case aumiks::STEREO_16_44100:
+			return 44100;
+		default:
+			throw aumiks::Exc("Unknown sound output format");
+	}
+}
