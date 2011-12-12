@@ -26,9 +26,11 @@ THE SOFTWARE. */
 
 #pragma once
 
+/* TODO: uncomment
 #ifndef WIN32
 #error "compiling in non-Win32 environment"
 #endif
+*/
 
 #include <dsound.h>
 #include <cstring>
@@ -59,125 +61,57 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 					throw aumiks::Exc("DirectSound: setting cooperative level failed");
 				}
 			}catch(...){
-				IDirectSound_Release(this->ds);
+				this->ds->Release();
 				throw;
 			}
 		}
 		~DirectSound(){
-			IDirectSound_Release(this->ds);
+			this->ds->Release();
 		}
 	} ds;
 
 	struct DirectSoundBuffer{
-	}
+		LPDIRECTSOUNDBUFFER dsb; //LP stands for long pointer
+		
+		DirectSoundBuffer(DirectSound& ds, unsigned bufferSizeFrames, aumiks::E_Format format){
+			WAVEFORMATEX wf;
+			memset(&wf, 0, sizeof(WAVEFORMATEX));
+
+			wf.nChannels = aumiks::SamplesPerFrame(format);
+			wf.nSamplesPerSec = aumiks::SamplingRate(format);
+
+			wf.wFormatTag = WAVE_FORMAT_PCM;
+			wf.wBitsPerSample = 16;
+			wf.nBlockAlign = wf.nChannels * (wf.wBitsPerSample / 8);
+			wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
+	
+			
+			DSBUFFERDESC dsbdesc;
+			memset(&dsbdesc, 0, sizeof(DSBUFFERDESC)); 
+			
+			dsbdesc.dwSize = sizeof(DSBUFFERDESC); 
+			dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GLOBALFOCUS; 
+			dsbdesc.dwBufferBytes = 2 * aumiks::BytesPerFrame(format) * bufferSizeFrames;
+			dsbdesc.lpwfxFormat = &wf; 
+			
+			if(dsbdesc.dwBufferBytes < DSBSIZE_MIN || DSBSIZE_MAX < dsbdesc.dwBufferBytes){
+				throw aumiks::Exc("DirectSound: requested buffer size is out of supported size range [DSBSIZE_MIN, DSBSIZE_MAX]");
+			}
+			
+			if(ds.ds->CreateSoundBuffer(&dsbdesc, &this->dsb, NULL) != DS_OK){
+				throw aumiks::Exc("DirectSound: creating sound buffer failed");
+			}
+		}
+		
+		~DirectSoundBuffer(){
+			this->dsb->Release();
+		}
+	} dsb;
 	
 	
-	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format){
-		WAVEFORMATEX wf;
-		memset(&wf, 0, sizeof(WAVEFORMATEX));
-
-		wf.nChannels = aumiks::SamplesPerFrame(format);
-		wf.nSamplesPerSec = aumiks::SamplingRate(format);
-
-		wf.wFormatTag = WAVE_FORMAT_PCM;
-		wf.wBitsPerSample = 16;
-		wf.nBlockAlign = wf.nChannels * (wf.wBitsPerSample / 8);
-		wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;;
-
-
-		DSBUFFERDESC bd;
-		LPDIRECTSOUNDBUFFER ppdsb, psdsb;
-  
-
-  memset (&bd, 0, sizeof (DSBUFFERDESC));
-  bd.dwSize = sizeof (DSBUFFERDESC);
-  bd.dwFlags = DSBCAPS_PRIMARYBUFFER;
-  bd.dwBufferBytes = 0;     //must be 0 for primary buffer
-  bd.lpwfxFormat = NULL;    //must be null for primary buffer
-
-  
-
-  if (SUCCEEDED (pds->CreateSoundBuffer (&bd, &ppdsb, NULL))){
-    ppdsb->SetFormat (&wf);
-  }
-		
-
-
-
-		pa_sample_spec ss;
-		ss.format = PA_SAMPLE_S16NE;//Native endian
-		
-		unsigned bufferSizeInBytes;
-		switch(format){
-			case aumiks::MONO_16_11025:
-				TRACE(<< "Requested format: Mono 11025" << std::endl)
-				ss.channels = 1;
-				ss.rate = 11025;
-				bufferSizeInBytes = bufferSizeFrames * 2;//2 bytes per sample, 1 sample per frame
-				break;
-			case aumiks::STEREO_16_11025:
-				TRACE(<< "Requested format: Stereo 11025" << std::endl)
-				ss.channels = 2;
-				ss.rate = 11025;
-				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 samples per frame
-				break;
-			case aumiks::MONO_16_22050:
-				TRACE(<< "Requested format: Mono 22050" << std::endl)
-				ss.channels = 1;
-				ss.rate = 22050;
-				bufferSizeInBytes = bufferSizeFrames * 2;//2 bytes per sample, 1 sample per frame
-				break;
-			case aumiks::STEREO_16_22050:
-				TRACE(<< "Requested format: Stereo 22050" << std::endl)
-				ss.channels = 2;
-				ss.rate = 22050;
-				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 samples per frame
-				break;
-			case aumiks::MONO_16_44100:
-				TRACE(<< "Requested format: Mono 44100" << std::endl)
-				ss.channels = 1;
-				ss.rate = 44100;
-				bufferSizeInBytes = bufferSizeFrames * 2;//2 bytes per sample, 1 sample per frame
-				break;
-			case aumiks::STEREO_16_44100:
-				TRACE(<< "Requested format: Stereo 44100" << std::endl)
-				ss.channels = 2;
-				ss.rate = 44100;
-				bufferSizeInBytes = bufferSizeFrames * 2 * 2;//2 bytes per sample, 2 samples per frame
-				break;
-			default:
-				throw aumiks::Exc("unknown sound output format requested");
-		}
-
-		pa_buffer_attr ba;
-		ba.fragsize = bufferSizeInBytes;
-		ba.tlength = bufferSizeInBytes;
-		ba.minreq = bufferSizeInBytes / 2;
-		ba.maxlength = ba.tlength;
-		ba.prebuf = ba.tlength;
-		
-		pa_channel_map cm;
-		pa_channel_map_init_auto(&cm, ss.channels, PA_CHANNEL_MAP_WAVEEX);
-
-		int error;
-
-		this->handle = pa_simple_new(
-				0, // Use the default server.
-				"aumiks", // Our application's name.
-				PA_STREAM_PLAYBACK,
-				0, // Use the default device.
-				"Music", // Description of our stream.
-				&ss, // our sample format.
-				&cm, // channel map
-				&ba, // buffering attributes.
-				&error
-			);
-
-		if(!this->handle){
-			TRACE(<< "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl)
-			throw aumiks::Exc("error opening PulseAudio connection");
-		}
-	}
+	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
+			dsb(this->ds, bufferSizeFrames, format)
+	{}
 
 public:
 

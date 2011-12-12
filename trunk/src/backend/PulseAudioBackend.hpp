@@ -48,41 +48,8 @@ class PulseAudioBackend : public WriteBasedBackend{
 
 		pa_sample_spec ss;
 		ss.format = PA_SAMPLE_S16NE;//Native endian
-		
-		switch(format){
-			case aumiks::MONO_16_11025:
-				TRACE(<< "Requested format: Mono 11025" << std::endl)
-				ss.channels = 1;
-				ss.rate = 11025;
-				break;
-			case aumiks::STEREO_16_11025:
-				TRACE(<< "Requested format: Stereo 11025" << std::endl)
-				ss.channels = 2;
-				ss.rate = 11025;
-				break;
-			case aumiks::MONO_16_22050:
-				TRACE(<< "Requested format: Mono 22050" << std::endl)
-				ss.channels = 1;
-				ss.rate = 22050;
-				break;
-			case aumiks::STEREO_16_22050:
-				TRACE(<< "Requested format: Stereo 22050" << std::endl)
-				ss.channels = 2;
-				ss.rate = 22050;
-				break;
-			case aumiks::MONO_16_44100:
-				TRACE(<< "Requested format: Mono 44100" << std::endl)
-				ss.channels = 1;
-				ss.rate = 44100;
-				break;
-			case aumiks::STEREO_16_44100:
-				TRACE(<< "Requested format: Stereo 44100" << std::endl)
-				ss.channels = 2;
-				ss.rate = 44100;
-				break;
-			default:
-				throw aumiks::Exc("unknown sound output format requested");
-		}
+		ss.channels = aumiks::SamplesPerFrame(format);
+		ss.rate = aumiks::SamplingRate(format);
 
 		unsigned bufferSizeInBytes = bufferSizeFrames * aumiks::BytesPerFrame(format);
 		pa_buffer_attr ba;
