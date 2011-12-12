@@ -36,6 +36,7 @@ THE SOFTWARE. */
 #include <cstring>
 
 #include <ting/WaitSet.hpp>
+#include <ting/Thread.hpp>
 
 #include "../aumiks/aumiks.hpp"
 #include "../aumiks/Exc.hpp"
@@ -46,11 +47,6 @@ namespace{
 
 class WinEvent : public ting::Waitable{
 	HANDLE eventForWaitable;
-	
-	//override
-	HANDLE GetHandle(){
-		return this->eventForWaitable;
-	}
 
 	ting::u32 flagsMask;//flags to wait for
 
@@ -71,6 +67,10 @@ class WinEvent : public ting::Waitable{
 		switch(WaitForSingleObject(this->eventForWaitable, 0)){
 			case WAIT_OBJECT_0: //event is signaled
 				this->SetCanReadFlag();
+				if(ResetEvent(this->eventForWaitable) == 0){
+					ASSERT(false)
+					throw ting::Exc("WinEvent::Reset(): ResetEvent() failed");
+				}
 				break;
 			case WAIT_TIMEOUT: //event is not signalled
 				this->ClearCanReadFlag();
@@ -82,6 +82,11 @@ class WinEvent : public ting::Waitable{
 		return (this->readinessFlags & this->flagsMask) != 0;
 	}
 public:
+	//override
+	HANDLE GetHandle(){
+		return this->eventForWaitable;
+	}
+	
 	WinEvent(){
 		this->eventForWaitable = CreateEvent(
 			NULL, //security attributes
@@ -97,17 +102,11 @@ public:
 	~WinEvent(){
 		CloseHandle(this->eventForWaitable);
 	}
-	
-	void Reset(){//resets the event
-		this->ClearCanReadFlag();
-		if(ResetEvent(this->eventForWaitable) == 0){
-			ASSERT(false)
-			throw ting::Exc("WinEvent::Reset(): ResetEvent() failed");
-		}
-	}
 };
 
-class DirectSoundBackend : public aumiks::AudioBackend{
+
+
+class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 	struct DirectSound{
 		LPDIRECTSOUND ds;//LP prefix means long pointer
 		
@@ -173,17 +172,17 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 			
 			//init buffer with silence, i.e. fill it with 0'es
 			{
-				LPVOID addr1, addr2;
-				DWORD size1, size2;
+				LPVOID addr;
+				DWORD size;
 				
 				//lock the entire buffer
 				if(this->dsb->Lock(
 						0,
 						0, //ignored because of the DSBLOCK_ENTIREBUFFER flag
-						&addr1,
-						&size1,
-						&addr2,
-						&size2,
+						&addr,
+						&size,
+						NULL, //wraparound not needed
+						0, //size of wraparound not needed
 						DSBLOCK_ENTIREBUFFER
 					) != DS_OK)
 				{
@@ -191,16 +190,14 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 					throw aumiks::Exc("DirectSound: locking buffer failed");
 				}
 				
-				ASSERT(addr1 != NULL)
-				ASSERT(size1 == 2 * this->halfSize)
-				ASSERT(addr2 == NULL)
-				ASSERT(size2 == 0)
+				ASSERT(addr != NULL)
+				ASSERT(size == 2 * this->halfSize)
 				
 				//set buffer to 0'es
-				memset(addr1, 0, size1);
+				memset(addr, 0, size);
 				
 				//unlock the buffer
-				if(this->dsb->Unlock(addr1, size1, addr2, 0) != DS_OK){
+				if(this->dsb->Unlock(addr, size, NULL, 0) != DS_OK){
 					this->dsb->Release();
 					throw aumiks::Exc("DirectSound: unlocking buffer failed");
 				}
@@ -219,13 +216,126 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
 			dsb(this->ds, bufferSizeFrames, format)
 	{
-		//TODO: start playing the buffer
+		//Set notification points
+		{
+			LPDIRECTSOUNDNOTIFY notify;
+			
+			//Get IID_IDirectSoundNotify interface
+			if(this->dsb.dsb->QueryInterface(
+					IID_IDirectSoundNotify,
+					&notify
+				) != DS_OK)
+			{
+				throw aumiks::Exc("DirectSound: obtaining IID_IDirectSoundNotify interface failed");
+			}
+			
+			ting::StaticBuffer<DSBPOSITIONNOTIFY, 2> pos;
+			pos[0].dwOffset = 0;
+			pos[0].hEventNotify = this->event1.GetHandle();
+			pos[1].dwOffset = this->dsb.halfSize;
+			pos[1].hEventNotify = this->event2.GetHandle();
+			
+			if(notify->SetNotificationPositions(pos.Size(), pos.Begin()) != DS_OK){
+				notify->Release();
+				throw aumiks::Exc("DirectSound: setting notification positions failed");
+			}
+			
+			//release IID_IDirectSoundNotify interface
+			notify->Release();
+		}
+		
+		//start playing thread
+		this->Start();
+		
+		//launch buffer playing
+		if(this->dsb.dsb->Play(
+				0, //reserved, must be 0
+				0,
+				DSBPLAY_LOOPING
+			) != DS_OK)
+		{
+			throw aumiks::Exc("DirectSound: failed to play buffer, Play() method failed");
+		}
+	}
+	
+	inline void FillDSBuffer(unsigned partNum){
+		ASSERT(partNum == 0 || partNum == 1)
+		LPVOID addr;
+		DWORD size;
+
+		//lock the second part of buffer
+		if(this->dsb->Lock(
+				this->dsb.halfSize * partNum, //offset
+				this->dsb.halfSize, //size
+				&addr,
+				&size,
+				NULL, //wraparound not needed
+				0, //size of wraparound not needed
+				0 //no flags
+			) != DS_OK)
+		{
+			TRACE(<< "DirectSound thread: locking buffer failed" << std::endl)
+			return;
+		}
+
+		ASSERT(addr != NULL)
+		ASSERT(size == this->dsb.halfSize)
+
+		ting::Buffer<ting::u8> buf(addr, size);
+		this->FillPlayBuf_ts(buf);
+
+		//unlock the buffer
+		if(this->dsb->Unlock(addr, size, NULL, 0) != DS_OK){
+			TRACE(<< "DirectSound thread: unlocking buffer failed" << std::endl)
+			ASSERT(false)
+		}
+	}
+	
+	//override
+	void Run(){
+		ting::WaitSet ws(3);
+		
+		ws.Add(&this->queue, ting::Waitable::READ);
+		ws.Add(&this->event1, ting::Waitable::READ);
+		ws.Add(&this->event2, ting::Waitable::READ);
+		
+		while(!this->quitFlag){
+//			TRACE(<< "Backend loop" << std::endl)
+			
+			ws.Wait();
+			
+			if(this->queue.CanRead()){
+				while(ting::Ptr<ting::Message> m = this->queue.PeekMsg()){
+					m->Handle();
+				}
+			}
+
+			//if first buffer playing has started, then fill the second one
+			if(this->event1.CanRead()){
+				this->FillDSBuffer(1);
+			}
+			
+			//if second buffer playing has started, then fill the first one
+			if(this->event2.CanRead()){
+				this->FillDSBuffer(0);
+			}
+		}//~while
+		
+		ws.Remove(&this->event2);
+		ws.Remove(&this->event1)
+		ws.Remove(&this->queue);
 	}
 
 public:
-
 	~DirectSoundBackend(){
-		//TODO:
+		//stop buffer playing
+		if(this->dsb.dsb->Stop() != DS_OK){
+			ASSERT(false)
+		}
+		
+		//Stop playing thread
+		this->PushQuitMessage();
+		this->Join();
 	}
 	
 	inline static ting::Ptr<DirectSoundBackend> New(unsigned bufferSizeMillis, aumiks::E_Format format){
