@@ -35,12 +35,77 @@ THE SOFTWARE. */
 #include <dsound.h>
 #include <cstring>
 
+#include <ting/WaitSet.hpp>
+
 #include "../aumiks/aumiks.hpp"
 #include "../aumiks/Exc.hpp"
 
 
 
 namespace{
+
+class WinEvent : public ting::Waitable{
+	HANDLE eventForWaitable;
+	
+	//override
+	HANDLE GetHandle(){
+		return this->eventForWaitable;
+	}
+
+	u32 flagsMask;//flags to wait for
+
+	//override
+	virtual void SetWaitingEvents(u32 flagsToWaitFor){
+		//Only possible flag values are READ and 0 (NOT_READY)
+		if(flagsToWaitFor != 0 && flagsToWaitFor != ting::Waitable::READ){
+			ASSERT_INFO(false, "flagsToWaitFor = " << flagsToWaitFor)
+			throw ting::Exc("WinEvent::SetWaitingEvents(): flagsToWaitFor should be ting::Waitable::READ or 0, other values are not allowed");
+		}
+
+		this->flagsMask = flagsToWaitFor;
+	}
+
+	//returns true if signaled
+	//override
+	virtual bool CheckSignalled(){
+		switch(WaitForSingleObject(this->eventForWaitable, 0)){
+			case WAIT_OBJECT_0: //event is signaled
+				this->SetCanReadFlag();
+				break;
+			case WAIT_TIMEOUT: //event is not signalled
+				this->ClearCanReadFlag();
+				break;
+			default:
+				throw ting::Exc("WinEvent: error when checking event state, WaitForSingleObject() failed");
+		}
+		
+		return (this->readinessFlags & this->flagsMask) != 0;
+	}
+public:
+	WinEvent(){
+		this->eventForWaitable = CreateEvent(
+			NULL, //security attributes
+			TRUE, //manual-reset
+			FALSE, //not signalled initially
+			NULL //no name
+		);
+		if(this->eventForWaitable == NULL){
+			throw ting::Exc("WinEvent::WinEvent(): could not create event (Win32) for implementing Waitable");
+		}
+	}
+	
+	~WinEvent(){
+		CloseHandle(this->eventForWaitable);
+	}
+	
+	void Reset(){//resets the event
+		this->ClearCanReadFlag();
+		if(ResetEvent(this->eventForWaitable) == 0){
+			ASSERT(false)
+			throw ting::Exc("WinEvent::Reset(): ResetEvent() failed");
+		}
+	}
+};
 
 class DirectSoundBackend : public aumiks::AudioBackend{
 	struct DirectSound{
@@ -149,10 +214,13 @@ class DirectSoundBackend : public aumiks::AudioBackend{
 		}
 	} dsb;
 	
+	WinEvent event1, event2;
 	
 	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
 			dsb(this->ds, bufferSizeFrames, format)
-	{}
+	{
+		//TODO: start playing the buffer
+	}
 
 public:
 
