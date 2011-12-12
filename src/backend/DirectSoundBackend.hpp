@@ -223,7 +223,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 			//Get IID_IDirectSoundNotify interface
 			if(this->dsb.dsb->QueryInterface(
 					IID_IDirectSoundNotify,
-					&notify
+					(LPVOID*)&notify
 				) != DS_OK)
 			{
 				throw aumiks::Exc("DirectSound: obtaining IID_IDirectSoundNotify interface failed");
@@ -264,7 +264,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 		DWORD size;
 
 		//lock the second part of buffer
-		if(this->dsb->Lock(
+		if(this->dsb.dsb->Lock(
 				this->dsb.halfSize * partNum, //offset
 				this->dsb.halfSize, //size
 				&addr,
@@ -281,11 +281,11 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 		ASSERT(addr != NULL)
 		ASSERT(size == this->dsb.halfSize)
 
-		ting::Buffer<ting::u8> buf(addr, size);
+		ting::Buffer<ting::u8> buf(static_cast<ting::u8*>(addr), size);
 		this->FillPlayBuf_ts(buf);
 
 		//unlock the buffer
-		if(this->dsb->Unlock(addr, size, NULL, 0) != DS_OK){
+		if(this->dsb.dsb->Unlock(addr, size, NULL, 0) != DS_OK){
 			TRACE(<< "DirectSound thread: unlocking buffer failed" << std::endl)
 			ASSERT(false)
 		}
@@ -322,7 +322,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 		}//~while
 		
 		ws.Remove(&this->event2);
-		ws.Remove(&this->event1)
+		ws.Remove(&this->event1);
 		ws.Remove(&this->queue);
 	}
 
