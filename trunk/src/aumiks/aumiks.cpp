@@ -55,34 +55,29 @@ using namespace aumiks;
 namespace{
 
 unsigned BufferSizeInFrames(unsigned bufferSizeMillis, E_Format format){
-	unsigned framesPerSecond;
-	
 	//NOTE: for simplicity of conversion from lower sample rates to higher ones,
 	//      the size of output buffer should be that it would hold no fractional
 	//      parts of source samples when they are mixed to it.
 	unsigned granularity;
-	
+
 	switch(format){
 		case MONO_16_11025:
 		case STEREO_16_11025:
-			framesPerSecond = 11025;
 			granularity = 1;
 			break;
 		case MONO_16_22050:
 		case STEREO_16_22050:
-			framesPerSecond = 22050;
 			granularity = 2;
 			break;
 		case MONO_16_44100:
 		case STEREO_16_44100:
-			framesPerSecond = 44100;
 			granularity = 4;
 			break;
 		default:
 			throw aumiks::Exc("unknown sound format");
 	}
-	
-	unsigned ret = framesPerSecond * bufferSizeMillis / 1000;
+
+	unsigned ret = aumiks::SamplingRate(format) * bufferSizeMillis / 1000;
 	return ret + (granularity - ret % granularity);
 }
 
@@ -114,7 +109,7 @@ void Lib::AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<au
 
 	{
 		ting::Mutex::Guard mut(this->mutex);
-		
+
 		this->effectsToAddToChan.push_back(T_ChannelEffectPair(ch, eff));//queue channel for affect addition
 	}
 }
@@ -126,7 +121,7 @@ void Lib::RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::R
 
 	{
 		ting::Mutex::Guard mut(this->mutex);
-		
+
 		this->effectsToRemoveFromChan.push_back(T_ChannelEffectPair(ch, eff));//queue channel for single effect removal
 	}
 }
@@ -138,7 +133,7 @@ void Lib::RemoveAllEffectsFromChannel_ts(const ting::Ref<Channel>& ch){
 
 	{
 		ting::Mutex::Guard mut(this->mutex);
-		
+
 		this->effectsToClear.push_back(ch);//queue channel for removal of all effects
 	}
 }
@@ -152,9 +147,9 @@ void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 		ting::Mutex::Guard mut(this->mutex);
 		if(ch->IsPlaying())
 			return;//already playing
-		
+
 		ch->InitEffects();
-		
+
 		this->channelsToAdd.push_back(ch);//queue channel to be added to playing pool
 		ch->isPlaying = true;//mark channel as playing
 		ch->soundStopped = false;//init sound stopped flag
@@ -174,15 +169,15 @@ bool Lib::MixerBuffer::MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
 		//clear smp buffer
 		memset(this->smpBuf.Begin(), 0, this->smpBuf.SizeInBytes());
 	}
-	
+
 	//Call channel effects.
 	//If there are no any effects, it should return ch->soundStopped, otherwise, depending on the effects.
 	bool ret = this->ApplyEffectsToSmpBuf(ch);
-	
+
 	if(this->isMuted){
 		return ret;
 	}
-	
+
 	this->MixSmpBufToMixBuf();
 	return ret;
 }
@@ -217,7 +212,7 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 			this->mixerBuffer->mixBuf.Size() * 2 == playBuf.Size(),
 			"playBuf.Size() = " << playBuf.Size() << " mixBuf.Size() = " << this->mixerBuffer->mixBuf.Size()
 		)
-	
+
 	//clean mixBuf
 	this->mixerBuffer->CleanMixBuf();
 
@@ -253,19 +248,19 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 
 			this->effectsToRemoveFromChan.pop_front();
 		}
-		
+
 		//remove all effects from channels
 		while(this->effectsToClear.size() != 0){
 			this->effectsToClear.front()->effects.clear();
 			this->effectsToClear.pop_front();
 		}
-		
+
 		//add global effects
 		while(this->effectsToAdd.size() != 0){
 			this->effects.push_back(this->effectsToAdd.front());
 			this->effectsToAdd.pop_front();
 		}
-		
+
 		//remove global effects
 		while(this->effectsToRemove.size() != 0){
 			for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
@@ -274,10 +269,10 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 					break;
 				}
 			}
-			
+
 			this->effectsToRemove.pop_front();
 		}
-		
+
 		//clear global effects if requested
 		if(this->clearEffects){
 			this->effects.clear();
@@ -295,7 +290,7 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 			++i;
 		}
 	}
-	
+
 	//apply global effects
 	this->mixerBuffer->ApplyEffectsToMixBuf();
 
@@ -308,10 +303,10 @@ void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 
 void aumiks::Lib::MixerBuffer::MixSmpBufToMixBuf(){
 	ASSERT(this->smpBuf.Size() == this->mixBuf.Size())
-	
+
 	ting::s32* src = this->smpBuf.Begin();
 	ting::s32* dst = this->mixBuf.Begin();
-	
+
 	for(; dst != this->mixBuf.End(); ++src, ++dst){
 		*dst += *src;
 	}
