@@ -26,14 +26,16 @@ THE SOFTWARE. */
 
 #pragma once
 
-/* TODO: uncomment
+
 #ifndef WIN32
 #error "compiling in non-Win32 environment"
 #endif
-*/
 
-#include <dsound.h>
+
 #include <cstring>
+
+#include <initguid.h> //The header file initguid.h is required to avoid the error message "undefined reference to `IID_IDirectSoundBuffer8'".
+#include <dsound.h>
 
 #include <ting/WaitSet.hpp>
 #include <ting/Thread.hpp>
@@ -89,12 +91,12 @@ public:
 	
 	WinEvent(){
 		this->eventForWaitable = CreateEvent(
-			NULL, //security attributes
+			0, //security attributes
 			TRUE, //manual-reset
 			FALSE, //not signalled initially
-			NULL //no name
+			0 //no name
 		);
-		if(this->eventForWaitable == NULL){
+		if(this->eventForWaitable == 0){
 			throw ting::Exc("WinEvent::WinEvent(): could not create event (Win32) for implementing Waitable");
 		}
 	}
@@ -108,16 +110,16 @@ public:
 
 class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 	struct DirectSound{
-		LPDIRECTSOUND ds;//LP prefix means long pointer
+		LPDIRECTSOUND8 ds;//LP prefix means long pointer
 		
 		DirectSound(){
-			if(DirectSoundCreate(NULL, &this->ds, NULL) != DS_OK){
+			if(DirectSoundCreate8(0, &this->ds, 0) != DS_OK){
 				throw aumiks::Exc("DirectSound object creation failed");
 			}
 			
 			try{
 				HWND hwnd = GetDesktopWindow();
-				if(hwnd == NULL){
+				if(hwnd == 0){
 					throw aumiks::Exc("DirectSound: no foreground window found");
 				}
 
@@ -135,7 +137,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 	} ds;
 
 	struct DirectSoundBuffer{
-		LPDIRECTSOUNDBUFFER dsb; //LP stands for long pointer
+		LPDIRECTSOUNDBUFFER8 dsb; //LP stands for long pointer
 		
 		unsigned halfSize;
 		
@@ -152,7 +154,6 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 			wf.wBitsPerSample = 16;
 			wf.nBlockAlign = wf.nChannels * (wf.wBitsPerSample / 8);
 			wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
-	
 			
 			DSBUFFERDESC dsbdesc;
 			memset(&dsbdesc, 0, sizeof(DSBUFFERDESC)); 
@@ -166,8 +167,16 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 				throw aumiks::Exc("DirectSound: requested buffer size is out of supported size range [DSBSIZE_MIN, DSBSIZE_MAX]");
 			}
 			
-			if(ds.ds->CreateSoundBuffer(&dsbdesc, &this->dsb, NULL) != DS_OK){
-				throw aumiks::Exc("DirectSound: creating sound buffer failed");
+			{
+				LPDIRECTSOUNDBUFFER dsb1;
+				if(ds.ds->CreateSoundBuffer(&dsbdesc, &dsb1, 0) != DS_OK){
+					throw aumiks::Exc("DirectSound: creating sound buffer failed");
+				}
+				if(dsb1->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&this->dsb) != DS_OK){
+					dsb1->Release();
+					throw aumiks::Exc("DirectSound: querying sound buffer interface failed");
+				}
+				dsb1->Release();
 			}
 			
 			//init buffer with silence, i.e. fill it with 0'es
@@ -181,7 +190,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 						0, //ignored because of the DSBLOCK_ENTIREBUFFER flag
 						&addr,
 						&size,
-						NULL, //wraparound not needed
+						0, //wraparound not needed
 						0, //size of wraparound not needed
 						DSBLOCK_ENTIREBUFFER
 					) != DS_OK)
@@ -190,14 +199,14 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 					throw aumiks::Exc("DirectSound: locking buffer failed");
 				}
 				
-				ASSERT(addr != NULL)
+				ASSERT(addr != 0)
 				ASSERT(size == 2 * this->halfSize)
 				
 				//set buffer to 0'es
 				memset(addr, 0, size);
 				
 				//unlock the buffer
-				if(this->dsb->Unlock(addr, size, NULL, 0) != DS_OK){
+				if(this->dsb->Unlock(addr, size, 0, 0) != DS_OK){
 					this->dsb->Release();
 					throw aumiks::Exc("DirectSound: unlocking buffer failed");
 				}
@@ -218,11 +227,11 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 	{
 		//Set notification points
 		{
-			LPDIRECTSOUNDNOTIFY notify;
+			LPDIRECTSOUNDNOTIFY8 notify;
 			
 			//Get IID_IDirectSoundNotify interface
 			if(this->dsb.dsb->QueryInterface(
-					IID_IDirectSoundNotify,
+					IID_IDirectSoundNotify8,
 					(LPVOID*)&notify
 				) != DS_OK)
 			{
@@ -269,7 +278,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 				this->dsb.halfSize, //size
 				&addr,
 				&size,
-				NULL, //wraparound not needed
+				0, //wraparound not needed
 				0, //size of wraparound not needed
 				0 //no flags
 			) != DS_OK)
@@ -278,14 +287,14 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 			return;
 		}
 
-		ASSERT(addr != NULL)
+		ASSERT(addr != 0)
 		ASSERT(size == this->dsb.halfSize)
 
 		ting::Buffer<ting::u8> buf(static_cast<ting::u8*>(addr), size);
 		this->FillPlayBuf_ts(buf);
 
 		//unlock the buffer
-		if(this->dsb.dsb->Unlock(addr, size, NULL, 0) != DS_OK){
+		if(this->dsb.dsb->Unlock(addr, size, 0, 0) != DS_OK){
 			TRACE(<< "DirectSound thread: unlocking buffer failed" << std::endl)
 			ASSERT(false)
 		}

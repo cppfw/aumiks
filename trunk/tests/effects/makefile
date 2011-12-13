@@ -8,15 +8,18 @@ endif
 
 
 ifeq ($(platform),win32)
-    libs := 
+    libs := ../../src/libaumiks.a ../../../ting/src/libting.a -ldsound
+    includes := -I"../../../ting/src"
     remove := del /Q /F
 endif
 ifeq ($(platform),darwin)
-    libs := 
+    libs :=
+    includes :=
     remove := rm -rf
 endif
 ifeq ($(platform),linux)
     libs := ../../src/libaumiks.so -lting
+    includes :=
     remove := rm -rf
 endif
 
@@ -37,7 +40,7 @@ test: $(binary_name)
 
 $(binary_name): main.cpp
 	@echo Building $@...
-	@g++ -o $@ $(cf) $< $(libs)
+	@g++ -o $@ $(cf) $< $(includes) $(libs)
 
 
 
