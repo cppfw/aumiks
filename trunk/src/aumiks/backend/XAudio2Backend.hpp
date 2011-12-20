@@ -30,7 +30,7 @@ THE SOFTWARE. */
 
 #include <XAudio2.h>
 
-#include "../aumiks/aumiks.hpp"
+#include "../aumiks.hpp"
 
 
 namespace{

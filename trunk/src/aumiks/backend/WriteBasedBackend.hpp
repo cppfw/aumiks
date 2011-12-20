@@ -32,8 +32,8 @@ THE SOFTWARE. */
 #include <ting/Array.hpp>
 
 
-#include "../aumiks/aumiks.hpp"
-#include "../aumiks/Exc.hpp"
+#include "../aumiks.hpp"
+#include "../Exc.hpp"
 
 
 

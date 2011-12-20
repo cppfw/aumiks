@@ -35,11 +35,11 @@ THE SOFTWARE. */
 #include "aumiks.hpp"
 
 #ifdef WIN32
-#include "../backend/DirectSoundBackend.hpp"
-//#include "../backend/XAudio2Backend.hpp"
+#include "backend/DirectSoundBackend.hpp"
+//#include "backend/XAudio2Backend.hpp"
 
 #elif defined(__linux__)
-#include "../backend/PulseAudioBackend.hpp"
+#include "backend/PulseAudioBackend.hpp"
 //#include "backend/ALSABackend.hpp"
 //#include "backend/ESoundBackend.hpp"
 
