@@ -161,7 +161,7 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 			ASSERT(res == SL_RESULT_SUCCESS)
 			
 			//fill the second buffer to be enqueued next time the callback is called
-			player->backend.FillPlayBuf_ts(player->bufs[1]);
+			player->backend.FillPlayBuf(player->bufs[1]);
 		}
 		
 		

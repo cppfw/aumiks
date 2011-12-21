@@ -291,7 +291,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 		ASSERT(size == this->dsb.halfSize)
 
 		ting::Buffer<ting::u8> buf(static_cast<ting::u8*>(addr), size);
-		this->FillPlayBuf_ts(buf);
+		this->FillPlayBuf(buf);
 
 		//unlock the buffer
 		if(this->dsb.dsb->Unlock(addr, size, 0, 0) != DS_OK){
