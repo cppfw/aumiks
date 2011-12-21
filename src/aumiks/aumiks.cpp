@@ -41,7 +41,7 @@ THE SOFTWARE. */
 #elif defined(__linux__)
 
  #if defined(__ANDROID__)
-  #include "backend/AndroidOpenSLESBackend.hpp"
+  #include "backend/OpenSLESBackend.hpp"
  #else
   #include "backend/PulseAudioBackend.hpp"
 // #include "backend/ALSABackend.hpp"
@@ -102,7 +102,7 @@ Lib::Lib(ting::u16 bufferSizeMillis, aumiks::E_Format format) :
 		audioBackend(DirectSoundBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
 #elif defined(__linux__)
  #if defined(__ANDROID__)
-		audioBackend(AndroidOpenSLESBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
+		audioBackend(OpenSLESBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
  #else
 		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
  #endif
