@@ -140,6 +140,8 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 #endif
 			)
 		{
+//			TRACE(<< "OpenSLESBackend::Player::Callback(): invoked" << std::endl)
+			
 			ASSERT(context)
 			Player* player = static_cast<Player*>(context);
 			
@@ -176,8 +178,8 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 					i->Init(bufSize);
 				}
 				ASSERT(this->bufs.Size() == 2)
-				//nitialize the second buffer with 0's, since playing will start from the second buffer
-				memset(this->bufs[1].Begin(), 0, this->bufs[1].Size());
+				//Initialize the first buffer with 0's, since playing will start from the first buffer
+				memset(this->bufs[0].Begin(), 0, this->bufs[0].Size());
 			}
 			
 			//========================
@@ -286,9 +288,20 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 			outputMix(this->engine),
 			player(*this, this->engine, this->outputMix, bufferSizeFrames, format)
 	{
+//		TRACE(<< "OpenSLESBackend::OpenSLESBackend(): Starting player" << std::endl)
 		// Set player to playing state
 		if((*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING) != SL_RESULT_SUCCESS){
 			throw aumiks::Exc("OpenSLES: Setting player state to PLAYING failed");
+		}
+		
+		//Enqueue the first buffer for playing, otherwise it will not start playing
+#if defined(__ANDROID__)
+		SLresult res = (*this->player.bufferQueue)->Enqueue(this->player.bufferQueue, this->player.bufs[0].Begin(), this->player.bufs[0].Size());
+#else
+		SLresult res = (*this->player.bufferQueue)->Enqueue(this->player.bufferQueue, this->player.bufs[0].Begin(), this->player.bufs[0].Size(), SL_BOOLEAN_FALSE);
+#endif
+		if(res != SL_RESULT_SUCCESS){
+			throw aumiks::Exc("OpenSLES: unable to enqueue");
 		}
 	}
 
@@ -296,8 +309,10 @@ public:
 
 	~OpenSLESBackend(){
 		// Stop player playing
-		SLresult result = (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
+		SLresult res = (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
 		ASSERT(res == SL_RESULT_SUCCESS);
+		
+		//TODO: make sure somehow that the callback will not be called anymore
 	}
 	
 	inline static ting::Ptr<OpenSLESBackend> New(unsigned bufferSizeFrames, aumiks::E_Format format){
