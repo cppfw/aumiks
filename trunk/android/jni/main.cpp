@@ -205,7 +205,7 @@ static void engine_term_display(struct engine* engine) {
 static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) {
     struct engine* engine = (struct engine*)app->userData;
     if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
-		TRACE(<< "!!!!!!!!!!!!!!!!!!!PLAYING!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl)
+		TRACE_ALWAYS(<< "!!!!!!!!!!!!!!!!!!!PLAYING!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl)
 		engine->snd->Play();
         engine->animating = 1;
         engine->state.x = AMotionEvent_getX(event, 0);
