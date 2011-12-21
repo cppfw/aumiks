@@ -65,7 +65,7 @@ void AndroidAssetFile::Open(EMode mode){
 			throw File::Exc("unknown mode");
 			break;
 	}
-	this->handle = AAssetManager_open(this->manager, this->Path(), AASSET_MODE_UNKNOWN); //don't know what this MODE mean at all
+	this->handle = AAssetManager_open(this->manager, this->Path().c_str(), AASSET_MODE_UNKNOWN); //don't know what this MODE mean at all
 	if(!this->handle){
 		throw File::Exc("AAssetManager_open() failed");
 	}
@@ -218,7 +218,7 @@ ting::Array<std::string> AndroidAssetFile::ListDirContents(size_t maxEntries){
 
 		//create DirentCloser to automatically call closedir on exit from the function in case of exceptions etc...
 		struct DirCloser{
-			AAssetDir* *pdir;
+			AAssetDir *pdir;
 
 			DirCloser(AAssetDir *pDirToClose) :
 					pdir(pDirToClose)
@@ -230,7 +230,7 @@ ting::Array<std::string> AndroidAssetFile::ListDirContents(size_t maxEntries){
 		} dirCloser(pdir);
 
 		while(const char *entry = AAssetDir_getNextFileName(pdir)){
-			std::string s(entry->d_name);
+			std::string s(entry);
 			if(s == "." || s == "..")
 				continue;//do not add ./ and ../ directories, we are not interested in them
 
