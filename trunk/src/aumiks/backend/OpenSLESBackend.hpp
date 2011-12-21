@@ -31,7 +31,10 @@ THE SOFTWARE. */
 #include <ting/Array.hpp>
 
 #include <SLES/OpenSLES.h>
-//#include <SLES/OpenSLES_Android.h> //TODO: remove this
+
+#if defined(__ANDROID__)
+ #include <SLES/OpenSLES_Android.h>
+#endif
 
 
 
@@ -108,51 +111,68 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 	
 	
 	struct Player{
+		OpenSLESBackend& backend;
+		
 		SLObjectItf object;
 		SLPlayItf play;
-		SLBufferQueueItf bufferQueue;
+#if defined(__ANDROID__)
+		SLAndroidSimpleBufferQueueItf
+#else
+		SLBufferQueueItf
+#endif
+				bufferQueue;
 		
 		ting::StaticBuffer<ting::Array<ting::u8>, 2> bufs;
 	
 	
 		//this callback handler is called every time a buffer finishes playing
 		static void Callback(
-				SLBufferQueueItf queueItf,
+#if defined(__ANDROID__)
+				SLAndroidSimpleBufferQueueItf queue,
+				void *context
+#else
+				SLBufferQueueItf queue,
 				SLuint32 eventFlags,
 				const void *buffer,
 				SLuint32 bufferSize,
 				SLuint32 dataUsed,
 				void *context
+#endif
 			)
 		{
-			if(eventFlags & SL_BUFFERQUEUEEVENT_STOPPED != 0){ //player was stopped
-				return;
-			}
-			
 			ASSERT(context)
 			Player* player = static_cast<Player*>(context);
 			
+#if defined(__ANDROID__)
+#else
 			ASSERT(buffer == player->bufs[0].Begin())
 			ASSERT(bufferSize == player->bufs[0].Size())
 			ASSERT(dataUsed <= bufferSize)
+#endif
 			
 			ASSERT(player->bufs.Size() == 2)
 			std::swap(player->bufs[0], player->bufs[1]); //swap buffers, the 0th one is the buffer which is currently playing
 			
-			SLresult res = (*queueItf)->Enqueue(queueItf, player->bufs[0].Begin(), player->bufs[0].Size());
+#if defined(__ANDROID__)
+			SLresult res = (*queue)->Enqueue(queue, player->bufs[0].Begin(), player->bufs[0].Size());
+#else
+			SLresult res = (*queue)->Enqueue(queue, player->bufs[0].Begin(), player->bufs[0].Size(), SL_BOOLEAN_FALSE);
+#endif
 			ASSERT(res == SL_RESULT_SUCCESS)
 			
 			//fill the second buffer to be enqueued next time the callback is called
-			this->FillPlayBuf_ts(player->bufs[1]);
+			player->backend.FillPlayBuf_ts(player->bufs[1]);
 		}
 		
 		
 		
-		Player(Engine& engine, OutputMix& outputMix, unsigned bufferSizeFrames, aumiks::E_Format format){
+		Player(OpenSLESBackend& backend, Engine& engine, OutputMix& outputMix, unsigned bufferSizeFrames, aumiks::E_Format format) :
+				backend(backend)
+		{
 			//Allocate play buffers of required size
 			{
 				size_t bufSize = bufferSizeFrames * aumiks::BytesPerFrame(format);
-				for(ting::Array* i = this->bufs.Begin(); i != this->bufs.End(); ++i){
+				for(ting::Array<ting::u8>* i = this->bufs.Begin(); i != this->bufs.End(); ++i){
 					i->Init(bufSize);
 				}
 				ASSERT(this->bufs.Size() == 2)
@@ -162,9 +182,11 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 			
 			//========================
 			// configure audio source
-			//TODO: remove this
-			//SLDataLocator_AndroidSimpleBufferQueue bufferQueue = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2}; //2 buffers in queue
-			SLDataLocator_BufferQueue bufferQueue = {SL_DATALOCATOR_BUFFERQUEUE, 2}; //2 buffers in queue
+#if defined(__ANDROID__)
+			SLDataLocator_AndroidSimpleBufferQueue bufferQueueStruct = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2}; //2 buffers in queue
+#else
+			SLDataLocator_BufferQueue bufferQueueStruct = {SL_DATALOCATOR_BUFFERQUEUE, 2}; //2 buffers in queue
+#endif
 			
 			unsigned numChannels = aumiks::SamplesPerFrame(format);
 			SLuint32 channelMask;
@@ -189,7 +211,7 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 				SL_BYTEORDER_LITTLEENDIAN //we want little endian byte order
 			};
 			
-			SLDataSource audioSourceStruct = {&bufferQueue, &audioFormat};
+			SLDataSource audioSourceStruct = {&bufferQueueStruct, &audioFormat};
 
 			//======================
 			// configure audio sink
@@ -259,30 +281,10 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 	
 	
 	
-	/*
-	//this callback handler is called every time a buffer finishes playing
-	static void Callback(SLAndroidSimpleBufferQueueItf bq, void *context){
-		TODO:
-		assert(bq == bqPlayerBufferQueue);
-		assert(NULL == context);
-		// for streaming playback, replace this test by logic to find and fill the next buffer
-		if (--nextCount > 0 && NULL != nextBuffer && 0 != nextSize) {
-			SLresult result;
-			// enqueue another buffer
-			result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, nextSize);
-			// the most likely other result is SL_RESULT_BUFFER_INSUFFICIENT,
-			// which for this code example would indicate a programming error
-			assert(SL_RESULT_SUCCESS == result);
-		}
-	}
-	*/
-	
-	
-	
 	//create buffered queue player
 	OpenSLESBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
 			outputMix(this->engine),
-			player(this->engine, this->outputMix, bufferSizeFrames, format)
+			player(*this, this->engine, this->outputMix, bufferSizeFrames, format)
 	{
 		// Set player to playing state
 		if((*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING) != SL_RESULT_SUCCESS){
