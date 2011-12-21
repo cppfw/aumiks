@@ -28,17 +28,16 @@ THE SOFTWARE. */
 
 #pragma once
 
-
+#include <ting/Array.hpp>
 
 #include <SLES/OpenSLES.h>
 //#include <SLES/OpenSLES_Android.h> //TODO: remove this
 
-#include "WriteBasedBackend.hpp"
 
 
 namespace{
 
-class AndroidOpenSLESBackend{
+class OpenSLESBackend : public aumiks::AudioBackend{
 	
 	struct Engine{
 		SLObjectItf object; //object
@@ -111,9 +110,56 @@ class AndroidOpenSLESBackend{
 	struct Player{
 		SLObjectItf object;
 		SLPlayItf play;
-		SLAndroidSimpleBufferQueueItf bufferQueue;
+		SLBufferQueueItf bufferQueue;
+		
+		ting::StaticBuffer<ting::Array<ting::u8>, 2> bufs;
+	
+	
+		//this callback handler is called every time a buffer finishes playing
+		static void Callback(
+				SLBufferQueueItf queueItf,
+				SLuint32 eventFlags,
+				const void *buffer,
+				SLuint32 bufferSize,
+				SLuint32 dataUsed,
+				void *context
+			)
+		{
+			if(eventFlags & SL_BUFFERQUEUEEVENT_STOPPED != 0){ //player was stopped
+				return;
+			}
+			
+			ASSERT(context)
+			Player* player = static_cast<Player*>(context);
+			
+			ASSERT(buffer == player->bufs[0].Begin())
+			ASSERT(bufferSize == player->bufs[0].Size())
+			ASSERT(dataUsed <= bufferSize)
+			
+			ASSERT(player->bufs.Size() == 2)
+			std::swap(player->bufs[0], player->bufs[1]); //swap buffers, the 0th one is the buffer which is currently playing
+			
+			SLresult res = (*queueItf)->Enqueue(queueItf, player->bufs[0].Begin(), player->bufs[0].Size());
+			ASSERT(res == SL_RESULT_SUCCESS)
+			
+			//fill the second buffer to be enqueued next time the callback is called
+			this->FillPlayBuf_ts(player->bufs[1]);
+		}
+		
+		
 		
 		Player(Engine& engine, OutputMix& outputMix, unsigned bufferSizeFrames, aumiks::E_Format format){
+			//Allocate play buffers of required size
+			{
+				size_t bufSize = bufferSizeFrames * aumiks::BytesPerFrame(format);
+				for(ting::Array* i = this->bufs.Begin(); i != this->bufs.End(); ++i){
+					i->Init(bufSize);
+				}
+				ASSERT(this->bufs.Size() == 2)
+				//nitialize the second buffer with 0's, since playing will start from the second buffer
+				memset(this->bufs[1].Begin(), 0, this->bufs[1].Size());
+			}
+			
 			//========================
 			// configure audio source
 			//TODO: remove this
@@ -189,7 +235,7 @@ class AndroidOpenSLESBackend{
 			//register callback on the buffer queue
 			if((*this->bufferQueue)->RegisterCallback(
 					this->bufferQueue,
-					&AndroidOpenSLESBackend::Callback,
+					&Callback,
 					this //context to be passed to the callback
 				) != SL_RESULT_SUCCESS)
 			{
@@ -210,21 +256,6 @@ class AndroidOpenSLESBackend{
 		Player(const Player&);
 		Player& operator=(const Player&);
 	} player;
-	
-	
-	
-	//this callback handler is called every time a buffer finishes playing
-	static void Callback(
-			SLBufferQueueItf queueItf,
-			SLuint32 eventFlags,
-			const void *pBuffer,
-			SLuint32 bufferSize,
-			SLuint32 dataUsed,
-			void *pContext
-		)
-	{
-		//TODO:
-	}
 	
 	
 	
@@ -249,7 +280,7 @@ class AndroidOpenSLESBackend{
 	
 	
 	//create buffered queue player
-	AndroidOpenSLESBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
+	OpenSLESBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
 			outputMix(this->engine),
 			player(this->engine, this->outputMix, bufferSizeFrames, format)
 	{
@@ -261,15 +292,15 @@ class AndroidOpenSLESBackend{
 
 public:
 
-	~AndroidOpenSLESBackend(){
+	~OpenSLESBackend(){
 		// Stop player playing
 		SLresult result = (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
 		ASSERT(res == SL_RESULT_SUCCESS);
 	}
 	
-	inline static ting::Ptr<AndroidOpenSLESBackend> New(unsigned bufferSizeFrames, aumiks::E_Format format){
-		return ting::Ptr<AndroidOpenSLESBackend>(
-				new AndroidOpenSLESBackend(bufferSizeFrames, format)
+	inline static ting::Ptr<OpenSLESBackend> New(unsigned bufferSizeFrames, aumiks::E_Format format){
+		return ting::Ptr<OpenSLESBackend>(
+				new OpenSLESBackend(bufferSizeFrames, format)
 			);
 	}
 };

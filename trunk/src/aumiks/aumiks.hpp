@@ -555,6 +555,8 @@ private:
 	};
 
 private:
+	//this function is not thread-safe, but it is supposed to be called from special audio thread
+	//TODO: rename, remove _ts suffix
 	void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf);
 
 	ting::Mutex mutex;
@@ -641,6 +643,7 @@ private:
 //TODO: make it private somehow
 class AudioBackend{
 protected:
+	//TODO: rename, remove _ts suffix
 	inline void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
 		aumiks::Lib::Inst().FillPlayBuf_ts(playBuf);
 	}
