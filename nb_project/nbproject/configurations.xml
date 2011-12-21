@@ -29,15 +29,19 @@
     <df name="tests" root="../tests">
       <df name="effects">
         <in>main.cpp</in>
+        <in>makefile</in>
       </df>
       <df name="playparallel">
         <in>main.cpp</in>
+        <in>makefile</in>
       </df>
       <df name="playwav">
         <in>main.cpp</in>
+        <in>makefile</in>
       </df>
       <df name="samples">
       </df>
+      <in>makefile</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
