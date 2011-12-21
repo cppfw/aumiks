@@ -3,19 +3,20 @@
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df name="src" root="../src">
       <df name="aumiks">
+        <df name="backend">
+          <in>ALSABackend.hpp</in>
+          <in>DirectSoundBackend.hpp</in>
+          <in>ESoundBackend.hpp</in>
+          <in>OpenSLESBackend.hpp</in>
+          <in>PulseAudioBackend.hpp</in>
+          <in>WriteBasedBackend.hpp</in>
+          <in>XAudio2Backend.hpp</in>
+        </df>
         <in>Exc.hpp</in>
         <in>WavSound.cpp</in>
         <in>WavSound.hpp</in>
         <in>aumiks.cpp</in>
         <in>aumiks.hpp</in>
-      </df>
-      <df name="backend">
-        <in>ALSABackend.hpp</in>
-        <in>DirectSoundBackend.hpp</in>
-        <in>ESoundBackend.hpp</in>
-        <in>PulseAudioBackend.hpp</in>
-        <in>WriteBasedBackend.hpp</in>
-        <in>XAudio2Backend.hpp</in>
       </df>
       <df name="obj">
         <df name="1">
@@ -29,19 +30,15 @@
     <df name="tests" root="../tests">
       <df name="effects">
         <in>main.cpp</in>
-        <in>makefile</in>
       </df>
       <df name="playparallel">
         <in>main.cpp</in>
-        <in>makefile</in>
       </df>
       <df name="playwav">
         <in>main.cpp</in>
-        <in>makefile</in>
       </df>
       <df name="samples">
       </df>
-      <in>makefile</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -54,6 +51,7 @@
   <sourceRootList>
     <Elem>../src</Elem>
     <Elem>../tests</Elem>
+    <Elem>../android/jni</Elem>
   </sourceRootList>
   <projectmakefile>../makefile</projectmakefile>
   <confs>
