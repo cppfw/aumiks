@@ -215,7 +215,7 @@ ting::Ptr<Lib::MixerBuffer> Lib::CreateMixerBuffer(unsigned bufferSizeInSamples,
 
 
 
-void aumiks::Lib::FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
+void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
 	//Check matching of mixBuf size and playBuf size, 16 bits per sample
 	ASSERT_INFO(
 			this->mixerBuffer->mixBuf.Size() * 2 == playBuf.Size(),

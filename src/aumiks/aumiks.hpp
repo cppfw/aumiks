@@ -556,8 +556,7 @@ private:
 
 private:
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
-	//TODO: rename, remove _ts suffix
-	void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf);
+	void FillPlayBuf(ting::Buffer<ting::u8>& playBuf);
 
 	ting::Mutex mutex;
 
@@ -633,7 +632,7 @@ private:
 	static ting::Ptr<MixerBuffer> CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format);
 
 	//backend must be initialized after all the essential parts of aumiks are initialized,
-	//because after the backend object is created, it starts calling the FillPlayBuf_ts() method periodically.
+	//because after the backend object is created, it starts calling the FillPlayBuf() method periodically.
 	const ting::Ptr<AudioBackend> audioBackend;
 };
 
@@ -643,9 +642,8 @@ private:
 //TODO: make it private somehow
 class AudioBackend{
 protected:
-	//TODO: rename, remove _ts suffix
-	inline void FillPlayBuf_ts(ting::Buffer<ting::u8>& playBuf){
-		aumiks::Lib::Inst().FillPlayBuf_ts(playBuf);
+	inline void FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
+		aumiks::Lib::Inst().FillPlayBuf(playBuf);
 	}
 
 	inline AudioBackend(){}

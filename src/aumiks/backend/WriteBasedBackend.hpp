@@ -61,7 +61,7 @@ private:
 				m->Handle();
 			}
 
-			this->FillPlayBuf_ts(this->playBuf);
+			this->FillPlayBuf(this->playBuf);
 			
 			//call virtual Write() function
 			try{
