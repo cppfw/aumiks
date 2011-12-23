@@ -17,7 +17,7 @@ LOCAL_SRC_FILES += ting/Socket.cpp
 LOCAL_SRC_FILES += ting/Timer.cpp
 LOCAL_SRC_FILES += aumiks/aumiks.cpp
 LOCAL_SRC_FILES += aumiks/WavSound.cpp
-LOCAL_SRC_FILES += AndroidAssetFile.cpp
+LOCAL_SRC_FILES += AssetFile/AssetFile.cpp
 
 LOCAL_CFLAGS := -Wno-div-by-zero #disable integer division by zero warning as it is sometimes useful when working with templates
 LOCAL_CFLAGS += -DDEBUG

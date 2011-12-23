@@ -31,7 +31,7 @@
 #include <aumiks/aumiks.hpp>
 #include <aumiks/WavSound.hpp>
 
-#include "AndroidAssetFile.hpp"
+#include "AssetFile/AssetFile.hpp"
 
 
 
@@ -282,7 +282,7 @@ void android_main(struct android_app* state) {
 
 		aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_44100);
 
-		android_asset_file::AndroidAssetFile fi(state->activity->assetManager, "ice_break.wav");
+		ting_android::AssetFile fi(state->activity->assetManager, "ice_break.wav");
 		engine.snd = aumiks::WavSound::LoadWAV(fi);
 		ASSERT(engine.snd)
 
