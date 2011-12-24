@@ -162,6 +162,7 @@ void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 		this->channelsToAdd.push_back(ch);//queue channel to be added to playing pool
 		ch->isPlaying = true;//mark channel as playing
 		ch->soundStopped = false;//init sound stopped flag
+		ch->stopFlag = false;
 	}
 }
 
