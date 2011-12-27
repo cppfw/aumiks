@@ -286,10 +286,10 @@ void android_main(struct android_app* state) {
 
 		ting_android::AssetFile fi(state->activity->assetManager, "ice_break.wav");
 		engine.snd = aumiks::WavSound::LoadWAV(fi);
-		ASSERT(engine.snd)
+		ASSERT_ALWAYS(engine.snd)
 
-		TRACE(<< "Playing!" << std::endl)
-		ting::Ref<aumiks::Channel> ch = engine.snd->Play();
+//		TRACE(<< "Playing!" << std::endl)
+//		ting::Ref<aumiks::Channel> ch = engine.snd->Play();
 
 		/*
 		while(ch->IsPlaying()){
