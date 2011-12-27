@@ -204,13 +204,15 @@ static void engine_term_display(struct engine* engine) {
  */
 static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) {
     struct engine* engine = (struct engine*)app->userData;
-    if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
-		TRACE_ALWAYS(<< "!!!!!!!!!!!!!!!!!!!PLAYING!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl)
-		engine->snd->Play();
-        engine->animating = 1;
-        engine->state.x = AMotionEvent_getX(event, 0);
-        engine->state.y = AMotionEvent_getY(event, 0);
-        return 1;
+    if(AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION){
+		if((AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK) == AMOTION_EVENT_ACTION_DOWN){
+			TRACE_ALWAYS(<< "!!!!!!!!!!!!!!!!!!!PLAYING!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl)
+			engine->snd->Play();
+			engine->animating = 1;
+			engine->state.x = AMotionEvent_getX(event, 0);
+			engine->state.y = AMotionEvent_getY(event, 0);
+			return 1;
+		}
     }
     return 0;
 }
