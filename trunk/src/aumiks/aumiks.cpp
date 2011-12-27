@@ -26,6 +26,7 @@ THE SOFTWARE. */
 
 #include <list>
 
+#include <ting/config.hpp>
 #include <ting/debug.hpp>
 #include <ting/types.hpp>
 #include <ting/Thread.hpp>
@@ -34,22 +35,17 @@ THE SOFTWARE. */
 
 #include "aumiks.hpp"
 
-#ifdef WIN32
- #include "backend/DirectSoundBackend.hpp"
-// #include "backend/XAudio2Backend.hpp"
-
-#elif defined(__linux__)
-
- #if defined(__ANDROID__)
-  #include "backend/OpenSLESBackend.hpp"
- #else
-  #include "backend/PulseAudioBackend.hpp"
-// #include "backend/ALSABackend.hpp"
-// #include "backend/ESoundBackend.hpp"
- #endif
-
+#if M_OS == M_OS_WIN32 || M_OS == M_OS_WIN64
+	#include "backend/DirectSoundBackend.hpp"
+#elif M_OS == M_OS_LINUX
+	#if defined(__ANDROID__)
+		#include "backend/OpenSLESBackend.hpp"
+	#else
+		#include "backend/PulseAudioBackend.hpp"
+//		#include "backend/ALSABackend.hpp"
+	#endif
 #else
- #error "Unknown OS"
+	#error "Unknown OS"
 #endif
 
 
@@ -105,6 +101,7 @@ Lib::Lib(ting::u16 bufferSizeMillis, aumiks::E_Format format) :
 		audioBackend(OpenSLESBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
  #else
 		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
+//		audioBackend(ALSABackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
  #endif
 #else
 #error "undefined OS"
