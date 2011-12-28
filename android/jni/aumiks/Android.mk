@@ -15,7 +15,7 @@ LOCAL_CFLAGS := -Wno-div-by-zero #disable integer division by zero warning as it
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../ting
 
-LOCAL_LDLIBS    := -lOpenSLES
+LOCAL_LDLIBS    := #-lOpenSLES
 
 LOCAL_STATIC_LIBRARIES := ting
 
