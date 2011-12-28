@@ -13,11 +13,11 @@ LOCAL_SRC_FILES += ../AssetFile/AssetFile.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../ting $(LOCAL_PATH)/../aumiks $(LOCAL_PATH)/..
 
-LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM
+LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lOpenSLES
 
-LOCAL_SHARED_LIBRARIES := aumiks ting
+LOCAL_SHARED_LIBRARIES := 
 
-LOCAL_STATIC_LIBRARIES := android_native_app_glue
+LOCAL_STATIC_LIBRARIES := android_native_app_glue aumiks ting
 
 include $(BUILD_SHARED_LIBRARY)
 
