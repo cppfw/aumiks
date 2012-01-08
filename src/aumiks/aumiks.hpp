@@ -410,7 +410,10 @@ unsigned SamplingRate(E_Format format);
  * It will perform necessary sound output initializations and open sound output device.
  * Destroying the object will close the sound output device and clean all the resources.
  */
-class Lib : public ting::Singleton<Lib>{
+class Lib : public ting::IntrusiveSingleton<Lib>{
+	friend class ting::IntrusiveSingleton<Lib>;
+	static ting::IntrusiveSingleton<Lib>::T_Instance instance;
+	
 	friend class aumiks::Channel;
 	friend class aumiks::AudioBackend;
 

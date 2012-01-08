@@ -53,6 +53,10 @@ using namespace aumiks;
 
 
 
+ting::IntrusiveSingleton<Lib>::T_Instance Lib::instance;
+
+
+
 namespace{
 
 unsigned BufferSizeInFrames(unsigned bufferSizeMillis, E_Format format){
