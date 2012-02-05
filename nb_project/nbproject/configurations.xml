@@ -36,6 +36,7 @@
           <in>File.hpp</in>
           <in>PoolStored.hpp</in>
           <in>Ptr.hpp</in>
+          <in>Ref.cpp</in>
           <in>Ref.hpp</in>
           <in>Signal.hpp</in>
           <in>Singleton.hpp</in>
@@ -71,6 +72,14 @@
         <in>WavSound.hpp</in>
         <in>aumiks.cpp</in>
         <in>aumiks.hpp</in>
+      </df>
+      <df name="obj">
+        <df name="1">
+          <df name="2">
+            <df name="aumiks">
+            </df>
+          </df>
+        </df>
       </df>
     </df>
     <df name="tests" root="../tests">
