@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009-2011 Ivan Gagis
+Copyright (c) 2009-2012 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-// Homepage: http://aumiks.googlecode.com
+// Home page: http://aumiks.googlecode.com
 
 /**
  * @author Ivan Gagis <igagis@gmail.com>
@@ -133,37 +133,49 @@ public:
 	 * @param soundStopped - true if sound has finished playing, false otherwise.
 	 * @return One of the E_Result values. See E_Result description for more info.
 	 */
-	virtual E_Result ApplyToBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+		return NORMAL;
+	}
 
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
 	 */
-	virtual E_Result ApplyToBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+		return NORMAL;
+	}
 
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
 	 */
-	virtual E_Result ApplyToBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+		return NORMAL;
+	}
 
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
 	 */
-	virtual E_Result ApplyToBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+		return NORMAL;
+	}
 
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
 	 */
-	virtual E_Result ApplyToBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+		return NORMAL;
+	}
 
 	/**
 	 * @brief Called when effect is to be applied to a portion of a playing sound.
 	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
 	 */
-	virtual E_Result ApplyToBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){return NORMAL;}
+	virtual E_Result ApplyToBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+		return NORMAL;
+	}
 
 private:
 	template <unsigned freq, unsigned chans> inline E_Result ApplyToBufImpl(ting::Buffer<ting::s32>& buf, bool soundStopped);
@@ -299,37 +311,49 @@ protected:
 	 * @return true if sound playing has finished.
 	 * @return false otherwise.
 	 */
-	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){
+		return true;
+	}
 
 	/**
 	 * @brief This function is called when more data to play is needed.
 	 * See description of Channel::FillSmpBuf11025Mono16() method.
 	 */
-	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){
+		return true;
+	}
 
 	/**
 	 * @brief This function is called when more data to play is needed.
 	 * See description of Channel::FillSmpBuf11025Mono16() method.
 	 */
-	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){
+		return true;
+	}
 
 	/**
 	 * @brief This function is called when more data to play is needed.
 	 * See description of Channel::FillSmpBuf11025Mono16() method.
 	 */
-	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){
+		return true;
+	}
 
 	/**
 	 * @brief This function is called when more data to play is needed.
 	 * See description of Channel::FillSmpBuf11025Mono16() method.
 	 */
-	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){
+		return true;
+	}
 
 	/**
 	 * @brief This function is called when more data to play is needed.
 	 * See description of Channel::FillSmpBuf11025Mono16() method.
 	 */
-	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){return true;}
+	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){
+		return true;
+	}
 };
 
 
