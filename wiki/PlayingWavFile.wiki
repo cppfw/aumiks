@@ -1,0 +1,23 @@
+#labels Featured
+= How to play a wav file =
+
+A minimalistic example of using the *aumiks* library to play a WAV file.
+
+{{{
+#include <ting/Thread.hpp> //for ting::Thread::Sleep()
+#include <aumiks/WavSound.hpp>
+
+int main(int argc, char *argv[]){
+	aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_44100);
+	
+	ting::Ref<aumiks::WavSound> snd = aumiks::WavSound::LoadWAV("sample.wav");
+	
+	ting::Ref<aumiks::Channel> ch = snd->Play();
+		
+	while(ch->IsPlaying()){
+		ting::Thread::Sleep(50);
+	}
+	
+	return 0;
+}
+}}}
