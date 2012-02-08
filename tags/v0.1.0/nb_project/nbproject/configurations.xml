@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="79">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df name="jni" root="../android/jni">
+      <df name="AssetFile">
+        <in>AssetFile.cpp</in>
+        <in>AssetFile.hpp</in>
+      </df>
+      <df name="aumiks">
+        <df name="aumiks">
+          <df name="backend">
+            <in>ALSABackend.hpp</in>
+            <in>DirectSoundBackend.hpp</in>
+            <in>OpenSLESBackend.hpp</in>
+            <in>PulseAudioBackend.hpp</in>
+            <in>WriteBasedBackend.hpp</in>
+          </df>
+          <in>Exc.hpp</in>
+          <in>WavSound.cpp</in>
+          <in>WavSound.hpp</in>
+          <in>aumiks.cpp</in>
+          <in>aumiks.hpp</in>
+        </df>
+      </df>
+      <df name="test">
+        <in>main.cpp</in>
+      </df>
+      <df name="ting">
+        <df name="ting">
+          <in>Array.hpp</in>
+          <in>Buffer.hpp</in>
+          <in>Exc.hpp</in>
+          <in>FSFile.cpp</in>
+          <in>FSFile.hpp</in>
+          <in>File.cpp</in>
+          <in>File.hpp</in>
+          <in>PoolStored.hpp</in>
+          <in>Ptr.hpp</in>
+          <in>Ref.cpp</in>
+          <in>Ref.hpp</in>
+          <in>Signal.hpp</in>
+          <in>Singleton.hpp</in>
+          <in>Socket.cpp</in>
+          <in>Socket.hpp</in>
+          <in>Thread.cpp</in>
+          <in>Thread.hpp</in>
+          <in>Timer.cpp</in>
+          <in>Timer.hpp</in>
+          <in>WaitSet.cpp</in>
+          <in>WaitSet.hpp</in>
+          <in>atomic.hpp</in>
+          <in>codegen.h</in>
+          <in>config.hpp</in>
+          <in>debug.hpp</in>
+          <in>math.hpp</in>
+          <in>types.hpp</in>
+          <in>utils.hpp</in>
+        </df>
+      </df>
+    </df>
+    <df name="src" root="../src">
+      <df name="aumiks">
+        <df name="backend">
+          <in>ALSABackend.hpp</in>
+          <in>DirectSoundBackend.hpp</in>
+          <in>OpenSLESBackend.hpp</in>
+          <in>PulseAudioBackend.hpp</in>
+          <in>WriteBasedBackend.hpp</in>
+        </df>
+        <in>Exc.hpp</in>
+        <in>WavSound.cpp</in>
+        <in>WavSound.hpp</in>
+        <in>aumiks.cpp</in>
+        <in>aumiks.hpp</in>
+      </df>
+      <df name="obj">
+        <df name="1">
+          <df name="2">
+            <df name="aumiks">
+            </df>
+          </df>
+        </df>
+      </df>
+    </df>
+    <df name="tests" root="../tests">
+      <df name="effects">
+        <in>main.cpp</in>
+      </df>
+      <df name="playparallel">
+        <in>main.cpp</in>
+      </df>
+      <df name="playwav">
+        <in>main.cpp</in>
+      </df>
+      <df name="samples">
+      </df>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>../makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>../src</Elem>
+    <Elem>../tests</Elem>
+    <Elem>../android/jni</Elem>
+    <Elem>../android/src</Elem>
+  </sourceRootList>
+  <projectmakefile>../makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>..</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f makefile</buildCommand>
+          <cleanCommand>${MAKE} -f makefile clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+      </makefileType>
+    </conf>
+  </confs>
+</configurationDescriptor>

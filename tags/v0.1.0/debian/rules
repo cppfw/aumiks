@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+build:
+	$(MAKE)
+
+clean:
+	rm -f debian/files
+	rm -rf debian/out
+	$(MAKE) clean
+
+binary:
+	./debian/libaumiks.sh
+	./debian/libaumiks-dbg.sh
+	./debian/libaumiks-dev.sh
+	./debian/libaumiks-doc.sh
+
