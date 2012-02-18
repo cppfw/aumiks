@@ -9,15 +9,15 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="750"
-   height="700"
+   width="650"
+   height="600"
    id="svg2988"
    version="1.1"
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="logo.svg"
    inkscape:export-filename="/home/ivan/prj/aumiks/logo.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:export-xdpi="8.3076925"
+   inkscape:export-ydpi="8.3076925">
   <defs
      id="defs2990">
     <linearGradient
@@ -66,10 +66,10 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-352.36218)">
+     transform="translate(0,-452.36218)">
     <g
        id="g4046"
-       transform="translate(0,199.7)">
+       transform="translate(-50,249.4)">
       <path
          sodipodi:nodetypes="cccccc"
          inkscape:connector-curvature="0"
