@@ -8,7 +8,8 @@ A minimal example of using the *aumiks* library to play a WAV file.
 #include <aumiks/WavSound.hpp>
 
 int main(int argc, char *argv[]){
-	//open audio device by creatig a singleton object
+	//open audio device by creatig a singleton object.
+	//We request stereo 44100KHz format and 100ms playing buffer.
 	aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_44100);
 	
 	//load sound from WAV file
