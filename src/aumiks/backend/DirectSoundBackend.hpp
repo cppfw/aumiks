@@ -27,8 +27,11 @@ THE SOFTWARE. */
 #pragma once
 
 
-#ifndef WIN32
-#error "compiling in non-Win32 environment"
+#include <ting/config.hpp>
+
+
+#if M_OS != M_OS_WIN32 && M_OS != M_OS_WIN64
+	#error "compiling in non-Windows environment"
 #endif
 
 
@@ -93,7 +96,7 @@ public:
 		this->eventForWaitable = CreateEvent(
 			0, //security attributes
 			TRUE, //manual-reset
-			FALSE, //not signalled initially
+			FALSE, //not signaled initially
 			0 //no name
 		);
 		if(this->eventForWaitable == 0){
@@ -101,7 +104,7 @@ public:
 		}
 	}
 	
-	~WinEvent(){
+	virtual ~WinEvent()throw{
 		CloseHandle(this->eventForWaitable);
 	}
 };
@@ -131,7 +134,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 				throw;
 			}
 		}
-		~DirectSound(){
+		~DirectSound()throw(){
 			this->ds->Release();
 		}
 	} ds;
@@ -215,7 +218,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 			this->dsb->SetCurrentPosition(0);
 		}
 		
-		~DirectSoundBuffer(){
+		~DirectSoundBuffer()throw(){
 			this->dsb->Release();
 		}
 	} dsb;
@@ -336,7 +339,7 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 	}
 
 public:
-	~DirectSoundBackend(){
+	~DirectSoundBackend()throw(){
 		//stop buffer playing
 		if(this->dsb.dsb->Stop() != DS_OK){
 			ASSERT(false)

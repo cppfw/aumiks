@@ -81,7 +81,7 @@ public:
 		this->Start();//start thread
 	}
 
-	~ALSABackend(){
+	virtual ~ALSABackend()throw(){
 		this->StopThread();
 	}
 	

@@ -46,13 +46,18 @@ protected:
 			playBuf(playBufSizeInBytes)
 	{}
 	
-	inline void StopThread(){
-		this->PushQuitMessage();
+	inline void StopThread()throw(){
+		this->PushPreallocatedQuitMessage();
 		this->Join();
 	}
 	
 	virtual void Write(const ting::Buffer<ting::u8>& buf) = 0;
+	
+public:
+	virtual ~WriteBasedBackend()throw(){}
+	
 private:
+	
 	//override
 	void Run(){
 		while(!this->quitFlag){
