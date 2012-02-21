@@ -721,14 +721,14 @@ public:
 
 
 Ref<WavSound> WavSound::LoadWAV(const std::string& fileName){
-	ting::FSFile fi(fileName);
+	ting::fs::FSFile fi(fileName);
 	return WavSound::LoadWAV(fi);
 }
 
 
 
-Ref<WavSound> WavSound::LoadWAV(File& fi){
-	File::Guard fileGuard(fi, File::READ);//make sure we close the file even in case of exception is thrown
+Ref<WavSound> WavSound::LoadWAV(ting::fs::File& fi){
+	ting::fs::File::Guard fileGuard(fi, ting::fs::File::READ);//make sure we close the file even in case of exception is thrown
 
 	//Start reading Wav-file header
 	{
@@ -763,7 +763,7 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 	{
 		StaticBuffer<u8, 4> pcmBuf;
 		fi.Read(pcmBuf);
-		u32 pcm = ting::Deserialize32LE(pcmBuf.Begin());
+		u32 pcm = ting::util::Deserialize32LE(pcmBuf.Begin());
 		if((pcm & 0x0000ffff) != 1){//Low word indicates whether the file is in PCM format
 			throw Exc("C_PCM_NonStreamedSound::LoadWAV(): not a PCM format, only PCM format is supported");
 		}
@@ -780,7 +780,7 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 	{
 		StaticBuffer<u8, 4> buf;
 		fi.Read(buf);
-		frequency = ting::Deserialize32LE(buf.Begin());
+		frequency = ting::util::Deserialize32LE(buf.Begin());
 	}
 
 	fi.SeekForward(4);//Playback speed (freq * PCMSampleSize). We don't need this info.
@@ -789,7 +789,7 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 	{
 		StaticBuffer<u8, 4> buf;
 		fi.Read(buf);
-		bitDepth = ting::Deserialize32LE(buf.Begin());
+		bitDepth = ting::util::Deserialize32LE(buf.Begin());
 		bitDepth >>= 16;//High word contains the sound bit depth
 	}
 
@@ -805,7 +805,7 @@ Ref<WavSound> WavSound::LoadWAV(File& fi){
 	{
 		StaticBuffer<u8, 4> buf;
 		fi.Read(buf);//read the size of the sound data
-		dataSize = ting::Deserialize32LE(buf.Begin());
+		dataSize = ting::util::Deserialize32LE(buf.Begin());
 	}
 	
 	//read in the sound data

@@ -16,6 +16,7 @@
             <in>WriteBasedBackend.hpp</in>
           </df>
           <in>Exc.hpp</in>
+          <in>MixChannel.hpp</in>
           <in>WavSound.cpp</in>
           <in>WavSound.hpp</in>
           <in>aumiks.cpp</in>
@@ -68,6 +69,7 @@
           <in>WriteBasedBackend.hpp</in>
         </df>
         <in>Exc.hpp</in>
+        <in>MixChannel.hpp</in>
         <in>WavSound.cpp</in>
         <in>WavSound.hpp</in>
         <in>aumiks.cpp</in>
