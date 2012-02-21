@@ -76,7 +76,7 @@ public:
 	}
 
 	static Ref<WavSound> LoadWAV(const std::string& fileName);
-	static Ref<WavSound> LoadWAV(File& fi);
+	static Ref<WavSound> LoadWAV(ting::fs::File& fi);
 	
 	
 	//override

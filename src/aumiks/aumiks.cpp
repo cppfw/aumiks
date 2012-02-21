@@ -333,8 +333,8 @@ void aumiks::Lib::MixerBuffer::CopyToPlayBuf(ting::Buffer<ting::u8>& playBuf){
 	ting::u8* dst = playBuf.Begin();
 	for(; src != this->mixBuf.End(); ++src){
 		ting::s32 tmp = *src;
-		ting::ClampTop(tmp, 0x7fff);
-		ting::ClampBottom(tmp, -0x7fff);
+		ting::util::ClampTop(tmp, 0x7fff);
+		ting::util::ClampBottom(tmp, -0x7fff);
 
 		ASSERT(playBuf.Begin() <= dst && dst <= playBuf.End() - 1)
 		*dst = ting::u8(tmp);
