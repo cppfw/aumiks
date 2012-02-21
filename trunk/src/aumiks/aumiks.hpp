@@ -247,6 +247,8 @@ protected:
 
 public:
 
+	virtual ~Channel()throw(){}
+	
 	/**
 	 * @brief Check if sound is currently playing.
 	 * @return true if channel is playing.
@@ -675,7 +677,7 @@ protected:
 
 	inline AudioBackend(){}
 public:
-	virtual ~AudioBackend(){}
+	virtual ~AudioBackend()throw(){}
 };
 
 

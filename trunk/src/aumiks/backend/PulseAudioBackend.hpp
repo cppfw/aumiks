@@ -103,7 +103,7 @@ class PulseAudioBackend : public WriteBasedBackend{
 
 public:
 
-	~PulseAudioBackend(){
+	virtual ~PulseAudioBackend()throw(){
 		this->StopThread();
 		
 		ASSERT(this->handle)

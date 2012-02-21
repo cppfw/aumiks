@@ -65,11 +65,11 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 			}
 		}
 		
-		~Engine(){
+		~Engine()throw(){
 			this->Destroy();
 		}
 		
-		void Destroy(){
+		void Destroy()throw(){
 			(*this->object)->Destroy(this->object);
 		}
 		
@@ -95,11 +95,11 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 			}
 		}
 		
-		~OutputMix(){
+		~OutputMix()throw(){
 			this->Destroy();
 		}
 		
-		void Destroy(){
+		void Destroy()throw(){
 			(*this->object)->Destroy(this->object);
 		}
 		
@@ -268,11 +268,11 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 			}
 		}
 		
-		~Player(){
+		~Player()throw(){
 			this->Destroy();
 		}
 		
-		void Destroy(){
+		void Destroy()throw(){
 			(*this->object)->Destroy(this->object);
 		}
 		
@@ -307,7 +307,7 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 
 public:
 
-	~OpenSLESBackend(){
+	~OpenSLESBackend()throw(){
 		// Stop player playing
 		SLresult res = (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
 		ASSERT(res == SL_RESULT_SUCCESS);
