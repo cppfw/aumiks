@@ -514,6 +514,35 @@ public:
 		return this->mixerBuffer->isMuted;
 	}
 
+	/**
+	 * @brief Sets the paused state of the audio engine.
+	 * Moves engine to paused or resumed state depending on the passed parameter value.
+	 * In paused state the engine still holds the audio device open but
+	 * does not play the main audio buffer, thus does not consume CPU resources.
+	 * The method is thread-safe.
+     * @param pause - determines whether to pause or resume the audio engine. Pass true to pause and false to resume.
+     */
+	inline void SetPaused(bool pause);	
+	/**
+	 * @brief Pause audio engine.
+	 * Moves the audio engine to paused state.
+	 * Essentially it just calls the SetPaused_ts(true) method.
+	 * The method is thread-safe.
+     */
+	inline void Pause(){
+		this->SetPaused(true);
+	}
+	
+	/**
+	 * @brief Resume audio engine.
+	 * Un-pauses the audio engine. See Pause_ts() method for more info.
+	 * Essentially it just calls the SetPaused_ts(false) method.
+	 * The method is thread-safe.
+     */
+	inline void Resume(){
+		this->SetPaused(false);
+	}
+	
 private:
 	//Base class for mixer buffers of different formats
 	class MixerBuffer{
@@ -676,9 +705,19 @@ protected:
 	}
 
 	inline AudioBackend(){}
+	
 public:
 	virtual ~AudioBackend()throw(){}
+	
+	virtual void SetPaused(bool pause){}
 };
+
+
+
+inline void Lib::SetPaused(bool pause){
+	ASSERT(this->audioBackend)
+	this->audioBackend->SetPaused(pause);
+}
 
 
 
