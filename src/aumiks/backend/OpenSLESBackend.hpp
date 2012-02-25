@@ -305,6 +305,15 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 		}
 	}
 
+	//override
+	void SetPaused(bool pause){
+		if(pause){
+			(*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
+		}else{
+			(*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING);
+		}
+	}
+	
 public:
 
 	~OpenSLESBackend()throw(){
