@@ -337,6 +337,19 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 		ws.Remove(&this->event1);
 		ws.Remove(&this->queue);
 	}
+	
+	//override
+	void SetPaused(bool pause){
+		if(pause){
+			this->dsb.dsb->Stop();
+		}else{
+			this->dsb.dsb->Play(
+					0, //reserved, must be 0
+					0,
+					DSBPLAY_LOOPING
+				);
+		}
+	}
 
 public:
 	~DirectSoundBackend()throw(){
