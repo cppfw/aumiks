@@ -1,6 +1,6 @@
 #include "../../src/aumiks/WavSound.hpp"
 
-#include <ting/FSFile.hpp>
+#include <ting/fs/FSFile.hpp>
 
 
 void Play(const std::string& fileName){

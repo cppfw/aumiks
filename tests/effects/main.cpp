@@ -1,6 +1,6 @@
 #include "../../src/aumiks/WavSound.hpp"
 
-#include <ting/FSFile.hpp>
+#include <ting/fs/FSFile.hpp>
 #include <ting/util.hpp>
 
 
