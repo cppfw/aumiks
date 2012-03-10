@@ -31,7 +31,7 @@ THE SOFTWARE. */
 
 
 #include <ting/Array.hpp>
-#include <ting/File.hpp>
+#include <ting/fs/File.hpp>
 
 #include "aumiks.hpp"
 

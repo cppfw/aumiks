@@ -25,7 +25,7 @@ THE SOFTWARE. */
 
 
 #include <ting/Buffer.hpp>
-#include <ting/FSFile.hpp>
+#include <ting/fs/FSFile.hpp>
 
 #include "WavSound.hpp"
 
