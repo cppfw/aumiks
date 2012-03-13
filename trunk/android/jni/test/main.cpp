@@ -13,19 +13,18 @@
 #include <ting/Buffer.hpp>
 #include <ting/debug.hpp>
 #include <ting/Exc.hpp>
-#include <ting/File.hpp>
-#include <ting/FSFile.hpp>
+#include <ting/fs/File.hpp>
+#include <ting/fs/FSFile.hpp>
 #include <ting/math.hpp>
 #include <ting/PoolStored.hpp>
 #include <ting/Ptr.hpp>
 #include <ting/Ref.hpp>
 #include <ting/Signal.hpp>
 #include <ting/Singleton.hpp>
-#include <ting/Socket.hpp>
 #include <ting/Thread.hpp>
-#include <ting/Timer.hpp>
+#include <ting/timer.hpp>
 #include <ting/types.hpp>
-#include <ting/utils.hpp>
+#include <ting/util.hpp>
 #include <ting/WaitSet.hpp>
 
 #include <aumiks/aumiks.hpp>
