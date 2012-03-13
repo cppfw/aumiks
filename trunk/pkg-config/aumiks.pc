@@ -1,6 +1,6 @@
 Name: aumiks   # human-readable name
 Description: C++ audio engine   # human-readable description
-Version: 0.1.0
+Version: 0.2.0
 URL: http://aumiks.googlecode.com
 Requires:
 Conflicts:

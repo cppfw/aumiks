@@ -1,5 +1,7 @@
 * add new entry to debian/changelog file
 
-* generate debian package using dpkg-buildpackage
+* update version in pkg-config/aumiks.pc file
 
 * update the PROJECT_NUMBER variable in the docs/doxygen.cfg file to latest version number
+
+* generate debian package using dpkg-buildpackage
