@@ -1,3 +1,10 @@
+libaumiks (0.2.0-1) unstable; urgency=low
+
+  * updating to ting-1.0.0
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 13 Mar 2012 14:27:18 +0200
+
+
 libaumiks (0.1.0-1) unstable; urgency=low
 
   * Initial release
