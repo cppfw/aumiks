@@ -1,0 +1,37 @@
+Source: libaumiks
+Section: devel
+Priority: extra
+Maintainer: Ivan Gagis <igagis@gmail.com>
+Build-Depends: libpulse-dev, libting-dev (>= 1.0.0), doxygen, awk
+Standards-Version: 3.7.2
+
+Package: libaumiks0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Audio mixing and playback engine in C++.
+ libaumiks is a library written in C++ which allows easy audio playback.
+ It has sound mixer for playing several sounds simultaneously.
+
+Package: libaumiks0-dbg
+Section: devel
+Architecture: any
+Depends: ${shlibs:Depends}, libaumiks0 (= ${binary:Version})
+Description: debugging symbols for libaumiks0 package.
+
+Package: libaumiks-dev
+Section: devel
+Architecture: any
+Depends: libting-dev (>= 1.0.0), libaumiks0 (= ${binary:Version})
+Suggests: libaumiks-doc
+Description: Audio mixing and playback engine in C++.
+ libaumiks is a library written in C++ which allows easy audio playback.
+ It has sound mixer for playing several sounds simultaneously.
+
+Package: libaumiks-doc
+Section: devel
+Architecture: any
+Depends: libaumiks-dev (= ${binary:Version})
+Description: Documentation of libaumiks - Audio mixing and playback engine in C++.
+ Documentation of libaumiks - Audio mixing and playback engine in C++.
+ For more info see description of libaumiks-dev package.
