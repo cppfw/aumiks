@@ -63,6 +63,7 @@ namespace aumiks{
 //forward declarations
 class Lib;
 class Channel;
+class MixChannel;
 class AudioBackend;
 
 
@@ -441,6 +442,7 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 	static ting::IntrusiveSingleton<Lib>::T_Instance instance;
 	
 	friend class aumiks::Channel;
+	friend class aumiks::MixChannel;
 	friend class aumiks::AudioBackend;
 
 	void AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff);
@@ -458,6 +460,14 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 	static inline void AddEffectToChannelSync(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
 		ch->effects.push_back(eff);
 	}
+	
+	//size of the playing buffer in samples
+	unsigned bufSizeInSamples;
+	
+	inline unsigned BufSizeInSamples(){
+		return this->bufSizeInSamples;
+	}
+	
 public:
 	/**
 	 * @brief Create sound library singleton instance.

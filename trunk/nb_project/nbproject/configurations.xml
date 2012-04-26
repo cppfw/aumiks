@@ -28,25 +28,41 @@
       </df>
       <df name="ting">
         <df name="ting">
+          <df name="fs">
+            <in>Exc.hpp</in>
+            <in>FSFile.cpp</in>
+            <in>FSFile.hpp</in>
+            <in>File.cpp</in>
+            <in>File.hpp</in>
+          </df>
+          <df name="net">
+            <in>Exc.hpp</in>
+            <in>HostNameResolver.cpp</in>
+            <in>HostNameResolver.hpp</in>
+            <in>IPAddress.cpp</in>
+            <in>IPAddress.hpp</in>
+            <in>Lib.cpp</in>
+            <in>Lib.hpp</in>
+            <in>Socket.cpp</in>
+            <in>Socket.hpp</in>
+            <in>TCPServerSocket.cpp</in>
+            <in>TCPServerSocket.hpp</in>
+            <in>TCPSocket.cpp</in>
+            <in>TCPSocket.hpp</in>
+            <in>UDPSocket.cpp</in>
+            <in>UDPSocket.hpp</in>
+          </df>
           <in>Array.hpp</in>
           <in>Buffer.hpp</in>
           <in>Exc.hpp</in>
-          <in>FSFile.cpp</in>
-          <in>FSFile.hpp</in>
-          <in>File.cpp</in>
-          <in>File.hpp</in>
           <in>PoolStored.hpp</in>
           <in>Ptr.hpp</in>
           <in>Ref.cpp</in>
           <in>Ref.hpp</in>
           <in>Signal.hpp</in>
           <in>Singleton.hpp</in>
-          <in>Socket.cpp</in>
-          <in>Socket.hpp</in>
           <in>Thread.cpp</in>
           <in>Thread.hpp</in>
-          <in>Timer.cpp</in>
-          <in>Timer.hpp</in>
           <in>WaitSet.cpp</in>
           <in>WaitSet.hpp</in>
           <in>atomic.hpp</in>
@@ -54,6 +70,8 @@
           <in>config.hpp</in>
           <in>debug.hpp</in>
           <in>math.hpp</in>
+          <in>timer.cpp</in>
+          <in>timer.hpp</in>
           <in>types.hpp</in>
           <in>util.hpp</in>
         </df>

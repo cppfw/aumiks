@@ -97,18 +97,19 @@ unsigned BufferSizeInSamples(unsigned bufferSizeMillis, E_Format format){
 
 
 Lib::Lib(ting::u16 bufferSizeMillis, aumiks::E_Format format) :
+		bufSizeInSamples(BufferSizeInSamples(bufferSizeMillis, format)),
 		mixerBuffer(Lib::CreateMixerBuffer(BufferSizeInSamples(bufferSizeMillis, format), format)),
 #ifdef WIN32
 		audioBackend(DirectSoundBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
 #elif defined(__linux__)
- #if defined(__ANDROID__)
+#	if defined(__ANDROID__)
 		audioBackend(OpenSLESBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
- #else
+#	else
 		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
 //		audioBackend(ALSABackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
- #endif
+#	endif
 #else
-#error "undefined OS"
+#	error "undefined OS"
 #endif
 {}
 
