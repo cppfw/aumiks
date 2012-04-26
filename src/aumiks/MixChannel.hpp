@@ -31,6 +31,9 @@ THE SOFTWARE. */
 #pragma once
 
 
+#include <list>
+
+#include <ting/Array.hpp>
 
 #include "aumiks.hpp"
 
@@ -39,7 +42,26 @@ THE SOFTWARE. */
 namespace aumiks{
 
 class MixChannel : public aumiks::Channel{
+	
+	std::list<ting::Ref<aumiks::Channel> > channels;
+	
+	ting::Array<ting::s32> smpbuf;
+	
+	MixChannel() :
+			smpbuf(aumiks::Lib::Inst().BufSizeInSamples())
+	{}
+	
+public:
+	
+	void Play(const ting::Ref<aumiks::Channel> >& channel);
+	
 	//TODO:
+	
+	static inline ting::Ref<aumiks::MixChannel> New(){
+		return ting::Ref<aumiks::MixChannel>(
+				new aumiks::MixChannel()
+			);
+	}
 };
 
 
