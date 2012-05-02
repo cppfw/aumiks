@@ -7,21 +7,6 @@
         <in>AssetFile.hpp</in>
       </df>
       <df name="aumiks">
-        <df name="aumiks">
-          <df name="backend">
-            <in>ALSABackend.hpp</in>
-            <in>DirectSoundBackend.hpp</in>
-            <in>OpenSLESBackend.hpp</in>
-            <in>PulseAudioBackend.hpp</in>
-            <in>WriteBasedBackend.hpp</in>
-          </df>
-          <in>Exc.hpp</in>
-          <in>MixChannel.hpp</in>
-          <in>WavSound.cpp</in>
-          <in>WavSound.hpp</in>
-          <in>aumiks.cpp</in>
-          <in>aumiks.hpp</in>
-        </df>
       </df>
       <df name="test">
         <in>main.cpp</in>
