@@ -74,7 +74,7 @@ class AudioBackend;
  * which are called to apply the effect to a sound when it is played.
  * The effects can be added to the playing channel.
  */
-class Effect : public ting::RefCounted{
+class Effect : public virtual ting::RefCounted{
 	friend class aumiks::Channel;
 	friend class aumiks::Lib;
 
@@ -188,7 +188,7 @@ private:
  * @brief Base class of a channel for playing the sound.
  * Usually, the effects are created by Sound class implementations using CreateChannel() method.
  */
-class Channel : public ting::RefCounted{
+class Channel : public virtual ting::RefCounted{
 	friend class aumiks::Lib;
 
 	ting::Inited<volatile bool, false> isPlaying;
@@ -241,9 +241,10 @@ private:
 		}
 		return ret || stopRequested;
 	}
-
-
+	
 protected:
+	bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans);
+	
 	Channel(){}
 
 public:
@@ -302,6 +303,9 @@ protected:
 	 */
 	virtual void OnStop(){}
 
+	
+	
+	//TODO: re-wise docs
 	/**
 	 * @brief This function is called when more data to play is needed.
 	 * Override this method in your Channel implementation.
@@ -314,49 +318,52 @@ protected:
 	 * @return true if sound playing has finished.
 	 * @return false otherwise.
 	 */
-	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){
-		return true;
-	}
-
-	/**
-	 * @brief This function is called when more data to play is needed.
-	 * See description of Channel::FillSmpBuf11025Mono16() method.
-	 */
-	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){
-		return true;
-	}
-
-	/**
-	 * @brief This function is called when more data to play is needed.
-	 * See description of Channel::FillSmpBuf11025Mono16() method.
-	 */
-	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){
-		return true;
-	}
-
-	/**
-	 * @brief This function is called when more data to play is needed.
-	 * See description of Channel::FillSmpBuf11025Mono16() method.
-	 */
-	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){
-		return true;
-	}
-
-	/**
-	 * @brief This function is called when more data to play is needed.
-	 * See description of Channel::FillSmpBuf11025Mono16() method.
-	 */
-	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){
-		return true;
-	}
-
-	/**
-	 * @brief This function is called when more data to play is needed.
-	 * See description of Channel::FillSmpBuf11025Mono16() method.
-	 */
-	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){
-		return true;
-	}
+	virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans) = 0;
+	
+	
+//	virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& buf){
+//		return true;
+//	}
+//
+//	/**
+//	 * @brief This function is called when more data to play is needed.
+//	 * See description of Channel::FillSmpBuf11025Mono16() method.
+//	 */
+//	virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& buf){
+//		return true;
+//	}
+//
+//	/**
+//	 * @brief This function is called when more data to play is needed.
+//	 * See description of Channel::FillSmpBuf11025Mono16() method.
+//	 */
+//	virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& buf){
+//		return true;
+//	}
+//
+//	/**
+//	 * @brief This function is called when more data to play is needed.
+//	 * See description of Channel::FillSmpBuf11025Mono16() method.
+//	 */
+//	virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& buf){
+//		return true;
+//	}
+//
+//	/**
+//	 * @brief This function is called when more data to play is needed.
+//	 * See description of Channel::FillSmpBuf11025Mono16() method.
+//	 */
+//	virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& buf){
+//		return true;
+//	}
+//
+//	/**
+//	 * @brief This function is called when more data to play is needed.
+//	 * See description of Channel::FillSmpBuf11025Mono16() method.
+//	 */
+//	virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& buf){
+//		return true;
+//	}
 };
 
 
