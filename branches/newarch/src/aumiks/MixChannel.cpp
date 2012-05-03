@@ -78,3 +78,9 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 
 	return this->channels.size() == 0;
 }
+
+
+
+void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel> >& channel){
+	//TODO:
+}
