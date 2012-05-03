@@ -43,17 +43,26 @@ namespace aumiks{
 
 class MixChannel : public aumiks::Channel{
 	
-	std::list<ting::Ref<aumiks::Channel> > channels;
+	typedef std::list<ting::Ref<aumiks::Channel> > T_ChannelList;
+	typedef T_ChannelList::iterator T_ChannelIter;
+	T_ChannelList channels;
 	
-	ting::Array<ting::s32> smpbuf;
+	ting::Array<ting::s32> smpBuf;
 	
 	MixChannel() :
-			smpbuf(aumiks::Lib::Inst().BufSizeInSamples())
+			smpBuf(aumiks::Lib::Inst().BufSizeInSamples())
 	{}
+	
+	
+	//override
+	bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans);
+	
+	
+	void MixSmpBufTo(ting::Buffer<ting::s32>& buf);
 	
 public:
 	
-	void Play(const ting::Ref<aumiks::Channel> >& channel);
+	void PlayChannel_ts(const ting::Ref<aumiks::Channel> >& channel);
 	
 	//TODO:
 	

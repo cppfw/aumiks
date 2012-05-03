@@ -384,3 +384,31 @@ unsigned aumiks::SamplingRate(E_Format format){
 			throw aumiks::Exc("Unknown sound output format");
 	}
 }
+
+
+
+bool Channel::FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+	if(this->stopFlag){
+		return true;
+	}
+	
+	if(!this->soundStopped){
+		this->soundStopped = this->FillSmpBuf(buf, freq, chans);
+	}else{
+		//clear smp buffer
+		memset(buf.Begin(), 0, buf.SizeInBytes());
+	}
+
+	//TODO:
+	//Call channel effects.
+	//If there are no any effects, it should return ch->soundStopped, otherwise, depending on the effects.
+//	bool ret = this->ApplyEffectsToSmpBuf(ch);
+
+	//TODO:
+//	if(this->isMuted){
+//		return ret;
+//	}
+
+	return ret;
+}
+
