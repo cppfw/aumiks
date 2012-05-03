@@ -26,50 +26,28 @@ THE SOFTWARE. */
  * @author Ivan Gagis <igagis@gmail.com>
  */
 
-
-
 #pragma once
 
-
-#include <list>
-
-#include <ting/Array.hpp>
-#include <ting/Ref.hpp>
 
 #include "Channel.hpp"
 
 
 
-namespace aumiks{
-
-class MixChannel : public aumiks::Channel{
-	
-	typedef std::list<ting::Ref<aumiks::Channel> > T_ChannelList;
-	typedef T_ChannelList::iterator T_ChannelIter;
-	T_ChannelList channels;//should be accessed from audio thread
-	
-	ting::Array<ting::s32> smpBuf;
-	
-	MixChannel() :
-			smpBuf(aumiks::Lib::Inst().BufSizeInSamples())
-	{}
-	
-	
-	//override
-	bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans);
-	
-	
-	void MixSmpBufTo(ting::Buffer<ting::s32>& buf);
-	
+/**
+ * @brief Base class for sounds.
+ * A sound object is an object which holds all the initial data required to play a particular sound.
+ * Sound object is normally used to create an instances of a channel to play that sound.
+ */
+class Sound : public ting::RefCounted{
+protected:
+	Sound(){}
 public:
-	void PlayChannel_ts(const ting::Ref<aumiks::Channel> >& channel);
-	
-	static inline ting::Ref<aumiks::MixChannel> New(){
-		return ting::Ref<aumiks::MixChannel>(
-				new aumiks::MixChannel()
-			);
-	}
+
+	/**
+	 * @brief Channel factory method.
+	 * Creates an instance of the channel which can later be used to play that sound.
+	 * @return a newly created instance of the channel for this sound.
+	 */
+	virtual ting::Ref<aumiks::Channel> CreateChannel()const = 0;
 };
 
-
-} //~namespace
