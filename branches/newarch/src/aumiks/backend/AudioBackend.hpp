@@ -22,55 +22,25 @@ THE SOFTWARE. */
 
 // Home page: http://aumiks.googlecode.com
 
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
-
 
 #pragma once
 
 
-#include <list>
-
-#include <ting/Array.hpp>
-#include <ting/Ref.hpp>
-
-#include "Channel.hpp"
+#include <ting/Buffer.hpp>
 
 
 
-namespace aumiks{
+//base class for audio backends
+class AudioBackend{
+protected:
+	inline void FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
+		aumiks::Lib::Inst().FillPlayBuf(playBuf);
+	}
 
-
-
-class MixChannel : public aumiks::Channel{
-	
-	typedef std::list<ting::Ref<aumiks::Channel> > T_ChannelList;
-	typedef T_ChannelList::iterator T_ChannelIter;
-	T_ChannelList channels;//should be accessed from audio thread only
-	
-	//TODO: assign buffer in the audio thread when channel starts to play
-	ting::Array<ting::s32> smpBuf;
-	
-	MixChannel(){}
-	
-	
-	//override
-	bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans);
-	
-	
-	void MixSmpBufTo(ting::Buffer<ting::s32>& buf);
+	inline AudioBackend(){}
 	
 public:
-	void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel);
+	virtual ~AudioBackend()throw(){}
 	
-	static inline ting::Ref<aumiks::MixChannel> New(){
-		return ting::Ref<aumiks::MixChannel>(
-				new aumiks::MixChannel()
-			);
-	}
+	virtual void SetPaused(bool pause) = 0;
 };
-
-
-}//~namespace

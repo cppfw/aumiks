@@ -29,6 +29,13 @@ THE SOFTWARE. */
 #pragma once
 
 
+#include <ting/Singleton.hpp>
+
+
+
+namespace aumiks{
+
+
 
 /**
  * @brief aumiks library singleton class.
@@ -40,34 +47,22 @@ THE SOFTWARE. */
 class Lib : public ting::IntrusiveSingleton<Lib>{
 	friend class ting::IntrusiveSingleton<Lib>;
 	static ting::IntrusiveSingleton<Lib>::T_Instance instance;
+
 	
-	friend class aumiks::Channel;
-	friend class aumiks::MixChannel;
-	friend class aumiks::AudioBackend;
-
-	void AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff);
-
-	void RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff);
-
-	void RemoveAllEffectsFromChannel_ts(const ting::Ref<Channel>& ch);
-
-	void PlayChannel_ts(const ting::Ref<Channel>& ch);
-
-	static inline void RemoveEffectFromChannelSync(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
-		ch->RemoveEffect(eff);
-	}
-
-	static inline void AddEffectToChannelSync(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
-		ch->effects.push_back(eff);
+	//sampling rate
+	unsigned freq;
+	
+	//channels (mono, stereo, quadro, 5.1, 7.1, etc.)
+	unsigned chans;
+	
+	//size of the playing buffer in frames
+	unsigned bufSizeInFrames;
+	
+	inline unsigned BufSizeInSamples()const throw(){
+		return this->bufSizeInFrames * this->chans;
 	}
 	
-	//size of the playing buffer in samples
-	unsigned bufSizeInSamples;
-	
-	inline unsigned BufSizeInSamples(){
-		return this->bufSizeInSamples;
-	}
-	
+	void *backend;
 public:
 	/**
 	 * @brief Create sound library singleton instance.
@@ -75,9 +70,16 @@ public:
 	 * opens sound device.
 	 * @param bufferSizeMillis - size of desired playing buffer in milliseconds. Use smaller buffers for higher latency.
 	 *                           Note, that very small buffer may result in bigger overhead and lags. The same applies to very big buffer sizes.
-	 * @param format - format of sound output.
+	 * @param freq - sampling rate in Hertz.
+	 * @param chans - number of channels. 1 = mono, 2 = stereo, etc.
 	 */
-	Lib(ting::u16 bufferSizeMillis = 100, aumiks::E_Format format = STEREO_16_22050);
+	Lib(ting::u16 bufferSizeMillis = 100, unsigned freq, unsigned chans);
+	
+	
+	
+	~Lib()throw();
+	
+	
 
 	/**
 	 * @brief Mute sound output.
@@ -132,7 +134,11 @@ public:
 	 * The method is not thread-safe and should be called from the thread where Lib object was created.
      * @param pause - determines whether to pause or resume the audio engine. Pass true to pause and false to resume.
      */
-	inline void SetPaused(bool pause);	
+	inline void SetPaused(bool pause){
+		ASSERT(this->audioBackend)
+		this->audioBackend->SetPaused(pause);
+	}
+
 	/**
 	 * @brief Pause audio engine.
 	 * Moves the audio engine to paused state.
@@ -152,101 +158,14 @@ public:
 	inline void Resume(){
 		this->SetPaused(false);
 	}
-	
-private:
-	//Base class for mixer buffers of different formats
-	class MixerBuffer{
-		friend class aumiks::Lib;
-	protected:
-		MixerBuffer(size_t mixBufSizeInSamples) :
-				mixBuf(mixBufSizeInSamples),
-				smpBuf(mixBufSizeInSamples)
-		{}
 
-		template <unsigned freq, unsigned chans> inline bool FillSmpBufImpl(const ting::Ref<aumiks::Channel>& ch);
-
-		ting::Array<ting::s32> mixBuf;
-		ting::Array<ting::s32> smpBuf;
-
-		ting::Inited<volatile bool, false> isMuted;
-	public:
-		virtual ~MixerBuffer(){}
-
-	private:
-		inline void CleanMixBuf(){
-			memset(this->mixBuf.Begin(), 0, this->mixBuf.SizeInBytes());
-		}
-
-		//return true if channel has finished playing and should be removed from playing channels pool
-		bool MixToMixBuf(const ting::Ref<aumiks::Channel>& ch);
-
-		void CopyToPlayBuf(ting::Buffer<ting::u8>& playBuf);
-
-		virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
-
-		virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch) = 0;
-
-		virtual void ApplyEffectsToMixBuf() = 0;
-
-		void MixSmpBufToMixBuf();
-
-		template <unsigned freq, unsigned chans> inline bool ApplyEffectsToSmpBufImpl(const ting::Ref<aumiks::Channel>& ch){
-			return ch->ApplyEffectsToSmpBuf<freq, chans>(this->smpBuf);
-		}
-	};
-
-	template <unsigned freq, unsigned chans> class MixerBufferImpl : public Lib::MixerBuffer{
-		MixerBufferImpl(unsigned bufferSizeInSamples) :
-				MixerBuffer(bufferSizeInSamples)
-		{}
-
-		//override
-		virtual bool FillSmpBuf(const ting::Ref<aumiks::Channel>& ch){
-			return this->FillSmpBufImpl<freq, chans>(ch);
-		}
-
-		//override
-		virtual bool ApplyEffectsToSmpBuf(const ting::Ref<aumiks::Channel>& ch){
-			return this->ApplyEffectsToSmpBufImpl<freq, chans>(ch);
-		}
-
-		//override
-		virtual void ApplyEffectsToMixBuf(){
-			aumiks::Lib::Inst().ApplyEffectsToMixBuf<freq, chans>(this->mixBuf);
-		}
-	public:
-		inline static ting::Ptr<MixerBufferImpl> New(unsigned bufferSizeInSamples){
-			return ting::Ptr<MixerBufferImpl>(
-					new MixerBufferImpl(bufferSizeInSamples)
-				);
-		}
-	};
 
 private:
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	void FillPlayBuf(ting::Buffer<ting::u8>& playBuf);
 
-	ting::Mutex mutex;
-
-	typedef std::list<ting::Ref<aumiks::Channel> > T_ChannelList;
-	typedef T_ChannelList::iterator T_ChannelIter;
-	T_ChannelList chPool;
-
-	T_ChannelList channelsToAdd;
-
-	Effect::T_EffectsList effects;//list of effects applied to final mixing buffer
-
-	template <unsigned freq, unsigned chans> inline void ApplyEffectsToMixBuf(ting::Buffer<ting::s32>& mixBuf){
-		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			(*i)->ApplyToBufImpl<freq, chans>(mixBuf, false);
-		}
-	}
-
-	Effect::T_EffectsList effectsToAdd;
-	Effect::T_EffectsList effectsToRemove;
-
-	ting::Inited<bool, false> clearEffects;//flag indicating that removing of all effects requested
-
+	void PlayChannel_ts(const ting::Ref<Channel>& ch);
+	
 public:
 	/**
 	 * @brief Add global effect.
@@ -256,12 +175,8 @@ public:
 	 */
 	inline void AddEffect_ts(const ting::Ref<Effect>& effect){
 		ASSERT(effect.IsValid())
-
-		{
-			ting::Mutex::Guard mutexGuard(this->mutex);
-
-			this->effectsToAdd.push_back(effect);
-		}
+		
+		//TODO:
 	}
 
 	/**
@@ -273,33 +188,15 @@ public:
 	inline void RemoveEffect_ts(const ting::Ref<Effect>& effect){
 		ASSERT(effect.IsValid())
 
-		{
-			ting::Mutex::Guard mutexGuard(this->mutex);
-
-			this->effectsToRemove.push_back(effect);
-		}
+		//TODO:
 	}
 
 	inline void RemoveAllEffects_ts(){
 		ting::Mutex::Guard mutexGuard(this->mutex);
 
-		this->clearEffects = true;
+		//TODO:
 	}
-private:
-	typedef std::pair<ting::Ref<aumiks::Channel>, ting::Ref<aumiks::Effect> > T_ChannelEffectPair;
-	typedef std::list<T_ChannelEffectPair> T_ChannelEffectPairsList;
-	typedef T_ChannelEffectPairsList::iterator T_ChannelEffectPairsIter;
-	T_ChannelEffectPairsList effectsToAddToChan;
-	T_ChannelEffectPairsList effectsToRemoveFromChan;
-
-	//list of channels from which it is requested to remove all effects
-	T_ChannelList effectsToClear;
-
-	const ting::Ptr<MixerBuffer> mixerBuffer;
-
-	static ting::Ptr<MixerBuffer> CreateMixerBuffer(unsigned bufferSizeMillis, E_Format format);
-
-	//backend must be initialized after all the essential parts of aumiks are initialized,
-	//because after the backend object is created, it starts calling the FillPlayBuf() method periodically.
-	const ting::Ptr<AudioBackend> audioBackend;
 };
+
+
+}//~namespace

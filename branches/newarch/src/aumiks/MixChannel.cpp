@@ -47,6 +47,7 @@ void MixChannel::MixSmpBufTo(ting::Buffer<ting::s32>& buf){
 
 bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 	//check if this mix channel holds sample buffer of a correct size
+	//TODO: assign buffer in the audio thread when channel starts to play
 	if(this->smpBuf.Size() != buf.Size()){
 		this->smpBuf.Init(buf.Size());
 	}
@@ -81,6 +82,6 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 
 
 
-void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel> >& channel){
-	//TODO:
+void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
+	//TODO: send message to audio thread
 }

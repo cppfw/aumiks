@@ -26,17 +26,7 @@ THE SOFTWARE. */
  * @author Ivan Gagis <igagis@gmail.com>
  */
 
-
-
 #pragma once
-
-
-#include <list>
-
-#include <ting/Array.hpp>
-#include <ting/Ref.hpp>
-
-#include "Channel.hpp"
 
 
 
@@ -44,33 +34,8 @@ namespace aumiks{
 
 
 
-class MixChannel : public aumiks::Channel{
-	
-	typedef std::list<ting::Ref<aumiks::Channel> > T_ChannelList;
-	typedef T_ChannelList::iterator T_ChannelIter;
-	T_ChannelList channels;//should be accessed from audio thread only
-	
-	//TODO: assign buffer in the audio thread when channel starts to play
-	ting::Array<ting::s32> smpBuf;
-	
-	MixChannel(){}
-	
-	
-	//override
-	bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans);
-	
-	
-	void MixSmpBufTo(ting::Buffer<ting::s32>& buf);
-	
-public:
-	void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel);
-	
-	static inline ting::Ref<aumiks::MixChannel> New(){
-		return ting::Ref<aumiks::MixChannel>(
-				new aumiks::MixChannel()
-			);
-	}
-};
+//TODO:
+
 
 
 }//~namespace

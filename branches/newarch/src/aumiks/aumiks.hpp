@@ -74,42 +74,7 @@ class AudioBackend;
 
 
 
-/**
- * @brief Sound output format.
- * Enumeration defining possible sound output formats.
- * All currently supported formats are 16 bits per sample.
- */
-enum E_Format{
-	/**
-	 * @brief Mono 11025 Hz.
-	 */
-	MONO_16_11025,
 
-	/**
-	 * @brief Mono 22050 Hz.
-	 */
-	MONO_16_22050,
-
-	/**
-	 * @brief Mono 44100 Hz.
-	 */
-	MONO_16_44100,
-
-	/**
-	 * @brief Stereo 11025 Hz.
-	 */
-	STEREO_16_11025,
-
-	/**
-	 * @brief Stereo 22050 Hz.
-	 */
-	STEREO_16_22050,
-
-	/**
-	 * @brief Stereo 44100 Hz.
-	 */
-	STEREO_16_44100
-};
 
 
 
@@ -143,32 +108,15 @@ unsigned SamplingRate(E_Format format);
 
 
 
-/
 
 
 
-//base class for audio backends
-//TODO: make it private somehow
-class AudioBackend{
-protected:
-	inline void FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
-		aumiks::Lib::Inst().FillPlayBuf(playBuf);
-	}
-
-	inline AudioBackend(){}
-	
-public:
-	virtual ~AudioBackend()throw(){}
-	
-	virtual void SetPaused(bool pause){}
-};
 
 
 
-inline void Lib::SetPaused(bool pause){
-	ASSERT(this->audioBackend)
-	this->audioBackend->SetPaused(pause);
-}
+
+
+
 
 
 

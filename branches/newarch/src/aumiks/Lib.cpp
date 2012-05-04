@@ -23,61 +23,79 @@ THE SOFTWARE. */
 // Home page: http://aumiks.googlecode.com
 
 
+#include <ting/config.hpp>
+
 #include "Lib.hpp"
 
 
+using namespace aumiks;
 
-Lib::Lib(ting::u16 bufferSizeMillis, aumiks::E_Format format) :
-		bufSizeInSamples(BufferSizeInSamples(bufferSizeMillis, format)),
-		mixerBuffer(Lib::CreateMixerBuffer(BufferSizeInSamples(bufferSizeMillis, format), format)),
-#ifdef WIN32
-		audioBackend(DirectSoundBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
-#elif defined(__linux__)
+
+
+ting::IntrusiveSingleton<Lib>::T_Instance Lib::instance;
+
+
+
+namespace{
+
+inline unsigned BufferSizeInFrames(unsigned bufferSizeMillis, unsigned freq){
+	return freq * bufferSizeMillis / 1000;
+}
+
+
+
+inline unsigned BufferSizeInSamples(unsigned bufferSizeMillis, unsigned freq, unsigned chans){
+	return BufferSizeInFrames(bufferSizeMillis, freq) * chans;
+}
+
+}//~namespace
+
+
+
+#include "backend/AudioBackend.hpp"
+
+#if M_OS == M_OS_WIN32 || M_OS == M_OS_WIN64
+#	include "backend/DirectSoundBackend.hpp"
+#elif M_OS == M_OS_LINUX
 #	if defined(__ANDROID__)
-		audioBackend(OpenSLESBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
+#		include "backend/OpenSLESBackend.hpp"
 #	else
-		audioBackend(PulseAudioBackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
-//		audioBackend(ALSABackend::New(BufferSizeInFrames(bufferSizeMillis, format), format))
+#		include "backend/PulseAudioBackend.hpp"
+//#		include "backend/ALSABackend.hpp"
+#	endif
+#else
+#	error "Unknown OS"
+#endif
+
+
+
+Lib::Lib(ting::u16 bufferSizeMillis, unsigned freq, unsigned chans) :
+		freq(freq),
+		chans(chans),
+		bufSizeInFrames(BufferSizeInFrames(bufferSizeMillis, freq))
+{
+	//backend must be initialized after all the essential parts of aumiks are initialized,
+	//because after the backend object is created, it starts calling the FillPlayBuf() method periodically.
+	this->backend = reinterpret_cast<void*>(static_cast<AudioBackend*>(
+#if M_OS == M_OS_WIN32 || M_OS == M_OS_WIN64
+			new DirectSoundBackend(BufferSizeInFrames(bufferSizeMillis, freq), format)
+#elif M_OS == M_OS_LINUX
+#	if defined(__ANDROID__)
+			new OpenSLESBackend(BufferSizeInFrames(bufferSizeMillis, freq), format)
+#	else
+			new PulseAudioBackend(BufferSizeInFrames(bufferSizeMillis, freq), format)
+//			new ALSABackend(BufferSizeInFrames(bufferSizeMillis, freq), format)
 #	endif
 #else
 #	error "undefined OS"
 #endif
-{}
-
-
-
-void Lib::AddEffectToChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
-	ASSERT(ch.IsValid())
-
-	{
-		ting::Mutex::Guard mut(this->mutex);
-
-		this->effectsToAddToChan.push_back(T_ChannelEffectPair(ch, eff));//queue channel for affect addition
-	}
+		));
 }
 
 
 
-void Lib::RemoveEffectFromChannel_ts(const ting::Ref<Channel>& ch, const ting::Ref<aumiks::Effect>& eff){
-	ASSERT(ch.IsValid())
-
-	{
-		ting::Mutex::Guard mut(this->mutex);
-
-		this->effectsToRemoveFromChan.push_back(T_ChannelEffectPair(ch, eff));//queue channel for single effect removal
-	}
-}
-
-
-
-void Lib::RemoveAllEffectsFromChannel_ts(const ting::Ref<Channel>& ch){
-	ASSERT(ch.IsValid())
-
-	{
-		ting::Mutex::Guard mut(this->mutex);
-
-		this->effectsToClear.push_back(ch);//queue channel for removal of all effects
-	}
+Lib::~Lib()throw(){
+	delete reinterpret_cast<AudioBackend*>(this->backend);
 }
 
 
@@ -96,54 +114,6 @@ void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 		ch->isPlaying = true;//mark channel as playing
 		ch->soundStopped = false;//init sound stopped flag
 		ch->stopFlag = false;
-	}
-}
-
-
-
-bool Lib::MixerBuffer::MixToMixBuf(const ting::Ref<aumiks::Channel>& ch){
-	if(ch->stopFlag){
-		return true;
-	}
-
-	if(!ch->soundStopped){
-		ch->soundStopped = this->FillSmpBuf(ch);
-	}else{
-		//clear smp buffer
-		memset(this->smpBuf.Begin(), 0, this->smpBuf.SizeInBytes());
-	}
-
-	//Call channel effects.
-	//If there are no any effects, it should return ch->soundStopped, otherwise, depending on the effects.
-	bool ret = this->ApplyEffectsToSmpBuf(ch);
-
-	if(this->isMuted){
-		return ret;
-	}
-
-	this->MixSmpBufToMixBuf();
-	return ret;
-}
-
-
-
-//static
-ting::Ptr<Lib::MixerBuffer> Lib::CreateMixerBuffer(unsigned bufferSizeInSamples, E_Format format){
-	switch(format){
-		case aumiks::MONO_16_11025:
-			return MixerBufferImpl<11025, 1>::New(bufferSizeInSamples);
-		case aumiks::STEREO_16_11025:
-			return MixerBufferImpl<11025, 2>::New(bufferSizeInSamples);
-		case aumiks::MONO_16_22050:
-			return MixerBufferImpl<22050, 1>::New(bufferSizeInSamples);
-		case aumiks::STEREO_16_22050:
-			return MixerBufferImpl<22050, 2>::New(bufferSizeInSamples);
-		case aumiks::MONO_16_44100:
-			return MixerBufferImpl<44100, 1>::New(bufferSizeInSamples);
-		case aumiks::STEREO_16_44100:
-			return MixerBufferImpl<44100, 2>::New(bufferSizeInSamples);
-		default:
-			throw aumiks::Exc("Unknown sound output format requested");
 	}
 }
 
