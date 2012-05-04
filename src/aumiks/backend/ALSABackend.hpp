@@ -84,12 +84,6 @@ public:
 	virtual ~ALSABackend()throw(){
 		this->StopThread();
 	}
-	
-	inline static ting::Ptr<ALSABackend> New(unsigned bufferSizeFrames, aumiks::E_Format format){
-		return ting::Ptr<ALSABackend>(
-				new ALSABackend(bufferSizeFrames, format)
-			);
-	}
 
 	int RecoverALSAFromXrun(int err){
 		TRACE(<< "stream recovery" << std::endl)

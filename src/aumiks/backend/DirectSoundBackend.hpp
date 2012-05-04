@@ -31,7 +31,7 @@ THE SOFTWARE. */
 
 
 #if M_OS != M_OS_WIN32 && M_OS != M_OS_WIN64
-	#error "compiling in non-Windows environment"
+#	error "compiling in non-Windows environment"
 #endif
 
 
@@ -43,7 +43,7 @@ THE SOFTWARE. */
 #include <ting/WaitSet.hpp>
 #include <ting/Thread.hpp>
 
-#include "../aumiks.hpp"
+#include "AudioBackend.hpp"
 #include "../Exc.hpp"
 
 
@@ -111,7 +111,7 @@ public:
 
 
 
-class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
+class DirectSoundBackend : public AudioBackend, public ting::MsgThread{
 	struct DirectSound{
 		LPDIRECTSOUND8 ds;//LP prefix means long pointer
 		
@@ -225,51 +225,6 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 	
 	WinEvent event1, event2;
 	
-	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
-			dsb(this->ds, bufferSizeFrames, format)
-	{
-		//Set notification points
-		{
-			LPDIRECTSOUNDNOTIFY8 notify;
-			
-			//Get IID_IDirectSoundNotify interface
-			if(this->dsb.dsb->QueryInterface(
-					IID_IDirectSoundNotify8,
-					(LPVOID*)&notify
-				) != DS_OK)
-			{
-				throw aumiks::Exc("DirectSound: obtaining IID_IDirectSoundNotify interface failed");
-			}
-			
-			ting::StaticBuffer<DSBPOSITIONNOTIFY, 2> pos;
-			pos[0].dwOffset = 0;
-			pos[0].hEventNotify = this->event1.GetHandle();
-			pos[1].dwOffset = this->dsb.halfSize;
-			pos[1].hEventNotify = this->event2.GetHandle();
-			
-			if(notify->SetNotificationPositions(pos.Size(), pos.Begin()) != DS_OK){
-				notify->Release();
-				throw aumiks::Exc("DirectSound: setting notification positions failed");
-			}
-			
-			//release IID_IDirectSoundNotify interface
-			notify->Release();
-		}
-		
-		//start playing thread
-		this->Start();
-		
-		//launch buffer playing
-		if(this->dsb.dsb->Play(
-				0, //reserved, must be 0
-				0,
-				DSBPLAY_LOOPING
-			) != DS_OK)
-		{
-			throw aumiks::Exc("DirectSound: failed to play buffer, Play() method failed");
-		}
-	}
-	
 	inline void FillDSBuffer(unsigned partNum){
 		ASSERT(partNum == 0 || partNum == 1)
 		LPVOID addr;
@@ -352,6 +307,51 @@ class DirectSoundBackend : public aumiks::AudioBackend, public ting::MsgThread{
 	}
 
 public:
+	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
+			dsb(this->ds, bufferSizeFrames, format)
+	{
+		//Set notification points
+		{
+			LPDIRECTSOUNDNOTIFY8 notify;
+			
+			//Get IID_IDirectSoundNotify interface
+			if(this->dsb.dsb->QueryInterface(
+					IID_IDirectSoundNotify8,
+					(LPVOID*)&notify
+				) != DS_OK)
+			{
+				throw aumiks::Exc("DirectSound: obtaining IID_IDirectSoundNotify interface failed");
+			}
+			
+			ting::StaticBuffer<DSBPOSITIONNOTIFY, 2> pos;
+			pos[0].dwOffset = 0;
+			pos[0].hEventNotify = this->event1.GetHandle();
+			pos[1].dwOffset = this->dsb.halfSize;
+			pos[1].hEventNotify = this->event2.GetHandle();
+			
+			if(notify->SetNotificationPositions(pos.Size(), pos.Begin()) != DS_OK){
+				notify->Release();
+				throw aumiks::Exc("DirectSound: setting notification positions failed");
+			}
+			
+			//release IID_IDirectSoundNotify interface
+			notify->Release();
+		}
+		
+		//start playing thread
+		this->Start();
+		
+		//launch buffer playing
+		if(this->dsb.dsb->Play(
+				0, //reserved, must be 0
+				0,
+				DSBPLAY_LOOPING
+			) != DS_OK)
+		{
+			throw aumiks::Exc("DirectSound: failed to play buffer, Play() method failed");
+		}
+	}
+	
 	~DirectSoundBackend()throw(){
 		//stop buffer playing
 		if(this->dsb.dsb->Stop() != DS_OK){
@@ -361,12 +361,6 @@ public:
 		//Stop playing thread
 		this->PushQuitMessage();
 		this->Join();
-	}
-	
-	inline static ting::Ptr<DirectSoundBackend> New(unsigned bufferSizeMillis, aumiks::E_Format format){
-		return ting::Ptr<DirectSoundBackend>(
-				new DirectSoundBackend(bufferSizeMillis, format)
-			);
 	}
 };
 

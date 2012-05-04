@@ -38,25 +38,10 @@ THE SOFTWARE. */
 
 #include "aumiks.hpp"
 
-#if M_OS == M_OS_WIN32 || M_OS == M_OS_WIN64
-	#include "backend/DirectSoundBackend.hpp"
-#elif M_OS == M_OS_LINUX
-	#if defined(__ANDROID__)
-		#include "backend/OpenSLESBackend.hpp"
-	#else
-		#include "backend/PulseAudioBackend.hpp"
-//		#include "backend/ALSABackend.hpp"
-	#endif
-#else
-	#error "Unknown OS"
-#endif
+
 
 
 using namespace aumiks;
-
-
-
-ting::IntrusiveSingleton<Lib>::T_Instance Lib::instance;
 
 
 

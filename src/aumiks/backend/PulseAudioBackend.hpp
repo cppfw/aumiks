@@ -40,7 +40,25 @@ namespace{
 
 class PulseAudioBackend : public WriteBasedBackend{
 	pa_simple *handle;
+	
+	//override
+	void Write(const ting::Buffer<ting::u8>& buf){
+//		ASSERT(buf.Size() == this->BufferSizeInBytes())
 
+		if(pa_simple_write(
+				this->handle,
+				buf.Begin(),
+				size_t(buf.SizeInBytes()),
+				0 // no error return
+			) < 0)
+		{
+			//TODO: handle error somehow, throw exception
+			//ignore error
+			TRACE(<< "pa_simple_write(): error" << std::endl)
+		}
+	}
+
+public:
 	PulseAudioBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
 			WriteBasedBackend(bufferSizeFrames * aumiks::BytesPerFrame(format))
 	{
@@ -83,37 +101,14 @@ class PulseAudioBackend : public WriteBasedBackend{
 		
 		this->Start();//start thread
 	}
+
 	
-	//override
-	void Write(const ting::Buffer<ting::u8>& buf){
-//		ASSERT(buf.Size() == this->BufferSizeInBytes())
-
-		if(pa_simple_write(
-				this->handle,
-				buf.Begin(),
-				size_t(buf.SizeInBytes()),
-				0 // no error return
-			) < 0)
-		{
-			//TODO: handle error somehow, throw exception
-			//ignore error
-			TRACE(<< "pa_simple_write(): error" << std::endl)
-		}
-	}
-
-public:
-
+	
 	virtual ~PulseAudioBackend()throw(){
 		this->StopThread();
 		
 		ASSERT(this->handle)
 		pa_simple_free(this->handle);
-	}
-	
-	inline static ting::Ptr<PulseAudioBackend> New(unsigned bufferSizeFrames, aumiks::E_Format format){
-		return ting::Ptr<PulseAudioBackend>(
-				new PulseAudioBackend(bufferSizeFrames, format)
-			);
 	}
 };
 

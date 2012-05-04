@@ -36,6 +36,8 @@ THE SOFTWARE. */
 
 
 
+namespace aumiks{
+
 
 
 /**
@@ -54,47 +56,48 @@ class Channel : public virtual ting::RefCounted{
 private:
 	Effect::T_EffectsList effects;
 
-	inline void InitEffects(){
-		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			(*i)->Init_ts();
-		}
-	}
-
-	inline void RemoveEffect(const ting::Ref<Effect>& e){
-		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			if((*i) == e){
-				this->effects.erase(i);
-				break;
-			}
-		}
-	}
-
-	template <unsigned freq, unsigned chans> inline bool ApplyEffectsToSmpBuf(ting::Buffer<ting::s32>& buf){
-		bool ret = this->soundStopped;
-		bool stopRequested = false;
-
-		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			switch((*i)->ApplyToBufImpl<freq, chans>(buf, this->soundStopped)){
-				case Effect::NORMAL:
-					break;
-				case Effect::CONTINUE:
-					ret = false; //at least one of the effects has requested to continue the channel playing
-					break;
-				case Effect::STOP_SOUND:
-					//Set the stop requested flag.
-					//It is still necessary to apply remaining effects, since current filled sample buffer
-					//will still be played, no matter that the channel playing will be stopped.
-					//This is why we use flag instead of immediately returning true here, because the for-loop
-					//needs to be finished.
-					stopRequested = true;
-					break;
-				default:
-					ASSERT(false)
-					break;
-			}
-		}
-		return ret || stopRequested;
-	}
+	//TODO:
+//	inline void InitEffects(){
+//		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+//			(*i)->Init_ts();
+//		}
+//	}
+//
+//	inline void RemoveEffect(const ting::Ref<Effect>& e){
+//		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+//			if((*i) == e){
+//				this->effects.erase(i);
+//				break;
+//			}
+//		}
+//	}
+//
+//	template <unsigned freq, unsigned chans> inline bool ApplyEffectsToSmpBuf(ting::Buffer<ting::s32>& buf){
+//		bool ret = this->soundStopped;
+//		bool stopRequested = false;
+//
+//		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+//			switch((*i)->ApplyToBufImpl<freq, chans>(buf, this->soundStopped)){
+//				case Effect::NORMAL:
+//					break;
+//				case Effect::CONTINUE:
+//					ret = false; //at least one of the effects has requested to continue the channel playing
+//					break;
+//				case Effect::STOP_SOUND:
+//					//Set the stop requested flag.
+//					//It is still necessary to apply remaining effects, since current filled sample buffer
+//					//will still be played, no matter that the channel playing will be stopped.
+//					//This is why we use flag instead of immediately returning true here, because the for-loop
+//					//needs to be finished.
+//					stopRequested = true;
+//					break;
+//				default:
+//					ASSERT(false)
+//					break;
+//			}
+//		}
+//		return ret || stopRequested;
+//	}
 	
 protected:
 	bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans);
@@ -207,3 +210,4 @@ inline void Channel::RemoveAllEffects_ts(){
 		);
 }
 
+}//~namespace

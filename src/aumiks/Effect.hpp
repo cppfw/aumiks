@@ -30,6 +30,10 @@ THE SOFTWARE. */
 
 
 
+namespace aumiks{
+
+
+
 /**
  * @brief Base class for effect classes which can be applied to a playing sound.
  * The effects should derive from this class and re-implement the virtual methods
@@ -37,9 +41,6 @@ THE SOFTWARE. */
  * The effects can be added to the playing channel.
  */
 class Effect : public virtual ting::RefCounted{
-	friend class aumiks::Channel;
-	friend class aumiks::Lib;
-
 	typedef std::list<ting::Ref<aumiks::Effect> > T_EffectsList;
 	typedef T_EffectsList::iterator T_EffectsIter;
 
@@ -47,7 +48,7 @@ public:
 
 	/**
 	 * @brief Called every time when the Channel is about to start playing.
-	 * Called from separate thread.
+	 * Called from separate thread, should be thread safe.
 	 * Default implementation does nothing. Override this method if needed.
 	 */
 	virtual void Init_ts(){}
@@ -87,59 +88,63 @@ public:
 		STOP_SOUND
 	};
 
-	/**
-	 * @brief Called when effect is to be applied to a portion of a playing sound.
-	 * Depending on the output sound format the corresponding method is called.
-	 * Note, that when effect is used as a global effect, then the return value from
-	 * this method is ignored. It only matters when effect is added to channel.
-	 * @param buf - buffer containing portion of sound data.
-	 * @param soundStopped - true if sound has finished playing, false otherwise.
-	 * @return One of the E_Result values. See E_Result description for more info.
-	 */
-	virtual E_Result ApplyToBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){
-		return NORMAL;
-	}
-
-	/**
-	 * @brief Called when effect is to be applied to a portion of a playing sound.
-	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
-	 */
-	virtual E_Result ApplyToBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
-		return NORMAL;
-	}
-
-	/**
-	 * @brief Called when effect is to be applied to a portion of a playing sound.
-	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
-	 */
-	virtual E_Result ApplyToBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){
-		return NORMAL;
-	}
-
-	/**
-	 * @brief Called when effect is to be applied to a portion of a playing sound.
-	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
-	 */
-	virtual E_Result ApplyToBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
-		return NORMAL;
-	}
-
-	/**
-	 * @brief Called when effect is to be applied to a portion of a playing sound.
-	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
-	 */
-	virtual E_Result ApplyToBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){
-		return NORMAL;
-	}
-
-	/**
-	 * @brief Called when effect is to be applied to a portion of a playing sound.
-	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
-	 */
-	virtual E_Result ApplyToBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
-		return NORMAL;
-	}
-
-private:
-	template <unsigned freq, unsigned chans> inline E_Result ApplyToBufImpl(ting::Buffer<ting::s32>& buf, bool soundStopped);
+	//TODO:
+//	/**
+//	 * @brief Called when effect is to be applied to a portion of a playing sound.
+//	 * Depending on the output sound format the corresponding method is called.
+//	 * Note, that when effect is used as a global effect, then the return value from
+//	 * this method is ignored. It only matters when effect is added to channel.
+//	 * @param buf - buffer containing portion of sound data.
+//	 * @param soundStopped - true if sound has finished playing, false otherwise.
+//	 * @return One of the E_Result values. See E_Result description for more info.
+//	 */
+//	virtual E_Result ApplyToBuf11025Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+//		return NORMAL;
+//	}
+//
+//	/**
+//	 * @brief Called when effect is to be applied to a portion of a playing sound.
+//	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+//	 */
+//	virtual E_Result ApplyToBuf11025Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+//		return NORMAL;
+//	}
+//
+//	/**
+//	 * @brief Called when effect is to be applied to a portion of a playing sound.
+//	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+//	 */
+//	virtual E_Result ApplyToBuf22050Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+//		return NORMAL;
+//	}
+//
+//	/**
+//	 * @brief Called when effect is to be applied to a portion of a playing sound.
+//	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+//	 */
+//	virtual E_Result ApplyToBuf22050Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+//		return NORMAL;
+//	}
+//
+//	/**
+//	 * @brief Called when effect is to be applied to a portion of a playing sound.
+//	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+//	 */
+//	virtual E_Result ApplyToBuf44100Mono16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+//		return NORMAL;
+//	}
+//
+//	/**
+//	 * @brief Called when effect is to be applied to a portion of a playing sound.
+//	 * See description of Effect::ApplyToSmpBuf11025Mono16() method.
+//	 */
+//	virtual E_Result ApplyToBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+//		return NORMAL;
+//	}
+//
+//private:
+//	template <unsigned freq, unsigned chans> inline E_Result ApplyToBufImpl(ting::Buffer<ting::s32>& buf, bool soundStopped);
 };
+
+
+}//~namespace

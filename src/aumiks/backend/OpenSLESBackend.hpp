@@ -33,14 +33,14 @@ THE SOFTWARE. */
 #include <SLES/OpenSLES.h>
 
 #if defined(__ANDROID__)
- #include <SLES/OpenSLES_Android.h>
+#	include <SLES/OpenSLES_Android.h>
 #endif
 
 
 
 namespace{
 
-class OpenSLESBackend : public aumiks::AudioBackend{
+class OpenSLESBackend : public AudioBackend{
 	
 	struct Engine{
 		SLObjectItf object; //object
@@ -282,7 +282,17 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 	} player;
 	
 	
+
+	//override
+	void SetPaused(bool pause){
+		if(pause){
+			(*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
+		}else{
+			(*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING);
+		}
+	}
 	
+public:
 	//create buffered queue player
 	OpenSLESBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
 			outputMix(this->engine),
@@ -305,29 +315,14 @@ class OpenSLESBackend : public aumiks::AudioBackend{
 		}
 	}
 
-	//override
-	void SetPaused(bool pause){
-		if(pause){
-			(*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
-		}else{
-			(*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING);
-		}
-	}
 	
-public:
-
+	
 	~OpenSLESBackend()throw(){
 		// Stop player playing
 		SLresult res = (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
 		ASSERT(res == SL_RESULT_SUCCESS);
 		
 		//TODO: make sure somehow that the callback will not be called anymore
-	}
-	
-	inline static ting::Ptr<OpenSLESBackend> New(unsigned bufferSizeFrames, aumiks::E_Format format){
-		return ting::Ptr<OpenSLESBackend>(
-				new OpenSLESBackend(bufferSizeFrames, format)
-			);
 	}
 };
 

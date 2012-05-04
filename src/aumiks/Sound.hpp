@@ -33,6 +33,10 @@ THE SOFTWARE. */
 
 
 
+namespace aumiks{
+
+
+
 /**
  * @brief Base class for sounds.
  * A sound object is an object which holds all the initial data required to play a particular sound.
@@ -51,3 +55,4 @@ public:
 	virtual ting::Ref<aumiks::Channel> CreateChannel()const = 0;
 };
 
+}//~namespace

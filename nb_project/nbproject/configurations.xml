@@ -7,6 +7,21 @@
         <in>AssetFile.hpp</in>
       </df>
       <df name="aumiks">
+        <df name="aumiks">
+          <df name="backend">
+            <in>ALSABackend.hpp</in>
+            <in>DirectSoundBackend.hpp</in>
+            <in>OpenSLESBackend.hpp</in>
+            <in>PulseAudioBackend.hpp</in>
+            <in>WriteBasedBackend.hpp</in>
+          </df>
+          <in>Exc.hpp</in>
+          <in>MixChannel.hpp</in>
+          <in>WavSound.cpp</in>
+          <in>WavSound.hpp</in>
+          <in>aumiks.cpp</in>
+          <in>aumiks.hpp</in>
+        </df>
       </df>
       <df name="test">
         <in>main.cpp</in>
@@ -66,13 +81,22 @@
       <df name="aumiks">
         <df name="backend">
           <in>ALSABackend.hpp</in>
+          <in>AudioBackend.hpp</in>
           <in>DirectSoundBackend.hpp</in>
           <in>OpenSLESBackend.hpp</in>
           <in>PulseAudioBackend.hpp</in>
           <in>WriteBasedBackend.hpp</in>
         </df>
+        <in>Channel.cpp</in>
+        <in>Channel.hpp</in>
+        <in>Effect.cpp</in>
+        <in>Effect.hpp</in>
         <in>Exc.hpp</in>
+        <in>Lib.cpp</in>
+        <in>Lib.hpp</in>
+        <in>MixChannel.cpp</in>
         <in>MixChannel.hpp</in>
+        <in>Sound.hpp</in>
         <in>WavSound.cpp</in>
         <in>WavSound.hpp</in>
         <in>aumiks.cpp</in>
@@ -129,6 +153,59 @@
           <executablePath></executablePath>
         </makeTool>
       </makefileType>
+      <item path="../android/jni/aumiks/aumiks/MixChannel.hpp"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="../android/jni/aumiks/aumiks/backend/ALSABackend.hpp"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="../android/jni/aumiks/aumiks/backend/DirectSoundBackend.hpp"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="../android/jni/aumiks/aumiks/backend/OpenSLESBackend.hpp"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="../android/jni/ting/ting/Signal.hpp" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="../android/jni/ting/ting/codegen.h" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="../src/aumiks/Sound.hpp" ex="true" tool="3" flavor="0">
+      </item>
+      <item path="../src/aumiks/aumiks.cpp" ex="false" tool="1" flavor="0">
+        <ccTool>
+          <incDir>
+            <pElem>../src</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../src/aumiks/backend/ALSABackend.hpp"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="../src/aumiks/backend/AudioBackend.hpp"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="../src/aumiks/backend/DirectSoundBackend.hpp"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
+      <item path="../src/aumiks/backend/OpenSLESBackend.hpp"
+            ex="true"
+            tool="3"
+            flavor="0">
+      </item>
     </conf>
   </confs>
 </configurationDescriptor>
