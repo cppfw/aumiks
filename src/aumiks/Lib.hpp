@@ -32,6 +32,8 @@ THE SOFTWARE. */
 #include <ting/debug.hpp>
 #include <ting/Singleton.hpp>
 
+#include "MixChannel.hpp"
+
 
 
 //#define M_ENABLE_AUMIKS_TRACE
@@ -71,8 +73,13 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 	inline unsigned BufSizeInSamples()const throw(){
 		return this->bufSizeInFrames * this->chans;
 	}
+
+	ting::Ref<aumiks::MixChannel> mixChannel;
+	
+	ting::Array<ting::s32> smpBuf;
 	
 	void *backend;
+
 public:
 	/**
 	 * @brief Create sound library singleton instance.
@@ -171,6 +178,8 @@ public:
 
 
 private:
+	void CopySmpBufToPlayBuf(ting::Buffer<ting::u8>& playBuf);
+	
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	void FillPlayBuf(ting::Buffer<ting::u8>& playBuf);
 

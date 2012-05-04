@@ -36,22 +36,6 @@ ting::IntrusiveSingleton<Lib>::T_Instance Lib::instance;
 
 
 
-namespace{
-
-inline unsigned BufferSizeInFrames(unsigned bufferSizeMillis, unsigned freq){
-	return freq * bufferSizeMillis / 1000;
-}
-
-
-
-inline unsigned BufferSizeInSamples(unsigned bufferSizeMillis, unsigned freq, unsigned chans){
-	return BufferSizeInFrames(bufferSizeMillis, freq) * chans;
-}
-
-}//~namespace
-
-
-
 #include "backend/AudioBackend.hpp"
 
 #if M_OS == M_OS_WIN32 || M_OS == M_OS_WIN64
@@ -72,19 +56,21 @@ inline unsigned BufferSizeInSamples(unsigned bufferSizeMillis, unsigned freq, un
 Lib::Lib(ting::u16 bufferSizeMillis, unsigned freq, unsigned chans) :
 		freq(freq),
 		chans(chans),
-		bufSizeInFrames(BufferSizeInFrames(bufferSizeMillis, freq))
+		bufSizeInFrames(freq * bufferSizeMillis / 1000),
+		mixChannel(aumiks::MixChannel::New()),
+		smpBuf(bufSizeInFrames * chans)
 {
 	//backend must be initialized after all the essential parts of aumiks are initialized,
 	//because after the backend object is created, it starts calling the FillPlayBuf() method periodically.
 	this->backend = reinterpret_cast<void*>(static_cast<AudioBackend*>(
 #if M_OS == M_OS_WIN32 || M_OS == M_OS_WIN64
-			new DirectSoundBackend(BufferSizeInFrames(bufferSizeMillis, freq), freq, chans)
+			new DirectSoundBackend(this->bufSizeInFrames, freq, chans)
 #elif M_OS == M_OS_LINUX
 #	if defined(__ANDROID__)
-			new OpenSLESBackend(BufferSizeInFrames(bufferSizeMillis, freq), freq, chans)
+			new OpenSLESBackend(this->bufSizeInFrames, freq, chans)
 #	else
-			new PulseAudioBackend(BufferSizeInFrames(bufferSizeMillis, freq), freq, chans)
-//			new ALSABackend(BufferSizeInFrames(bufferSizeMillis, freq), freq, chans)
+			new PulseAudioBackend(this->bufSizeInFrames, freq, chans)
+//			new ALSABackend(this->bufSizeInFrames, freq, chans)
 #	endif
 #else
 #	error "undefined OS"
@@ -127,114 +113,94 @@ void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
 			"playBuf.Size() = " << playBuf.Size() << " mixBuf.Size() = " << this->mixerBuffer->mixBuf.Size()
 		)
 
+	//TODO:
+	
 	//clean mixBuf
-	this->mixerBuffer->CleanMixBuf();
+//	this->mixerBuffer->CleanMixBuf();
 
-	{//add queued channels to playing pool and effects to channels
-		ting::Mutex::Guard mut(this->mutex);//lock mutex
+//	{//add queued channels to playing pool and effects to channels
+//		ting::Mutex::Guard mut(this->mutex);//lock mutex
+//
+//		M_AUMIKS_TRACE(<< "chPoolToAdd.size() = " << this->channelsToAdd.size() << std::endl)
+//		while(this->channelsToAdd.size() != 0){
+//			ting::Ref<aumiks::Channel> ch = this->channelsToAdd.front();
+//			this->channelsToAdd.pop_front();
+//			this->chPool.push_back(ch);
+//			ch->OnStart();//notify channel that it was just started
+//		}
+//
+//		//add effects to channels
+//		while(this->effectsToAddToChan.size() != 0){
+//			T_ChannelEffectPair& p = this->effectsToAddToChan.front();
+//			ASSERT(p.first)
+//			ASSERT(p.second)
+//
+//			aumiks::Lib::AddEffectToChannelSync(p.first, p.second);
+//
+//			this->effectsToAddToChan.pop_front();
+//		}
+//
+//		//remove effects from channels
+//		while(this->effectsToRemoveFromChan.size() != 0){
+//			T_ChannelEffectPair &p = this->effectsToRemoveFromChan.front();
+//			ASSERT(p.first)
+//			ASSERT(p.second)
+//
+//			aumiks::Lib::RemoveEffectFromChannelSync(p.first, p.second);
+//
+//			this->effectsToRemoveFromChan.pop_front();
+//		}
+//
+//		//remove all effects from channels
+//		while(this->effectsToClear.size() != 0){
+//			this->effectsToClear.front()->effects.clear();
+//			this->effectsToClear.pop_front();
+//		}
+//
+//		//add global effects
+//		while(this->effectsToAdd.size() != 0){
+//			this->effects.push_back(this->effectsToAdd.front());
+//			this->effectsToAdd.pop_front();
+//		}
+//
+//		//remove global effects
+//		while(this->effectsToRemove.size() != 0){
+//			for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+//				if(*i == this->effectsToRemove.front()){
+//					this->effects.erase(i);
+//					break;
+//				}
+//			}
+//
+//			this->effectsToRemove.pop_front();
+//		}
+//
+//		//clear global effects if requested
+//		if(this->clearEffects){
+//			this->effects.clear();
+//			this->clearEffects = false;
+//		}
+//	}//~mutex guard
 
-		M_AUMIKS_TRACE(<< "chPoolToAdd.size() = " << this->channelsToAdd.size() << std::endl)
-		while(this->channelsToAdd.size() != 0){
-			ting::Ref<aumiks::Channel> ch = this->channelsToAdd.front();
-			this->channelsToAdd.pop_front();
-			this->chPool.push_back(ch);
-			ch->OnStart();//notify channel that it was just started
-		}
-
-		//add effects to channels
-		while(this->effectsToAddToChan.size() != 0){
-			T_ChannelEffectPair& p = this->effectsToAddToChan.front();
-			ASSERT(p.first)
-			ASSERT(p.second)
-
-			aumiks::Lib::AddEffectToChannelSync(p.first, p.second);
-
-			this->effectsToAddToChan.pop_front();
-		}
-
-		//remove effects from channels
-		while(this->effectsToRemoveFromChan.size() != 0){
-			T_ChannelEffectPair &p = this->effectsToRemoveFromChan.front();
-			ASSERT(p.first)
-			ASSERT(p.second)
-
-			aumiks::Lib::RemoveEffectFromChannelSync(p.first, p.second);
-
-			this->effectsToRemoveFromChan.pop_front();
-		}
-
-		//remove all effects from channels
-		while(this->effectsToClear.size() != 0){
-			this->effectsToClear.front()->effects.clear();
-			this->effectsToClear.pop_front();
-		}
-
-		//add global effects
-		while(this->effectsToAdd.size() != 0){
-			this->effects.push_back(this->effectsToAdd.front());
-			this->effectsToAdd.pop_front();
-		}
-
-		//remove global effects
-		while(this->effectsToRemove.size() != 0){
-			for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-				if(*i == this->effectsToRemove.front()){
-					this->effects.erase(i);
-					break;
-				}
-			}
-
-			this->effectsToRemove.pop_front();
-		}
-
-		//clear global effects if requested
-		if(this->clearEffects){
-			this->effects.clear();
-			this->clearEffects = false;
-		}
-	}//~mutex guard
-
-	//mix channels to mixbuf
-	for(T_ChannelIter i = this->chPool.begin(); i != this->chPool.end();){
-		if(this->mixerBuffer->MixToMixBuf(*i)){
-			(*i)->isPlaying = false;//clear playing flag
-			(*i)->OnStop();//notify channel that it has stopped playing
-			i = this->chPool.erase(i);
-		}else{
-			++i;
-		}
-	}
-
-	//apply global effects
-	this->mixerBuffer->ApplyEffectsToMixBuf();
+		
+	//mix channels to smpBuf
+	this->mixChannel->FillSmpBufAndApplyEffects(this->smpBuf, this->freq, this->chans);
 
 //		TRACE(<< "chPool.size() = " << this->chPool.size() << std::endl)
 	M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)
 
-	this->mixerBuffer->CopyToPlayBuf(playBuf);
-}
-
-
-void aumiks::Lib::MixerBuffer::MixSmpBufToMixBuf(){
-	ASSERT(this->smpBuf.Size() == this->mixBuf.Size())
-
-	ting::s32* src = this->smpBuf.Begin();
-	ting::s32* dst = this->mixBuf.Begin();
-
-	for(; dst != this->mixBuf.End(); ++src, ++dst){
-		*dst += *src;
-	}
+	this->CopySmpBufToPlayBuf(playBuf);
 }
 
 
 
-void aumiks::Lib::MixerBuffer::CopyToPlayBuf(ting::Buffer<ting::u8>& playBuf){
+void aumiks::Lib::CopySmpBufToPlayBuf(ting::Buffer<ting::u8>& playBuf){
 	//playBuf size is in bytes and we have 2 bytes per sample always.
 	ASSERT((this->mixBuf.Size() * 2) == playBuf.Size())
 
-	const ting::s32 *src = this->mixBuf.Begin();
+	const ting::s32 *src = this->smpBuf.Begin();
 	ting::u8* dst = playBuf.Begin();
-	for(; src != this->mixBuf.End(); ++src){
+	for(; src != this->smpBuf.End(); ++src){
 		ting::s32 tmp = *src;
 		ting::util::ClampTop(tmp, 0x7fff);
 		ting::util::ClampBottom(tmp, -0x7fff);
