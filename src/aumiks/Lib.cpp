@@ -78,13 +78,13 @@ Lib::Lib(ting::u16 bufferSizeMillis, unsigned freq, unsigned chans) :
 	//because after the backend object is created, it starts calling the FillPlayBuf() method periodically.
 	this->backend = reinterpret_cast<void*>(static_cast<AudioBackend*>(
 #if M_OS == M_OS_WIN32 || M_OS == M_OS_WIN64
-			new DirectSoundBackend(BufferSizeInFrames(bufferSizeMillis, freq), format)
+			new DirectSoundBackend(BufferSizeInFrames(bufferSizeMillis, freq), freq, chans)
 #elif M_OS == M_OS_LINUX
 #	if defined(__ANDROID__)
-			new OpenSLESBackend(BufferSizeInFrames(bufferSizeMillis, freq), format)
+			new OpenSLESBackend(BufferSizeInFrames(bufferSizeMillis, freq), freq, chans)
 #	else
-			new PulseAudioBackend(BufferSizeInFrames(bufferSizeMillis, freq), format)
-//			new ALSABackend(BufferSizeInFrames(bufferSizeMillis, freq), format)
+			new PulseAudioBackend(BufferSizeInFrames(bufferSizeMillis, freq), freq, chans)
+//			new ALSABackend(BufferSizeInFrames(bufferSizeMillis, freq), freq, chans)
 #	endif
 #else
 #	error "undefined OS"
@@ -105,8 +105,9 @@ void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 
 	{
 		ting::Mutex::Guard mut(this->mutex);
-		if(ch->IsPlaying())
+		if(ch->IsPlaying()){
 			return;//already playing
+		}
 
 		ch->InitEffects();
 

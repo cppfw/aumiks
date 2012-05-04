@@ -33,6 +33,7 @@ THE SOFTWARE. */
 #include <pulse/simple.h>
 #include <pulse/error.h>
 
+#include "../util.hpp"
 #include "WriteBasedBackend.hpp"
 
 
@@ -59,17 +60,17 @@ class PulseAudioBackend : public WriteBasedBackend{
 	}
 
 public:
-	PulseAudioBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
-			WriteBasedBackend(bufferSizeFrames * aumiks::BytesPerFrame(format))
+	PulseAudioBackend(unsigned bufferSizeFrames, unsigned freq, unsigned chans) :
+			WriteBasedBackend(bufferSizeFrames * aumiks::BytesPerFrame(chans))
 	{
 		TRACE(<< "opening device" << std::endl)
 
 		pa_sample_spec ss;
 		ss.format = PA_SAMPLE_S16NE;//Native endian
-		ss.channels = aumiks::SamplesPerFrame(format);
-		ss.rate = aumiks::SamplingRate(format);
+		ss.channels = chans;
+		ss.rate = freq;
 
-		unsigned bufferSizeInBytes = bufferSizeFrames * aumiks::BytesPerFrame(format);
+		unsigned bufferSizeInBytes = bufferSizeFrames * aumiks::BytesPerFrame(chans);
 		pa_buffer_attr ba;
 		ba.fragsize = bufferSizeInBytes;
 		ba.tlength = bufferSizeInBytes;
@@ -96,6 +97,7 @@ public:
 
 		if(!this->handle){
 			TRACE(<< "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl)
+			//TODO: more informative error message
 			throw aumiks::Exc("error opening PulseAudio connection");
 		}
 		

@@ -29,7 +29,17 @@ THE SOFTWARE. */
 #pragma once
 
 
+#include <ting/debug.hpp>
 #include <ting/Singleton.hpp>
+
+
+
+//#define M_ENABLE_AUMIKS_TRACE
+#ifdef M_ENABLE_AUMIKS_TRACE
+#define M_AUMIKS_TRACE(x) TRACE(<< "[aumiks] ") TRACE(x)
+#else
+#define M_AUMIKS_TRACE(x)
+#endif
 
 
 
