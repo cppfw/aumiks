@@ -32,7 +32,7 @@ THE SOFTWARE. */
 #include <ting/Array.hpp>
 
 
-#include "../aumiks.hpp"
+#include "AudioBackend.hpp"
 #include "../Exc.hpp"
 
 
