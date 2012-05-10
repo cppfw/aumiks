@@ -53,7 +53,7 @@ ting::IntrusiveSingleton<Lib>::T_Instance Lib::instance;
 
 
 
-Lib::Lib(ting::u16 bufferSizeMillis, unsigned freq, unsigned chans) :
+Lib::Lib(unsigned freq, unsigned chans, ting::u16 bufferSizeMillis) :
 		freq(freq),
 		chans(chans),
 		bufSizeInFrames(freq * bufferSizeMillis / 1000),
@@ -69,7 +69,7 @@ Lib::Lib(ting::u16 bufferSizeMillis, unsigned freq, unsigned chans) :
 #	if defined(__ANDROID__)
 			new OpenSLESBackend(this->bufSizeInFrames, freq, chans)
 #	else
-			new PulseAudioBackend(this->bufSizeInFrames, freq, chans)
+			new PulseAudioBackend(*this, &aumiks::Lib::FillPlayBuf, this->bufSizeInFrames, freq, chans)
 //			new ALSABackend(this->bufSizeInFrames, freq, chans)
 #	endif
 #else

@@ -37,7 +37,11 @@ endif
 
 #Sources
 srcs :=
-srcs += aumiks/aumiks.cpp
+srcs += aumiks/Channel.cpp
+srcs += aumiks/Effect.cpp
+srcs += aumiks/Lib.cpp
+srcs += aumiks/MixChannel.cpp
+srcs += aumiks/util.cpp
 srcs += aumiks/WavSound.cpp
 
 
