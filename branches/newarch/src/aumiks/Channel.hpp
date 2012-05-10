@@ -34,9 +34,15 @@ THE SOFTWARE. */
 
 #include <ting/Ref.hpp>
 
+#include "Effect.hpp"
+
 
 
 namespace aumiks{
+
+
+
+class Lib;
 
 
 
@@ -178,6 +184,15 @@ protected:
 	virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans) = 0;
 };
 
+}//~namespace
+
+
+
+#include "Lib.hpp"
+
+
+
+namespace aumiks{
 
 
 inline void Channel::Play(){

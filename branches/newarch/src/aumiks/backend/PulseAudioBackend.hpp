@@ -60,8 +60,14 @@ class PulseAudioBackend : public WriteBasedBackend{
 	}
 
 public:
-	PulseAudioBackend(unsigned bufferSizeFrames, unsigned freq, unsigned chans) :
-			WriteBasedBackend(bufferSizeFrames * aumiks::BytesPerFrame(chans))
+	PulseAudioBackend(
+			aumiks::Lib& lib,
+			void(aumiks::Lib::*callback)(ting::Buffer<ting::u8>&),
+			unsigned bufferSizeFrames,
+			unsigned freq,
+			unsigned chans
+		) :
+			WriteBasedBackend(lib, callback, bufferSizeFrames * aumiks::BytesPerFrame(chans))
 	{
 		TRACE(<< "opening device" << std::endl)
 

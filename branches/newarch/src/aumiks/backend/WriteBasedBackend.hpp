@@ -42,7 +42,12 @@ namespace{
 class WriteBasedBackend : public aumiks::AudioBackend, public ting::MsgThread{
 	ting::Array<ting::u8> playBuf;
 protected:
-	WriteBasedBackend(size_t playBufSizeInBytes) :
+	WriteBasedBackend(
+			aumiks::Lib& lib,
+			void(aumiks::Lib::*callback)(ting::Buffer<ting::u8>&),
+			size_t playBufSizeInBytes
+		) :
+			aumiks::AudioBackend(lib, callback),
 			playBuf(playBufSizeInBytes)
 	{}
 	

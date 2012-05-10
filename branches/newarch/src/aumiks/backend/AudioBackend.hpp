@@ -29,15 +29,27 @@ THE SOFTWARE. */
 #include <ting/Buffer.hpp>
 
 
+#include "../Lib.hpp"
+
+
 
 //base class for audio backends
 class AudioBackend{
+	aumiks::Lib& lib;
+	void(aumiks::Lib::*callback)(ting::Buffer<ting::u8>&);
+	
 protected:
 	inline void FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
-		aumiks::Lib::Inst().FillPlayBuf(playBuf);
+		(this->lib.*(this->callback))(playBuf);
 	}
 
-	inline AudioBackend(){}
+	inline AudioBackend(
+			aumiks::Lib& lib,
+			void(aumiks::Lib::*callback)(ting::Buffer<ting::u8>&)
+		) :
+			lib(lib),
+			callback(callback)
+	{}
 	
 public:
 	virtual ~AudioBackend()throw(){}

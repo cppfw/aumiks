@@ -63,6 +63,8 @@ class MixChannel : public aumiks::Channel{
 	void MixSmpBufTo(ting::Buffer<ting::s32>& buf);
 	
 public:
+	virtual ~MixChannel()throw(){}
+	
 	void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel);
 	
 	static inline ting::Ref<aumiks::MixChannel> New(){

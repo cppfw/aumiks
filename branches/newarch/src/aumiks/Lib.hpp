@@ -90,7 +90,7 @@ public:
 	 * @param freq - sampling rate in Hertz.
 	 * @param chans - number of channels. 1 = mono, 2 = stereo, etc.
 	 */
-	Lib(ting::u16 bufferSizeMillis = 100, unsigned freq, unsigned chans);
+	Lib(unsigned freq, unsigned chans, ting::u16 bufferSizeMillis = 100);
 	
 	
 	

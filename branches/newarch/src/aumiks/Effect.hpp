@@ -34,6 +34,10 @@ namespace aumiks{
 
 
 
+class Channel;
+
+
+
 /**
  * @brief Base class for effect classes which can be applied to a playing sound.
  * The effects should derive from this class and re-implement the virtual methods
@@ -41,6 +45,8 @@ namespace aumiks{
  * The effects can be added to the playing channel.
  */
 class Effect : public virtual ting::RefCounted{
+	friend class aumiks::Channel;
+	
 	typedef std::list<ting::Ref<aumiks::Effect> > T_EffectsList;
 	typedef T_EffectsList::iterator T_EffectsIter;
 
