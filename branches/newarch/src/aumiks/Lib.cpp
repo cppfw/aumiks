@@ -57,7 +57,7 @@ Lib::Lib(unsigned freq, unsigned chans, ting::u16 bufferSizeMillis) :
 		freq(freq),
 		chans(chans),
 		bufSizeInFrames(freq * bufferSizeMillis / 1000),
-		mixChannel(aumiks::MixChannel::New()),
+		masterChannel(aumiks::MixChannel::New()),
 		smpBuf(bufSizeInFrames * chans)
 {
 	//backend must be initialized after all the essential parts of aumiks are initialized,
@@ -88,20 +88,21 @@ Lib::~Lib()throw(){
 
 void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
 	ASSERT(ch.IsValid())
-
-	{
-		ting::Mutex::Guard mut(this->mutex);
-		if(ch->IsPlaying()){
-			return;//already playing
-		}
-
-		ch->InitEffects();
-
-		this->channelsToAdd.push_back(ch);//queue channel to be added to playing pool
-		ch->isPlaying = true;//mark channel as playing
-		ch->soundStopped = false;//init sound stopped flag
-		ch->stopFlag = false;
-	}
+	
+	//TODO:
+//	{
+//		ting::Mutex::Guard mut(this->mutex);
+//		if(ch->IsPlaying()){
+//			return;//already playing
+//		}
+//
+//		ch->InitEffects();
+//
+//		this->channelsToAdd.push_back(ch);//queue channel to be added to playing pool
+//		ch->isPlaying = true;//mark channel as playing
+//		ch->soundStopped = false;//init sound stopped flag
+//		ch->stopFlag = false;
+//	}
 }
 
 
@@ -184,7 +185,7 @@ void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
 
 		
 	//mix channels to smpBuf
-	this->mixChannel->FillSmpBufAndApplyEffects(this->smpBuf, this->freq, this->chans);
+	this->masterChannel->FillSmpBufAndApplyEffects(this->smpBuf, this->freq, this->chans);
 
 //		TRACE(<< "chPool.size() = " << this->chPool.size() << std::endl)
 	M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)

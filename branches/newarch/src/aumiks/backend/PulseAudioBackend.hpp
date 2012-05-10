@@ -43,7 +43,7 @@ class PulseAudioBackend : public WriteBasedBackend{
 	pa_simple *handle;
 	
 	//override
-	void Write(const ting::Buffer<ting::u8>& buf){
+	virtual void Write(const ting::Buffer<ting::u8>& buf){
 //		ASSERT(buf.Size() == this->BufferSizeInBytes())
 
 		if(pa_simple_write(
@@ -59,6 +59,11 @@ class PulseAudioBackend : public WriteBasedBackend{
 		}
 	}
 
+	//override
+	virtual void SetPaused(bool pause){
+		//TODO:
+	}
+	
 public:
 	PulseAudioBackend(
 			aumiks::Lib& lib,

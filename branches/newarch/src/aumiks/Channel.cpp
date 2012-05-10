@@ -28,6 +28,10 @@ THE SOFTWARE. */
 
 
 
+using namespace aumiks;
+
+
+
 bool Channel::FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 	if(this->stopFlag){
 		return true;
@@ -50,7 +54,7 @@ bool Channel::FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned f
 //		return ret;
 //	}
 
-	return ret;
+	return this->soundStopped;//TODO: what to return?
 }
 
 
