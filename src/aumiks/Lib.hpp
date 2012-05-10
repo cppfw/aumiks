@@ -74,13 +74,20 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 		return this->bufSizeInFrames * this->chans;
 	}
 
-	ting::Ref<aumiks::MixChannel> mixChannel;
+	ting::Ref<aumiks::MixChannel> masterChannel;
 	
 	ting::Array<ting::s32> smpBuf;
 	
 	void *backend;
 
 public:
+	
+	
+	inline const ting::Ref<aumiks::MixChannel>& MasterChannel()throw(){
+		return this->masterChannel;
+	}
+	
+	
 	/**
 	 * @brief Create sound library singleton instance.
 	 * Creates singleton instance of sound library object and
@@ -104,77 +111,78 @@ public:
 	 * I.e. all the computational resources for sound mixing etc. are still being consumed when sound is muted.
 	 * @param muted - pass true to mute the sound, false to un-mute.
 	 */
-	inline void SetMuted(bool muted){
-		this->mixerBuffer->isMuted = muted;
-	}
-
-	/**
-	 * @brief Unmute the sound.
-	 * Inversion of Lib::SetMuted() method.
-	 * See description of Lib::SetMuted() method for more info.
-	 * @param unmuted - true to un-mute the sound, false to mute.
-	 */
-	inline void SetUnmuted(bool unmuted){
-		this->SetMuted(!unmuted);
-	}
-
-	/**
-	 * @brief Mute the sound.
-	 * See description of Lib::SetMuted() method for more info.
-	 */
-	inline void Mute(){
-		this->SetMuted(true);
-	}
-
-	/**
-	 * @brief Un-mute the sound.
-	 * See description of Lib::SetMuted() method for more info.
-	 */
-	inline void Unmute(){
-		this->SetMuted(false);
-	}
-
-	/**
-	 * @brief Check if sound output is muted or not.
-	 * @return true if sound output is muted.
-	 * @return false otherwise.
-	 */
-	inline bool IsMuted()const{
-		return this->mixerBuffer->isMuted;
-	}
-
-	/**
-	 * @brief Sets the paused state of the audio engine.
-	 * Moves engine to paused or resumed state depending on the passed parameter value.
-	 * In paused state the engine still holds the audio device open but
-	 * does not play the main audio buffer, thus does not consume CPU resources.
-	 * The method is not thread-safe and should be called from the thread where Lib object was created.
-     * @param pause - determines whether to pause or resume the audio engine. Pass true to pause and false to resume.
-     */
-	inline void SetPaused(bool pause){
-		ASSERT(this->audioBackend)
-		this->audioBackend->SetPaused(pause);
-	}
-
-	/**
-	 * @brief Pause audio engine.
-	 * Moves the audio engine to paused state.
-	 * Essentially it just calls the SetPaused_ts(true) method.
-	 * The method is not thread-safe and should be called from the thread where Lib object was created.
-     */
-	inline void Pause(){
-		this->SetPaused(true);
-	}
-	
-	/**
-	 * @brief Resume audio engine.
-	 * Un-pauses the audio engine. See Pause_ts() method for more info.
-	 * Essentially it just calls the SetPaused_ts(false) method.
-	 * The method is not thread-safe and should be called from the thread where Lib object was created.
-     */
-	inline void Resume(){
-		this->SetPaused(false);
-	}
+	//TODO:
+//	inline void SetMuted(bool muted){
+//		this->mixerBuffer->isMuted = muted;
+//	}
+//
+//	/**
+//	 * @brief Unmute the sound.
+//	 * Inversion of Lib::SetMuted() method.
+//	 * See description of Lib::SetMuted() method for more info.
+//	 * @param unmuted - true to un-mute the sound, false to mute.
+//	 */
+//	inline void SetUnmuted(bool unmuted){
+//		this->SetMuted(!unmuted);
+//	}
+//
+//	/**
+//	 * @brief Mute the sound.
+//	 * See description of Lib::SetMuted() method for more info.
+//	 */
+//	inline void Mute(){
+//		this->SetMuted(true);
+//	}
+//
+//	/**
+//	 * @brief Un-mute the sound.
+//	 * See description of Lib::SetMuted() method for more info.
+//	 */
+//	inline void Unmute(){
+//		this->SetMuted(false);
+//	}
+//
+//	/**
+//	 * @brief Check if sound output is muted or not.
+//	 * @return true if sound output is muted.
+//	 * @return false otherwise.
+//	 */
+//	inline bool IsMuted()const{
+//		return this->mixerBuffer->isMuted;
+//	}
+//
+//	/**
+//	 * @brief Sets the paused state of the audio engine.
+//	 * Moves engine to paused or resumed state depending on the passed parameter value.
+//	 * In paused state the engine still holds the audio device open but
+//	 * does not play the main audio buffer, thus does not consume CPU resources.
+//	 * The method is not thread-safe and should be called from the thread where Lib object was created.
+//	 * @param pause - determines whether to pause or resume the audio engine. Pass true to pause and false to resume.
+//	 */
+//	inline void SetPaused(bool pause){
+//		ASSERT(this->audioBackend)
+//		this->audioBackend->SetPaused(pause);
+//	}
+//
+//	/**
+//	 * @brief Pause audio engine.
+//	 * Moves the audio engine to paused state.
+//	 * Essentially it just calls the SetPaused_ts(true) method.
+//	 * The method is not thread-safe and should be called from the thread where Lib object was created.
+//	 */
+//	inline void Pause(){
+//		this->SetPaused(true);
+//	}
+//	
+//	/**
+//	 * @brief Resume audio engine.
+//	 * Un-pauses the audio engine. See Pause_ts() method for more info.
+//	 * Essentially it just calls the SetPaused_ts(false) method.
+//	 * The method is not thread-safe and should be called from the thread where Lib object was created.
+//	 */
+//	inline void Resume(){
+//		this->SetPaused(false);
+//	}
 
 
 private:
@@ -186,35 +194,35 @@ private:
 	void PlayChannel_ts(const ting::Ref<Channel>& ch);
 	
 public:
-	/**
-	 * @brief Add global effect.
-	 * Adds the effect to the list of global effects which are applied to the
-	 * final mixing buffer after all the playing channels are mixed.
-	 * @param effect - effect to add.
-	 */
-	inline void AddEffect_ts(const ting::Ref<Effect>& effect){
-		ASSERT(effect.IsValid())
-		
-		//TODO:
-	}
-
-	/**
-	 * @brief Remove global effect.
-	 * Removes the effect from the list of global effects which are applied to the
-	 * final mixing buffer after all the playing channels are mixed.
-	 * @param effect - effect to remove.
-	 */
-	inline void RemoveEffect_ts(const ting::Ref<Effect>& effect){
-		ASSERT(effect.IsValid())
-
-		//TODO:
-	}
-
-	inline void RemoveAllEffects_ts(){
-		ting::Mutex::Guard mutexGuard(this->mutex);
-
-		//TODO:
-	}
+	//TODO:
+//	/**
+//	 * @brief Add global effect.
+//	 * Adds the effect to the list of global effects which are applied to the
+//	 * final mixing buffer after all the playing channels are mixed.
+//	 * @param effect - effect to add.
+//	 */
+//	inline void AddEffect_ts(const ting::Ref<Effect>& effect){
+//		ASSERT(effect.IsValid())
+//		
+//		//TODO:
+//	}
+//
+//	/**
+//	 * @brief Remove global effect.
+//	 * Removes the effect from the list of global effects which are applied to the
+//	 * final mixing buffer after all the playing channels are mixed.
+//	 * @param effect - effect to remove.
+//	 */
+//	inline void RemoveEffect_ts(const ting::Ref<Effect>& effect){
+//		ASSERT(effect.IsValid())
+//
+//		//TODO:
+//	}
+//
+//	inline void RemoveAllEffects_ts(){
+//
+//		//TODO:
+//	}
 };
 
 

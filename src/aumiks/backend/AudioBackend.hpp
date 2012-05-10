@@ -33,6 +33,8 @@ THE SOFTWARE. */
 
 
 
+namespace{
+
 //base class for audio backends
 class AudioBackend{
 	aumiks::Lib& lib;
@@ -40,6 +42,7 @@ class AudioBackend{
 	
 protected:
 	inline void FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
+		ASSERT(aumiks::Lib::IsCreated())
 		(this->lib.*(this->callback))(playBuf);
 	}
 
@@ -56,3 +59,5 @@ public:
 	
 	virtual void SetPaused(bool pause) = 0;
 };
+
+}//~namespace

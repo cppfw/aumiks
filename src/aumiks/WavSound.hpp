@@ -33,7 +33,7 @@ THE SOFTWARE. */
 #include <ting/Array.hpp>
 #include <ting/fs/File.hpp>
 
-#include "aumiks.hpp"
+#include "Sound.hpp"
 
 
 
@@ -60,20 +60,22 @@ public:
 		 * @brief play channel
          * @param numLoops - number of time the sound should be repeated. 0 means repeat infinitely.
          */
-		inline void Play(unsigned numLoops = 1){
-			this->numLoops = numLoops;//not protected by mutex, but should not cause any serious problems
-			this->aumiks::Channel::Play();
-		}
+		//TODO:
+//		inline void Play(unsigned numLoops = 1){
+//			this->numLoops = numLoops;//not protected by mutex, but should not cause any serious problems
+//			this->aumiks::Channel::Play();
+//		}
 	};
 
 public:
 	virtual Ref<WavSound::Channel> CreateWavChannel()const = 0;
 
-	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{
-		Ref<WavSound::Channel> ret = this->CreateWavChannel();
-		ret->Play(numLoops);
-		return ret;
-	}
+	//TODO:
+//	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{
+//		Ref<WavSound::Channel> ret = this->CreateWavChannel();
+//		ret->Play(numLoops);
+//		return ret;
+//	}
 
 	static Ref<WavSound> LoadWAV(const std::string& fileName);
 	static Ref<WavSound> LoadWAV(ting::fs::File& fi);
