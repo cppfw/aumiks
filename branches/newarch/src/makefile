@@ -42,7 +42,8 @@ srcs += aumiks/Effect.cpp
 srcs += aumiks/Lib.cpp
 srcs += aumiks/MixChannel.cpp
 srcs += aumiks/util.cpp
-srcs += aumiks/WavSound.cpp
+#TODO:
+#srcs += aumiks/WavSound.cpp
 
 
 
