@@ -86,24 +86,24 @@ Lib::~Lib()throw(){
 
 
 
-void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
-	ASSERT(ch.IsValid())
-	
-	//TODO:
-//	{
-//		ting::Mutex::Guard mut(this->mutex);
-//		if(ch->IsPlaying()){
-//			return;//already playing
-//		}
-//
-//		ch->InitEffects();
-//
-//		this->channelsToAdd.push_back(ch);//queue channel to be added to playing pool
-//		ch->isPlaying = true;//mark channel as playing
-//		ch->soundStopped = false;//init sound stopped flag
-//		ch->stopFlag = false;
-//	}
-}
+//void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
+//	ASSERT(ch.IsValid())
+//	
+//	//TODO:
+////	{
+////		ting::Mutex::Guard mut(this->mutex);
+////		if(ch->IsPlaying()){
+////			return;//already playing
+////		}
+////
+////		ch->InitEffects();
+////
+////		this->channelsToAdd.push_back(ch);//queue channel to be added to playing pool
+////		ch->isPlaying = true;//mark channel as playing
+////		ch->soundStopped = false;//init sound stopped flag
+////		ch->stopFlag = false;
+////	}
+//}
 
 
 

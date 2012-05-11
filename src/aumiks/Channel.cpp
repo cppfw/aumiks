@@ -33,6 +33,8 @@ using namespace aumiks;
 
 
 bool Channel::FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+	ASSERT(buf.Size() % chans == 0)
+	
 	if(this->stopFlag){
 		return true;
 	}

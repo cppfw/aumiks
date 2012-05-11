@@ -191,7 +191,8 @@ private:
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	void FillPlayBuf(ting::Buffer<ting::u8>& playBuf);
 
-	void PlayChannel_ts(const ting::Ref<Channel>& ch);
+	//TODO: remove?
+//	void PlayChannel_ts(const ting::Ref<Channel>& ch);
 	
 public:
 	//TODO:
