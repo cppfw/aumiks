@@ -25,6 +25,7 @@ THE SOFTWARE. */
 
 
 #include "MixChannel.hpp"
+#include "Lib.hpp"
 
 
 
@@ -83,5 +84,51 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 
 
 void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
-	//TODO: send message to audio thread
+	
+	class PlayChannelAction : public aumiks::Lib::Action{
+		ting::Ref<aumiks::MixChannel> mixChannel;
+		ting::Ref<aumiks::Channel> channelToPlay;
+		
+		//override
+		virtual void Perform(){
+			//TODO:
+//			this->channelToPlay->InitEffects();
+
+			this->channelToPlay->soundStopped = false;//init sound stopped flag
+			this->channelToPlay->stopFlag = false;
+			
+			this->mixChannel->channels.push_back(this->channelToPlay);
+		}
+		
+	public:
+		PlayChannelAction(
+				const ting::Ref<aumiks::MixChannel>& mixChannel,
+				const ting::Ref<aumiks::Channel>& channelToPlay
+			) :
+				mixChannel(mixChannel),
+				channelToPlay(channelToPlay)
+		{}
+	};//~class
+	
+	TRACE(<< "MixChannel::PlayChannel_ts(): enter" << std::endl)
+	{
+		aumiks::Lib& lib = aumiks::Lib::Inst();
+		
+		ting::atomic::SpinLock::Guard spinlockGuard(lib.actionsSpinLock);
+
+		if(channel->IsPlaying()){
+			return;//already playing
+		}
+
+		channel->isPlaying = true;//mark channel as playing
+
+		//send message to audio thread
+		lib.addList->push_back(ting::Ptr<aumiks::Lib::Action>(
+				new PlayChannelAction(
+						ting::Ref<MixChannel>(this),
+						channel
+					)
+			));
+	}
+	TRACE(<< "MixChannel::PlayChannel_ts(): exit" << std::endl)
 }

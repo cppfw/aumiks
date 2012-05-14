@@ -13,19 +13,24 @@ class SineSound : public aumiks::Sound{
 		
 		//override
 		bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
+			
 			if(this->time > 2){
+				TRACE_ALWAYS(<< "returned true" << std::endl)
 				return true;
 			}
 			
 			for(ting::s32* dst = buf.Begin(); dst != buf.End();){
-				ting::s32 v = ting::math::Sin<float>(float(this->time) * ting::math::D2Pi<float>() * 440.0f);
-				this->time += 1 / freq;
+				ting::s32 v = ting::math::Sin<float>(this->time * ting::math::D2Pi<float>() * 440.0f);
+				this->time += 1 / float(freq);
 				for(unsigned i = 0; i != chans; ++i){
 					ASSERT(buf.Overlaps(dst))
 					*dst = v;
 					++dst;
 				}
 			}
+			
+			TRACE_ALWAYS(<< "time = " << this->time << std::endl)
 			
 			return false;
 		}
@@ -64,6 +69,7 @@ int main(int argc, char *argv[]){
 		while(ch->IsPlaying()){
 			ting::Thread::Sleep(333);
 		}
+		TRACE_ALWAYS(<< "finished playing" << std::endl)
 	}
 	
 //	{
