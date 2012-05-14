@@ -41,7 +41,9 @@ bool Channel::FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned f
 	
 	if(!this->soundStopped){
 		this->soundStopped = this->FillSmpBuf(buf, freq, chans);
+		TRACE(<< "soundStopped = " << this->soundStopped << std::endl)
 	}else{
+		TRACE(<< "sound is stopped" << std::endl)
 		//clear smp buffer
 		memset(buf.Begin(), 0, buf.SizeInBytes());
 	}

@@ -21,7 +21,7 @@ class SineSound : public aumiks::Sound{
 			}
 			
 			for(ting::s32* dst = buf.Begin(); dst != buf.End();){
-				ting::s32 v = ting::math::Sin<float>(this->time * ting::math::D2Pi<float>() * 440.0f);
+				ting::s32 v = float(0x7fff) * ting::math::Sin<float>(this->time * ting::math::D2Pi<float>() * 440.0f);
 				this->time += 1 / float(freq);
 				for(unsigned i = 0; i != chans; ++i){
 					ASSERT(buf.Overlaps(dst))
@@ -31,7 +31,8 @@ class SineSound : public aumiks::Sound{
 			}
 			
 			TRACE_ALWAYS(<< "time = " << this->time << std::endl)
-			
+//			TRACE(<< "this->smpBuf = " << buf << std::endl)
+					
 			return false;
 		}
 		

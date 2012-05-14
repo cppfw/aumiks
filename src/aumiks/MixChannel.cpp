@@ -98,6 +98,7 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 			this->channelToPlay->stopFlag = false;
 			
 			this->mixChannel->channels.push_back(this->channelToPlay);
+			this->mixChannel->soundStopped = false;
 		}
 		
 	public:
@@ -110,7 +111,7 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 		{}
 	};//~class
 	
-	TRACE(<< "MixChannel::PlayChannel_ts(): enter" << std::endl)
+//	TRACE(<< "MixChannel::PlayChannel_ts(): enter" << std::endl)
 	{
 		aumiks::Lib& lib = aumiks::Lib::Inst();
 		
@@ -130,5 +131,5 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 					)
 			));
 	}
-	TRACE(<< "MixChannel::PlayChannel_ts(): exit" << std::endl)
+//	TRACE(<< "MixChannel::PlayChannel_ts(): exit" << std::endl)
 }

@@ -110,8 +110,8 @@ void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
 	this->masterChannel->FillSmpBufAndApplyEffects(this->smpBuf, this->freq, this->chans);
 
 //		TRACE(<< "chPool.size() = " << this->chPool.size() << std::endl)
-	M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)
 	TRACE(<< "mixed, copying to playbuf..." << std::endl)
+//	TRACE(<< "this->smpBuf = " << this->smpBuf << std::endl)
 
 	this->CopySmpBufToPlayBuf(playBuf);
 }
