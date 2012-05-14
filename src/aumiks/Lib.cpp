@@ -24,6 +24,7 @@ THE SOFTWARE. */
 
 
 #include <ting/config.hpp>
+#include <algorithm>
 
 #include "Lib.hpp"
 
@@ -54,6 +55,8 @@ ting::IntrusiveSingleton<Lib>::T_Instance Lib::instance;
 
 
 Lib::Lib(unsigned freq, unsigned chans, ting::u16 bufferSizeMillis) :
+		addList(&actionsList1),
+		handleList(&actionsList2),
 		freq(freq),
 		chans(chans),
 		bufSizeInFrames(freq * bufferSizeMillis / 1000),
@@ -86,109 +89,29 @@ Lib::~Lib()throw(){
 
 
 
-//void Lib::PlayChannel_ts(const ting::Ref<Channel>& ch){
-//	ASSERT(ch.IsValid())
-//	
-//	//TODO:
-////	{
-////		ting::Mutex::Guard mut(this->mutex);
-////		if(ch->IsPlaying()){
-////			return;//already playing
-////		}
-////
-////		ch->InitEffects();
-////
-////		this->channelsToAdd.push_back(ch);//queue channel to be added to playing pool
-////		ch->isPlaying = true;//mark channel as playing
-////		ch->soundStopped = false;//init sound stopped flag
-////		ch->stopFlag = false;
-////	}
-//}
-
-
-
 void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
-	//Check matching of mixBuf size and playBuf size, 16 bits per sample
-	ASSERT_INFO(
-			this->mixerBuffer->mixBuf.Size() * 2 == playBuf.Size(),
-			"playBuf.Size() = " << playBuf.Size() << " mixBuf.Size() = " << this->mixerBuffer->mixBuf.Size()
-		)
-
-	//TODO:
+	ASSERT(playBuf.Size() == this->smpBuf.Size() * 2)
 	
-	//clean mixBuf
-//	this->mixerBuffer->CleanMixBuf();
+	//handle actions if any
+	
+	{
+		//swap actions lists
+		ting::atomic::SpinLock::Guard spinlockGuard(this->actionsSpinLock);
+		std::swap(this->addList, this->handleList);
+	}
 
-//	{//add queued channels to playing pool and effects to channels
-//		ting::Mutex::Guard mut(this->mutex);//lock mutex
-//
-//		M_AUMIKS_TRACE(<< "chPoolToAdd.size() = " << this->channelsToAdd.size() << std::endl)
-//		while(this->channelsToAdd.size() != 0){
-//			ting::Ref<aumiks::Channel> ch = this->channelsToAdd.front();
-//			this->channelsToAdd.pop_front();
-//			this->chPool.push_back(ch);
-//			ch->OnStart();//notify channel that it was just started
-//		}
-//
-//		//add effects to channels
-//		while(this->effectsToAddToChan.size() != 0){
-//			T_ChannelEffectPair& p = this->effectsToAddToChan.front();
-//			ASSERT(p.first)
-//			ASSERT(p.second)
-//
-//			aumiks::Lib::AddEffectToChannelSync(p.first, p.second);
-//
-//			this->effectsToAddToChan.pop_front();
-//		}
-//
-//		//remove effects from channels
-//		while(this->effectsToRemoveFromChan.size() != 0){
-//			T_ChannelEffectPair &p = this->effectsToRemoveFromChan.front();
-//			ASSERT(p.first)
-//			ASSERT(p.second)
-//
-//			aumiks::Lib::RemoveEffectFromChannelSync(p.first, p.second);
-//
-//			this->effectsToRemoveFromChan.pop_front();
-//		}
-//
-//		//remove all effects from channels
-//		while(this->effectsToClear.size() != 0){
-//			this->effectsToClear.front()->effects.clear();
-//			this->effectsToClear.pop_front();
-//		}
-//
-//		//add global effects
-//		while(this->effectsToAdd.size() != 0){
-//			this->effects.push_back(this->effectsToAdd.front());
-//			this->effectsToAdd.pop_front();
-//		}
-//
-//		//remove global effects
-//		while(this->effectsToRemove.size() != 0){
-//			for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-//				if(*i == this->effectsToRemove.front()){
-//					this->effects.erase(i);
-//					break;
-//				}
-//			}
-//
-//			this->effectsToRemove.pop_front();
-//		}
-//
-//		//clear global effects if requested
-//		if(this->clearEffects){
-//			this->effects.clear();
-//			this->clearEffects = false;
-//		}
-//	}//~mutex guard
-
-		
+	//handle actions
+	while(this->handleList->size()){
+		this->handleList->back()->Perform();
+		this->handleList->pop_back();
+	}
+	
 	//mix channels to smpBuf
 	this->masterChannel->FillSmpBufAndApplyEffects(this->smpBuf, this->freq, this->chans);
 
 //		TRACE(<< "chPool.size() = " << this->chPool.size() << std::endl)
 	M_AUMIKS_TRACE(<< "mixed, copying to playbuf..." << std::endl)
+	TRACE(<< "mixed, copying to playbuf..." << std::endl)
 
 	this->CopySmpBufToPlayBuf(playBuf);
 }
@@ -197,7 +120,7 @@ void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
 
 void aumiks::Lib::CopySmpBufToPlayBuf(ting::Buffer<ting::u8>& playBuf){
 	//playBuf size is in bytes and we have 2 bytes per sample always.
-	ASSERT((this->mixBuf.Size() * 2) == playBuf.Size())
+	ASSERT((this->smpBuf.Size() * 2) == playBuf.Size())
 
 	const ting::s32 *src = this->smpBuf.Begin();
 	ting::u8* dst = playBuf.Begin();

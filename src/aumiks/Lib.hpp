@@ -31,6 +31,7 @@ THE SOFTWARE. */
 
 #include <ting/debug.hpp>
 #include <ting/Singleton.hpp>
+#include <ting/atomic.hpp>
 
 #include "MixChannel.hpp"
 
@@ -60,6 +61,26 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 	friend class ting::IntrusiveSingleton<Lib>;
 	static ting::IntrusiveSingleton<Lib>::T_Instance instance;
 
+	friend class aumiks::MixChannel;
+	
+	
+	class Action{
+	public:
+		virtual ~Action()throw(){}
+		
+		virtual void Perform() = 0;
+	};
+	
+	
+	ting::atomic::SpinLock actionsSpinLock;
+	
+	typedef std::list<ting::Ptr<Action> > T_ActionsList;
+	typedef T_ActionsList::iterator T_ActionsIter;
+	
+	T_ActionsList actionsList1, actionsList2;
+	T_ActionsList *addList, *handleList;
+	
+	
 	
 	//sampling rate
 	unsigned freq;
@@ -190,7 +211,7 @@ private:
 	
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	void FillPlayBuf(ting::Buffer<ting::u8>& playBuf);
-
+	
 	//TODO: remove?
 //	void PlayChannel_ts(const ting::Ref<Channel>& ch);
 	
