@@ -25,6 +25,7 @@ THE SOFTWARE. */
 
 
 #include "Channel.hpp"
+#include "Lib.hpp"
 
 
 
@@ -41,7 +42,7 @@ bool Channel::FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned f
 	
 	if(!this->soundStopped){
 		this->soundStopped = this->FillSmpBuf(buf, freq, chans);
-		TRACE(<< "soundStopped = " << this->soundStopped << std::endl)
+//		TRACE(<< "soundStopped = " << this->soundStopped << std::endl)
 	}else{
 		TRACE(<< "sound is stopped" << std::endl)
 		//clear smp buffer
@@ -62,3 +63,97 @@ bool Channel::FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned f
 }
 
 
+
+void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
+	class AddEffectAction : public aumiks::Lib::Action{
+		ting::Ref<aumiks::Channel> channel;
+		ting::Ref<aumiks::Effect> effect;
+		
+		//override
+		virtual void Perform(){
+			this->channel->effects.push_back(this->effect);
+		}
+		
+	public:
+		AddEffectAction(
+				const ting::Ref<aumiks::Channel>& channel,
+				const ting::Ref<aumiks::Effect>& effect
+			) :
+				channel(channel),
+				effect(effect)
+		{}
+	};
+	
+	
+	aumiks::Lib::Inst().addList->push_back(ting::Ptr<aumiks::Lib::Action>(
+			new AddEffectAction(
+					ting::Ref<Channel>(this),
+					effect
+				)
+		));
+}
+
+
+
+void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
+	class RemoveEffectAction : public aumiks::Lib::Action{
+		ting::Ref<aumiks::Channel> channel;
+		ting::Ref<aumiks::Effect> effect;
+		
+		//override
+		virtual void Perform(){
+			for(aumiks::Effect::T_EffectsIter i = this->channel->effects.begin(); i != this->channel->effects.end();){
+				if((*i) == effect){
+					this->channel->effects.erase(i);
+					return;
+				}else{
+					++i;
+				}
+			}
+		}
+		
+	public:
+		RemoveEffectAction(
+				const ting::Ref<aumiks::Channel>& channel,
+				const ting::Ref<aumiks::Effect>& effect
+			) :
+				channel(channel),
+				effect(effect)
+		{}
+	};
+	
+	
+	aumiks::Lib::Inst().addList->push_back(ting::Ptr<aumiks::Lib::Action>(
+			new RemoveEffectAction(
+					ting::Ref<Channel>(this),
+					effect
+				)
+		));
+}
+
+
+
+void Channel::RemoveAllEffects_ts(){
+	class RemoveAllEffectsAction : public aumiks::Lib::Action{
+		ting::Ref<aumiks::Channel> channel;
+		
+		//override
+		virtual void Perform(){
+			this->channel->effects.clear();
+		}
+		
+	public:
+		RemoveAllEffectsAction(
+				const ting::Ref<aumiks::Channel>& channel
+			) :
+				channel(channel)
+		{}
+	};
+	
+	
+	aumiks::Lib::Inst().addList->push_back(ting::Ptr<aumiks::Lib::Action>(
+			new RemoveAllEffectsAction(
+					ting::Ref<Channel>(this)
+				)
+		));
+}

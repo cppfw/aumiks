@@ -139,27 +139,26 @@ public:
 		this->stopFlag = true;
 	}
 
-	//TODO:
-//	/**
-//	 * @brief Add effect to the channel.
-//	 * It is allowed to add effects during channel playing.
-//	 * The single effect instance can only be added to one channel. Adding single
-//	 * Effect instance to more than one channel will result in undefined behavior.
-//	 * @param effect - the effect to add.
-//	 */
-//	inline void AddEffect_ts(const ting::Ref<aumiks::Effect>& effect);
-//
-//	/**
-//	 * @brief Remove effect from the channel.
-//	 * It is allowed to remove effects during channel playing.
-//	 * @param effect - effect to remove.
-//	 */
-//	inline void RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect);
-//
-//	/**
-//	 * @brief Remove all effects from channel.
-//	 */
-//	inline void RemoveAllEffects_ts();
+	/**
+	 * @brief Add effect to the channel.
+	 * It is allowed to add effects during channel playing.
+	 * The single effect instance can only be added to one channel. Adding single
+	 * Effect instance to more than one channel will result in undefined behavior.
+	 * @param effect - the effect to add.
+	 */
+	void AddEffect_ts(const ting::Ref<aumiks::Effect>& effect);
+
+	/**
+	 * @brief Remove effect from the channel.
+	 * It is allowed to remove effects during channel playing.
+	 * @param effect - effect to remove.
+	 */
+	void RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect);
+
+	/**
+	 * @brief Remove all effects from channel.
+	 */
+	void RemoveAllEffects_ts();
 protected:
 	/**
 	 * @brief Called when channel has been added to pool of playing channels.
@@ -183,6 +182,8 @@ protected:
 	 * possible if there are any effects added to this channel which keeps playing, for example
 	 * an echo effect.
 	 * @param buf - the sample buffer to fill with the data to play.
+	 * @param freq - sampling rate in Hertz.
+	 * @param chans - number of channels (1 = mono, 2 = stereo, etc.).
 	 * @return true if sound playing has finished.
 	 * @return false otherwise.
 	 */
@@ -192,43 +193,9 @@ protected:
 }//~namespace
 
 
-
 //TODO:
-//#include "Lib.hpp"
-//
-//
-//
-//namespace aumiks{
-//
 //
 //inline void Channel::Play(){
 //	aumiks::Lib::Inst().PlayChannel_ts(ting::Ref<aumiks::Channel>(this));
 //}
 //
-//
-//
-//inline void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
-//	aumiks::Lib::Inst().AddEffectToChannel_ts(
-//			ting::Ref<Channel>(this),
-//			effect
-//		);
-//}
-//
-//
-//
-//inline void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
-//	aumiks::Lib::Inst().RemoveEffectFromChannel_ts(
-//			ting::Ref<Channel>(this),
-//			effect
-//		);
-//}
-//
-//
-//
-//inline void Channel::RemoveAllEffects_ts(){
-//	aumiks::Lib::Inst().RemoveAllEffectsFromChannel_ts(
-//			ting::Ref<Channel>(this)
-//		);
-//}
-//
-//}//~namespace

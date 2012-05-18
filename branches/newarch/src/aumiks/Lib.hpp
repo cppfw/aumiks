@@ -61,6 +61,7 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 	friend class ting::IntrusiveSingleton<Lib>;
 	static ting::IntrusiveSingleton<Lib>::T_Instance instance;
 
+	friend class aumiks::Channel;
 	friend class aumiks::MixChannel;
 	
 	
