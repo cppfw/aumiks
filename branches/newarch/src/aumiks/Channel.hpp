@@ -65,22 +65,13 @@ class Channel : public virtual ting::RefCounted{
 private:
 	Effect::T_EffectsList effects;
 
+	inline void InitEffects(){
+		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
+			(*i)->Init_ts();
+		}
+	}
+
 	//TODO:
-//	inline void InitEffects(){
-//		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-//			(*i)->Init_ts();
-//		}
-//	}
-//
-//	inline void RemoveEffect(const ting::Ref<Effect>& e){
-//		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-//			if((*i) == e){
-//				this->effects.erase(i);
-//				break;
-//			}
-//		}
-//	}
-//
 //	template <unsigned freq, unsigned chans> inline bool ApplyEffectsToSmpBuf(ting::Buffer<ting::s32>& buf){
 //		bool ret = this->soundStopped;
 //		bool stopRequested = false;
