@@ -13,10 +13,10 @@ class SineSound : public aumiks::Sound{
 		
 		//override
 		bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
-			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
+//			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
 			
 			if(this->time > 2){
-				TRACE_ALWAYS(<< "returned true" << std::endl)
+//				TRACE_ALWAYS(<< "returned true" << std::endl)
 				return true;
 			}
 			
@@ -30,7 +30,7 @@ class SineSound : public aumiks::Sound{
 				}
 			}
 			
-			TRACE_ALWAYS(<< "time = " << this->time << std::endl)
+//			TRACE_ALWAYS(<< "time = " << this->time << std::endl)
 //			TRACE(<< "this->smpBuf = " << buf << std::endl)
 					
 			return false;
