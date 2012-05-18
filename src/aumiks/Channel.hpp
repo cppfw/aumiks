@@ -126,11 +126,10 @@ public:
 		return this->isPlaying;
 	}
 
-	//TODO:
-//	/**
-//	 * @brief Start playing of this channel.
-//	 */
-//	inline void Play();
+	/**
+	 * @brief Start playing of this channel.
+	 */
+	void Play();
 
 	/**
 	 * @brief Stop playing of this channel.
@@ -191,11 +190,3 @@ protected:
 };
 
 }//~namespace
-
-
-//TODO:
-//
-//inline void Channel::Play(){
-//	aumiks::Lib::Inst().PlayChannel_ts(ting::Ref<aumiks::Channel>(this));
-//}
-//

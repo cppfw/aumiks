@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
 		aumiks::Lib aumiksLibrary(11025, 1, 100);
 
 		ting::Ref<aumiks::Channel> ch = snd->CreateChannel();
-		aumiks::Lib::Inst().MasterChannel()->PlayChannel_ts(ch);
+		ch->Play();
 		
 		while(ch->IsPlaying()){
 			ting::Thread::Sleep(333);
