@@ -105,9 +105,17 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 public:
 	
 	
+	//TODO: doxygen comments
 	inline const ting::Ref<aumiks::MixChannel>& MasterChannel()throw(){
 		return this->masterChannel;
 	}
+	
+	
+	
+	inline void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
+		this->MasterChannel()->PlayChannel_ts(channel);
+	}
+	
 	
 	
 	/**

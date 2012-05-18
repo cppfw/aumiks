@@ -157,3 +157,11 @@ void Channel::RemoveAllEffects_ts(){
 				)
 		));
 }
+
+
+
+void Channel::Play(){
+	aumiks::Lib::Inst().PlayChannel_ts(ting::Ref<aumiks::Channel>(this));
+}
+
+
