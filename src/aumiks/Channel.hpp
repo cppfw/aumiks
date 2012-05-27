@@ -51,7 +51,7 @@ class MixChannel;
  * @brief Base class of a channel for playing the sound.
  * Usually, the effects are created by Sound class implementations using CreateChannel() method.
  */
-class Channel : public virtual ting::RefCounted{
+class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 	friend class aumiks::Lib;
 	friend class aumiks::MixChannel;
 	
@@ -159,25 +159,6 @@ protected:
 	 * @brief Called when channel has been removed from pool of playing channels.
 	 */
 	virtual void OnStop(){}
-
-	
-	
-	//TODO: re-wise docs
-	/**
-	 * @brief This function is called when more data to play is needed.
-	 * Override this method in your Channel implementation.
-	 * Depending on the selected output format (sampling rate, mono/stereo) the corresponding method is called.
-	 * The return value indicates whether the sound has finished playing or not.
-	 * Note, that channel playing may continue even if sound has stopped playing, this is
-	 * possible if there are any effects added to this channel which keeps playing, for example
-	 * an echo effect.
-	 * @param buf - the sample buffer to fill with the data to play.
-	 * @param freq - sampling rate in Hertz.
-	 * @param chans - number of channels (1 = mono, 2 = stereo, etc.).
-	 * @return true if sound playing has finished.
-	 * @return false otherwise.
-	 */
-	virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans) = 0;
 };
 
 }//~namespace
