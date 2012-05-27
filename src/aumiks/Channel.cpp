@@ -73,9 +73,9 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 		virtual void Perform(){
 			//add the effect to sample buffer fillers chain
 			if(this->channel->effects.size() == 0){
-				this->effect->next = this->channel->effects.back().operator->();
-			}else{
 				this->effect->next = this->channel.operator->();
+			}else{
+				this->effect->next = this->channel->effects.back().operator->();
 			}
 			
 			this->channel->effects.push_back(this->effect);
@@ -92,12 +92,16 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 	};
 	
 	
-	aumiks::Lib::Inst().addList->push_back(ting::Ptr<aumiks::Lib::Action>(
-			new AddEffectAction(
-					ting::Ref<Channel>(this),
-					effect
-				)
+	ting::Ptr<aumiks::Lib::Action> action(new AddEffectAction(
+			ting::Ref<Channel>(this),
+			effect
 		));
+	
+	aumiks::Lib& lib = aumiks::Lib::Inst();
+	
+	ting::atomic::SpinLock::Guard mutexGuard(lib.actionsSpinLock);
+	
+	lib.addList->push_back(action);
 }
 
 
@@ -111,9 +115,13 @@ void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 		virtual void Perform(){
 			for(aumiks::Effect::T_EffectsIter i = this->channel->effects.begin(); i != this->channel->effects.end();){
 				if((*i) == effect){
-					
-					//TODO: remove from chain
 					this->channel->effects.erase(i);
+					//Now iterator points to next element in the list.
+					
+					//Remove effect from chain of sample buffer fillers
+					if(i != this->channel->effects.end()){
+						(*i)->next = this->effect->next;
+					}
 					return;
 				}else{
 					++i;
@@ -132,12 +140,16 @@ void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 	};
 	
 	
-	aumiks::Lib::Inst().addList->push_back(ting::Ptr<aumiks::Lib::Action>(
-			new RemoveEffectAction(
-					ting::Ref<Channel>(this),
-					effect
-				)
+	ting::Ptr<aumiks::Lib::Action> action(new RemoveEffectAction(
+			ting::Ref<Channel>(this),
+			effect
 		));
+	
+	aumiks::Lib& lib = aumiks::Lib::Inst();
+	
+	ting::atomic::SpinLock::Guard mutexGuard(lib.actionsSpinLock);
+	
+	lib.addList->push_back(action);
 }
 
 
@@ -159,12 +171,15 @@ void Channel::RemoveAllEffects_ts(){
 		{}
 	};
 	
-	
-	aumiks::Lib::Inst().addList->push_back(ting::Ptr<aumiks::Lib::Action>(
-			new RemoveAllEffectsAction(
-					ting::Ref<Channel>(this)
-				)
+	ting::Ptr<aumiks::Lib::Action> action(new RemoveAllEffectsAction(
+			ting::Ref<Channel>(this)
 		));
+	
+	aumiks::Lib& lib = aumiks::Lib::Inst();
+	
+	ting::atomic::SpinLock::Guard mutexGuard(lib.actionsSpinLock);
+	
+	lib.addList->push_back(action);
 }
 
 

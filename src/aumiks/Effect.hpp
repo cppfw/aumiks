@@ -36,7 +36,6 @@ namespace aumiks{
 
 
 
-class Lib;
 class Channel;
 
 
@@ -46,7 +45,7 @@ class Channel;
  * TODO: write docs about chain of sample buffer fillers.
  */
 class SampleBufferFiller{
-	friend class aumiks::Lib;
+	friend class aumiks::Channel;
 	
 	//pointer to the next buffer filler in the chain.
 	//If 0 then this is the last one in the chain.
