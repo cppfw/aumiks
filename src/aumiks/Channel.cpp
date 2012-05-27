@@ -71,11 +71,6 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 		
 		//override
 		virtual void Perform(){
-			ASSERT(!this->effect->next)//make sure the effect is not added yet
-			if(this->effect->next){
-				return;//effect is already added, do nothing
-			}
-			
 			//add the effect to sample buffer fillers chain
 			if(this->channel->effects.size() == 0){
 				this->effect->next = this->channel->effects.back().operator->();
@@ -83,13 +78,7 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 				this->effect->next = this->channel.operator->();
 			}
 			
-			try{
-				this->channel->effects.push_back(this->effect);
-			}catch(...){
-				this->effect->next = 0;
-				throw;
-			}
-			
+			this->channel->effects.push_back(this->effect);
 		}
 		
 	public:
