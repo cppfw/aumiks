@@ -71,7 +71,25 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 		
 		//override
 		virtual void Perform(){
-			this->channel->effects.push_back(this->effect);
+			ASSERT(!this->effect->next)//make sure the effect is not added yet
+			if(this->effect->next){
+				return;//effect is already added, do nothing
+			}
+			
+			//add the effect to sample buffer fillers chain
+			if(this->channel->effects.size() == 0){
+				this->effect->next = this->channel->effects.back().operator->();
+			}else{
+				this->effect->next = this->channel.operator->();
+			}
+			
+			try{
+				this->channel->effects.push_back(this->effect);
+			}catch(...){
+				this->effect->next = 0;
+				throw;
+			}
+			
 		}
 		
 	public:
@@ -104,6 +122,8 @@ void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 		virtual void Perform(){
 			for(aumiks::Effect::T_EffectsIter i = this->channel->effects.begin(); i != this->channel->effects.end();){
 				if((*i) == effect){
+					
+					//TODO: remove from chain
 					this->channel->effects.erase(i);
 					return;
 				}else{
