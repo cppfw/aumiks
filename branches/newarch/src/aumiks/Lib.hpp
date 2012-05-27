@@ -112,6 +112,7 @@ public:
 	
 	
 	
+	//TODO: doxygen comments
 	inline void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 		this->MasterChannel()->PlayChannel_ts(channel);
 	}

@@ -30,8 +30,6 @@ THE SOFTWARE. */
 
 #pragma once
 
-
-
 #include <ting/Ref.hpp>
 
 #include "Effect.hpp"

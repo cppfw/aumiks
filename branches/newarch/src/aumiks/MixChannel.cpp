@@ -114,6 +114,7 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 	{
 		aumiks::Lib& lib = aumiks::Lib::Inst();
 		
+		//TODO: this spinlock does not protect the isPlaying var, re-wise
 		ting::atomic::SpinLock::Guard spinlockGuard(lib.actionsSpinLock);
 
 		if(channel->IsPlaying()){
