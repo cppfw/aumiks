@@ -33,37 +33,6 @@ using namespace aumiks;
 
 
 
-bool Channel::FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
-	ASSERT(buf.Size() % chans == 0)
-	
-	if(this->stopFlag){
-		return true;
-	}
-	
-	if(!this->soundStopped){
-		this->soundStopped = this->FillSmpBuf(buf, freq, chans);
-//		TRACE(<< "soundStopped = " << this->soundStopped << std::endl)
-	}else{
-		TRACE(<< "sound is stopped" << std::endl)
-		//clear smp buffer
-		memset(buf.Begin(), 0, buf.SizeInBytes());
-	}
-
-	//TODO:
-	//Call channel effects.
-	//If there are no any effects, it should return ch->soundStopped, otherwise, depending on the effects.
-//	bool ret = this->ApplyEffectsToSmpBuf(ch);
-
-	//TODO:
-//	if(this->isMuted){
-//		return ret;
-//	}
-
-	return this->soundStopped;//TODO: what to return?
-}
-
-
-
 void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 	class AddEffectAction : public aumiks::Lib::Action{
 		ting::Ref<aumiks::Channel> channel;
@@ -79,6 +48,8 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 			}
 			
 			this->channel->effects.push_back(this->effect);
+			
+			this->channel->lastFillerInChain = this->channel->effects.back().operator->();
 		}
 		
 	public:
@@ -121,6 +92,8 @@ void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 					//Remove effect from chain of sample buffer fillers
 					if(i != this->channel->effects.end()){
 						(*i)->next = this->effect->next;
+					}else{
+						this->channel->lastFillerInChain = this->channel->effects.back().operator->();
 					}
 					return;
 				}else{
@@ -161,6 +134,7 @@ void Channel::RemoveAllEffects_ts(){
 		//override
 		virtual void Perform(){
 			this->channel->effects.clear();
+			this->channel->lastFillerInChain = this->channel.operator->();
 		}
 		
 	public:

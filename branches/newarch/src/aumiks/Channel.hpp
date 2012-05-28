@@ -56,10 +56,11 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 
 	ting::Inited<volatile bool, false> isPlaying;
 
-	bool soundStopped;//used to indicate that sound has finished playing, but effects are still playing.
-
 	ting::Inited<volatile bool, false> stopFlag;//indicates that playing should stop immediately
 
+	
+	aumiks::SampleBufferFiller* lastFillerInChain;
+	
 private:
 	Effect::T_EffectsList effects;
 
@@ -70,9 +71,23 @@ private:
 	}
 
 protected:
-	bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans);
+	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+		ASSERT(buf.Size() % chans == 0)
 	
-	Channel(){}
+		if(this->stopFlag){
+			return true;
+		}
+
+		ASSERT(this->lastFillerInChain)
+
+		bool ret = this->lastFillerInChain->FillSmpBuf(buf, freq, chans);
+
+		return ret;
+	}
+	
+	Channel() :
+			lastFillerInChain(this)
+	{}
 
 public:
 

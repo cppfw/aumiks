@@ -93,11 +93,12 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 		virtual void Perform(){
 			this->channelToPlay->InitEffects();
 
-			this->channelToPlay->soundStopped = false;//init sound stopped flag
 			this->channelToPlay->stopFlag = false;
 			
 			this->mixChannel->channels.push_back(this->channelToPlay);
-			this->mixChannel->soundStopped = false;
+			
+			//notify channel that it has started playing
+			this->channelToPlay->OnStart();
 		}
 		
 	public:
