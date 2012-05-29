@@ -91,8 +91,6 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 		//override
 		virtual void Perform(){
 			this->channelToPlay->InitEffects();
-
-			this->channelToPlay->stopFlag = false;
 			
 			this->mixChannel->channels.push_back(this->channelToPlay);
 			
@@ -110,15 +108,19 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 		{}
 	};//~class
 	
-//	TRACE(<< "MixChannel::PlayChannel_ts(): enter" << std::endl)
-	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
-			new PlayChannelAction(
-					ting::Ref<MixChannel>(this),
-					channel
-				)
-		));
+	//mark channel as playing before sending the action because the action may be
+	//handled before setting the flag if it is set after sending the action!
+	channel->isPlaying = true;
 	
-	channel->isPlaying = true;//mark channel as playing
-	
-//	TRACE(<< "MixChannel::PlayChannel_ts(): exit" << std::endl)
+	try{
+		aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+				new PlayChannelAction(
+						ting::Ref<MixChannel>(this),
+						channel
+					)
+			));
+	}catch(...){
+		channel->isPlaying = false;
+		throw;
+	}
 }

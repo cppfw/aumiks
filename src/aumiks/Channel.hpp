@@ -53,11 +53,7 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 	friend class aumiks::Lib;
 	friend class aumiks::MixChannel;
 	
-
 	ting::Inited<volatile bool, false> isPlaying;
-
-	ting::Inited<volatile bool, false> stopFlag;//indicates that playing should stop immediately
-
 	
 	aumiks::SampleBufferFiller* lastFillerInChain;
 	
@@ -74,7 +70,9 @@ protected:
 	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 		ASSERT(buf.Size() % chans == 0)
 	
-		if(this->stopFlag){
+		TRACE(<< "Channel::FillSmpBufAndApplyEffects(): isPlaying = " << this->isPlaying << std::endl)
+		
+		if(!this->isPlaying){
 			return true;
 		}
 
@@ -111,7 +109,7 @@ public:
 	 * @brief Stop playing of this channel.
 	 */
 	inline void Stop(){
-		this->stopFlag = true;
+		this->isPlaying = false;
 	}
 
 	/**
