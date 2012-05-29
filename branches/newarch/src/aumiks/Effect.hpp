@@ -102,7 +102,7 @@ public:
 	 * Called from separate thread, should be thread safe.
 	 * Default implementation does nothing. Override this method if needed.
 	 */
-	virtual void Init_ts(){}
+	virtual void Init_ts()throw(){}
 };
 
 

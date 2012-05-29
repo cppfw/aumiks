@@ -222,6 +222,13 @@ private:
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	void FillPlayBuf(ting::Buffer<ting::u8>& playBuf);
 	
+	
+	inline void PushAction_ts(ting::Ptr<Action> action){
+		ting::atomic::SpinLock::Guard mutexGuard(this->actionsSpinLock);
+		this->addList->push_back(action);
+	}
+	
+	
 	//TODO: remove?
 //	void PlayChannel_ts(const ting::Ref<Channel>& ch);
 	

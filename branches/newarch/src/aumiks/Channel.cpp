@@ -63,16 +63,12 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 	};
 	
 	
-	ting::Ptr<aumiks::Lib::Action> action(new AddEffectAction(
-			ting::Ref<Channel>(this),
-			effect
+	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+			new AddEffectAction(
+					ting::Ref<Channel>(this),
+					effect
+				)
 		));
-	
-	aumiks::Lib& lib = aumiks::Lib::Inst();
-	
-	ting::atomic::SpinLock::Guard mutexGuard(lib.actionsSpinLock);
-	
-	lib.addList->push_back(action);
 }
 
 
@@ -113,16 +109,12 @@ void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 	};
 	
 	
-	ting::Ptr<aumiks::Lib::Action> action(new RemoveEffectAction(
-			ting::Ref<Channel>(this),
-			effect
+	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+			new RemoveEffectAction(
+					ting::Ref<Channel>(this),
+					effect
+				)
 		));
-	
-	aumiks::Lib& lib = aumiks::Lib::Inst();
-	
-	ting::atomic::SpinLock::Guard mutexGuard(lib.actionsSpinLock);
-	
-	lib.addList->push_back(action);
 }
 
 
@@ -145,15 +137,11 @@ void Channel::RemoveAllEffects_ts(){
 		{}
 	};
 	
-	ting::Ptr<aumiks::Lib::Action> action(new RemoveAllEffectsAction(
-			ting::Ref<Channel>(this)
+	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+			new RemoveAllEffectsAction(
+					ting::Ref<Channel>(this)
+				)
 		));
-	
-	aumiks::Lib& lib = aumiks::Lib::Inst();
-	
-	ting::atomic::SpinLock::Guard mutexGuard(lib.actionsSpinLock);
-	
-	lib.addList->push_back(action);
 }
 
 

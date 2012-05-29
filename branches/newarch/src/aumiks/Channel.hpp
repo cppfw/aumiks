@@ -138,12 +138,12 @@ protected:
 	/**
 	 * @brief Called when channel has been added to pool of playing channels.
 	 */
-	virtual void OnStart(){}
+	virtual void OnStart()throw(){}
 
 	/**
 	 * @brief Called when channel has been removed from pool of playing channels.
 	 */
-	virtual void OnStop(){}
+	virtual void OnStop()throw(){}
 };
 
 }//~namespace
