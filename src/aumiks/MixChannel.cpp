@@ -113,24 +113,21 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 	
 //	TRACE(<< "MixChannel::PlayChannel_ts(): enter" << std::endl)
 	{
+		//create the action object to send
+		ting::Ptr<aumiks::Lib::Action> action(new PlayChannelAction(
+				ting::Ref<MixChannel>(this),
+				channel
+			));
+		
 		aumiks::Lib& lib = aumiks::Lib::Inst();
 		
-		//TODO: this spinlock does not protect the isPlaying var, re-wise
 		ting::atomic::SpinLock::Guard spinlockGuard(lib.actionsSpinLock);
 
-		if(channel->IsPlaying()){
-			return;//already playing
-		}
-
-		channel->isPlaying = true;//mark channel as playing
-
 		//send message to audio thread
-		lib.addList->push_back(ting::Ptr<aumiks::Lib::Action>(
-				new PlayChannelAction(
-						ting::Ref<MixChannel>(this),
-						channel
-					)
-			));
+		lib.addList->push_back(action);
 	}
+	
+	channel->isPlaying = true;//mark channel as playing
+	
 //	TRACE(<< "MixChannel::PlayChannel_ts(): exit" << std::endl)
 }
