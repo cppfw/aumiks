@@ -84,7 +84,6 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 
 
 void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
-	
 	class PlayChannelAction : public aumiks::Lib::Action{
 		ting::Ref<aumiks::MixChannel> mixChannel;
 		ting::Ref<aumiks::Channel> channelToPlay;
@@ -112,20 +111,12 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 	};//~class
 	
 //	TRACE(<< "MixChannel::PlayChannel_ts(): enter" << std::endl)
-	{
-		//create the action object to send
-		ting::Ptr<aumiks::Lib::Action> action(new PlayChannelAction(
-				ting::Ref<MixChannel>(this),
-				channel
-			));
-		
-		aumiks::Lib& lib = aumiks::Lib::Inst();
-		
-		ting::atomic::SpinLock::Guard spinlockGuard(lib.actionsSpinLock);
-
-		//send message to audio thread
-		lib.addList->push_back(action);
-	}
+	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+			new PlayChannelAction(
+					ting::Ref<MixChannel>(this),
+					channel
+				)
+		));
 	
 	channel->isPlaying = true;//mark channel as playing
 	
