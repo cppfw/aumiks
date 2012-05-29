@@ -89,10 +89,10 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 		ting::Ref<aumiks::Channel> channelToPlay;
 		
 		//override
-		virtual void Perform(){
-			this->channelToPlay->InitEffects();
-			
+		virtual void Perform(){			
 			this->mixChannel->channels.push_back(this->channelToPlay);
+			
+			this->channelToPlay->InitEffects();
 			
 			//notify channel that it has started playing
 			this->channelToPlay->OnStart();
