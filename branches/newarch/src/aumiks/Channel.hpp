@@ -70,7 +70,7 @@ protected:
 	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 		ASSERT(buf.Size() % chans == 0)
 	
-		TRACE(<< "Channel::FillSmpBufAndApplyEffects(): isPlaying = " << this->isPlaying << std::endl)
+//		TRACE(<< "Channel::FillSmpBufAndApplyEffects(): isPlaying = " << this->isPlaying << std::endl)
 		
 		if(!this->isPlaying){
 			return true;
