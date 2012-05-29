@@ -227,11 +227,7 @@ private:
 		ting::atomic::SpinLock::Guard mutexGuard(this->actionsSpinLock);
 		this->addList->push_back(action);
 	}
-	
-	
-	//TODO: remove?
-//	void PlayChannel_ts(const ting::Ref<Channel>& ch);
-	
+		
 public:
 	//TODO:
 //	/**
