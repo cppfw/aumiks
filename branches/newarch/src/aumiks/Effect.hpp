@@ -71,7 +71,7 @@ protected:
 	
 	//TODO: doxygen
 	inline bool FillSmpBufFromNextByChain(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
-		if(this->next == 0){
+		if(!this->next){
 			return true;
 		}
 		return this->next->FillSmpBuf(buf, freq, chans);
