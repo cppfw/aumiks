@@ -60,7 +60,7 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 private:
 	Effect::T_EffectsList effects;
 
-	inline void InitEffects(){
+	inline void InitEffects()throw(){
 		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
 			(*i)->Init_ts();
 		}
