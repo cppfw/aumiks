@@ -50,6 +50,10 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 			this->channel->effects.push_back(this->effect);
 			
 			this->channel->lastFillerInChain = this->channel->effects.back().operator->();
+			
+			if(this->channel->isPlaying){
+				this->effect->Init_ts();
+			}
 		}
 		
 	public:
