@@ -55,6 +55,8 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 	
 	ting::Inited<volatile bool, false> isPlaying;
 	
+	bool stopFlag;
+	
 	aumiks::SampleBufferFiller* lastFillerInChain;
 	
 private:
@@ -72,15 +74,13 @@ protected:
 	
 //		TRACE(<< "Channel::FillSmpBufAndApplyEffects(): isPlaying = " << this->isPlaying << std::endl)
 		
-		if(!this->isPlaying){
+		if(this->stopFlag){
 			return true;
 		}
 
 		ASSERT(this->lastFillerInChain)
 
-		bool ret = this->lastFillerInChain->FillSmpBuf(buf, freq, chans);
-
-		return ret;
+		return this->lastFillerInChain->FillSmpBuf(buf, freq, chans);
 	}
 	
 	Channel() :
@@ -108,9 +108,7 @@ public:
 	/**
 	 * @brief Stop playing of this channel.
 	 */
-	inline void Stop(){
-		this->isPlaying = false;
-	}
+	void Stop();
 
 	/**
 	 * @brief Add effect to the channel.

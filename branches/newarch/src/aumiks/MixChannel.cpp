@@ -100,6 +100,8 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 			
 			this->channelToPlay->InitEffects();
 			
+			this->channelToPlay->stopFlag = false;
+			
 			//notify channel that it has started playing
 			this->channelToPlay->OnStart();
 		}

@@ -156,3 +156,27 @@ void Channel::Play(){
 }
 
 
+
+void Channel::Stop(){
+	class StopChannelAction : public aumiks::Lib::Action{
+		ting::Ref<aumiks::Channel> channel;
+		
+		//override
+		virtual void Perform(){
+			this->channel->stopFlag = true;
+		}
+		
+	public:
+		StopChannelAction(
+				const ting::Ref<aumiks::Channel>& channel
+			) :
+				channel(channel)
+		{}
+	};
+	
+	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+			new StopChannelAction(
+					ting::Ref<Channel>(this)
+				)
+		));
+}
