@@ -78,7 +78,7 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 		}
 	}
 
-	return this->channels.size() == 0;
+	return !this->isPersistent && (this->channels.size() == 0);
 }
 
 
