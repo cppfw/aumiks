@@ -60,9 +60,11 @@ Lib::Lib(unsigned freq, unsigned chans, ting::u16 bufferSizeMillis) :
 		freq(freq),
 		chans(chans),
 		bufSizeInFrames(freq * bufferSizeMillis / 1000),
-		masterChannel(aumiks::MixChannel::New()),
+		masterChannel(aumiks::MixChannel::New(true)),
 		smpBuf(bufSizeInFrames * chans)
 {
+	this->masterChannel->isPlaying = true;//initially playing
+	
 	//backend must be initialized after all the essential parts of aumiks are initialized,
 	//because after the backend object is created, it starts calling the FillPlayBuf() method periodically.
 	this->backend = reinterpret_cast<void*>(static_cast<AudioBackend*>(
@@ -107,7 +109,6 @@ void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
 	}
 	
 	//mix channels to smpBuf
-	this->masterChannel->isPlaying = true;//always playing
 	this->masterChannel->FillSmpBufAndApplyEffects(this->smpBuf, this->freq, this->chans);
 
 //	TRACE(<< "mixed, copying to playbuf..." << std::endl)

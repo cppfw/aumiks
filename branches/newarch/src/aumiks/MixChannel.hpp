@@ -53,7 +53,11 @@ class MixChannel : public aumiks::Channel{
 	//TODO: assign buffer in the audio thread when channel starts to play
 	ting::Array<ting::s32> smpBuf;
 	
-	MixChannel(){}
+	bool isPersistent;
+	
+	MixChannel(bool isPersistent = false) :
+			isPersistent(isPersistent)
+	{}
 	
 	
 	//override
@@ -69,9 +73,16 @@ public:
 	//playing the same channel the second time results in undefined behavior
 	void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel);
 	
-	static inline ting::Ref<aumiks::MixChannel> New(){
+	/**
+	 * @brief Create a new MixChannel object.
+     * @param isPersistent - true = the channel will continue to be in the playing state even
+	 *                       after all the child channels have finished playing.
+	 *                       flase = the channel will stop as fast as all the child channels has finished playing.
+     * @return a reference to a newly creted object.
+     */
+	static inline ting::Ref<aumiks::MixChannel> New(bool isPersistent = false){
 		return ting::Ref<aumiks::MixChannel>(
-				new aumiks::MixChannel()
+				new aumiks::MixChannel(isPersistent)
 			);
 	}
 };
