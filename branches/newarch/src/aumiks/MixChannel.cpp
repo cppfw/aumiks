@@ -53,32 +53,38 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 		this->smpBuf.Init(buf.Size());
 	}
 	
-	{
-		T_ChannelIter i = this->channels.begin();
-		if(i != this->channels.end()){
-			//the very first channel is not mixed, but simply written to the output buffer
-			if((*i)->FillSmpBufAndApplyEffects(buf, freq, chans)){
+	T_ChannelIter i = this->channels.begin();
+	if(i != this->channels.end()){//if there is at least one child channel
+		//the very first channel is not mixed, but simply written to the output buffer
+		if((*i)->FillSmpBufAndApplyEffects(buf, freq, chans)){
+			(*i)->isPlaying = false;//clear playing flag
+			(*i)->OnStop();//notify channel that it has stopped playing
+			i = this->channels.erase(i);
+		}else{
+			++i;
+		}
+
+		for(; i != this->channels.end();){
+			if((*i)->FillSmpBufAndApplyEffects(this->smpBuf, freq, chans)){
 				(*i)->isPlaying = false;//clear playing flag
 				(*i)->OnStop();//notify channel that it has stopped playing
 				i = this->channels.erase(i);
 			}else{
 				++i;
 			}
-			
-			for(; i != this->channels.end();){
-				if((*i)->FillSmpBufAndApplyEffects(this->smpBuf, freq, chans)){
-					(*i)->isPlaying = false;//clear playing flag
-					(*i)->OnStop();//notify channel that it has stopped playing
-					i = this->channels.erase(i);
-				}else{
-					++i;
-				}
-				this->MixSmpBufTo(buf);
-			}
+			this->MixSmpBufTo(buf);
 		}
-	}
 
-	return !this->isPersistent && (this->channels.size() == 0);
+		return !this->isPersistent && (this->channels.size() == 0);
+	}else{//no any child channels to play initially
+		if(!this->isPersistent){
+			return true;
+		}
+
+		//zero out the sample buffer
+		memset(buf.Begin(), 0, buf.SizeInBytes());
+		return false;
+	}
 }
 
 
