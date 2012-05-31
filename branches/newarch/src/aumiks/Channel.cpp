@@ -151,13 +151,13 @@ void Channel::RemoveAllEffects_ts(){
 
 
 
-void Channel::Play(){
+void Channel::Play_ts(){
 	aumiks::Lib::Inst().PlayChannel_ts(ting::Ref<aumiks::Channel>(this));
 }
 
 
 
-void Channel::Stop(){
+void Channel::Stop_ts(){
 	class StopChannelAction : public aumiks::Lib::Action{
 		ting::Ref<aumiks::Channel> channel;
 		

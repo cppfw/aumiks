@@ -55,7 +55,7 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 	
 	ting::Inited<volatile bool, false> isPlaying;
 	
-	bool stopFlag;
+	bool stopFlag;//TODO: keep weak ref to mix channel instead???
 	
 	aumiks::SampleBufferFiller* lastFillerInChain;
 	
@@ -96,19 +96,19 @@ public:
 	 * @return true if channel is playing.
 	 * @return false otherwise.
 	 */
-	inline bool IsPlaying()const{
+	inline bool IsPlaying_ts()const{
 		return this->isPlaying;
 	}
 
 	/**
 	 * @brief Start playing of this channel.
 	 */
-	void Play();
+	void Play_ts();
 
 	/**
 	 * @brief Stop playing of this channel.
 	 */
-	void Stop();
+	void Stop_ts();
 
 	/**
 	 * @brief Add effect to the channel.
@@ -134,12 +134,12 @@ protected:
 	/**
 	 * @brief Called when channel has been added to pool of playing channels.
 	 */
-	virtual void OnStart()throw(){}
+	virtual void OnStart_ts()throw(){}
 
 	/**
 	 * @brief Called when channel has been removed from pool of playing channels.
 	 */
-	virtual void OnStop()throw(){}
+	virtual void OnStop_ts()throw(){}
 };
 
 }//~namespace
