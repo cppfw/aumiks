@@ -45,6 +45,7 @@ namespace aumiks{
 
 
 class MixChannel : public aumiks::Channel{
+	friend class aumiks::Channel;
 	
 	typedef std::list<ting::Ref<aumiks::Channel> > T_ChannelList;
 	typedef T_ChannelList::iterator T_ChannelIter;
@@ -65,6 +66,18 @@ class MixChannel : public aumiks::Channel{
 	
 	
 	void MixSmpBufTo(ting::Buffer<ting::s32>& buf);
+	
+	
+	
+	void RemoveChannel(const ting::Ref<Channel>& channel){
+		for(T_ChannelIter i = this->channels.begin(); i != this->channels.end(); ++i){
+			if((*i) == channel){
+				this->channels.erase(i);
+				return;
+			}
+		}
+	}
+	
 	
 public:
 	virtual ~MixChannel()throw(){}

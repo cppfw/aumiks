@@ -99,8 +99,8 @@
         <in>Sound.hpp</in>
         <in>WavSound.cpp</in>
         <in>WavSound.hpp</in>
-        <in>aumiks.cpp</in>
-        <in>aumiks.hpp</in>
+        <in>util.cpp</in>
+        <in>util.hpp</in>
       </df>
       <df name="obj">
         <df name="1">
@@ -122,6 +122,9 @@
         <in>main.cpp</in>
       </df>
       <df name="samples">
+      </df>
+      <df name="sinesynth">
+        <in>main.cpp</in>
       </df>
     </df>
     <logicalFolder name="ExternalFiles"
@@ -178,13 +181,6 @@
       <item path="../android/jni/ting/ting/codegen.h" ex="true" tool="3" flavor="0">
       </item>
       <item path="../src/aumiks/Sound.hpp" ex="true" tool="3" flavor="0">
-      </item>
-      <item path="../src/aumiks/aumiks.cpp" ex="false" tool="1" flavor="0">
-        <ccTool>
-          <incDir>
-            <pElem>../src</pElem>
-          </incDir>
-        </ccTool>
       </item>
       <item path="../src/aumiks/backend/ALSABackend.hpp"
             ex="true"

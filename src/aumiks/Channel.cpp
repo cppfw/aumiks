@@ -163,7 +163,10 @@ void Channel::Stop_ts(){
 		
 		//override
 		virtual void Perform(){
-			this->channel->stopFlag = true;
+			if(ting::Ref<MixChannel> parent = this->channel->parent){
+				parent->RemoveChannel(this->channel);
+				this->channel->parent.Reset();
+			}
 		}
 		
 	public:

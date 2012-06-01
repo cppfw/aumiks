@@ -55,7 +55,7 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 	
 	ting::Inited<volatile bool, false> isPlaying;
 	
-	bool stopFlag;//TODO: keep weak ref to mix channel instead???
+	ting::WeakRef<MixChannel> parent;//ref to the parent MixChannel
 	
 	aumiks::SampleBufferFiller* lastFillerInChain;
 	
@@ -68,21 +68,17 @@ private:
 		}
 	}
 
-protected:
 	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 		ASSERT(buf.Size() % chans == 0)
 	
 //		TRACE(<< "Channel::FillSmpBufAndApplyEffects(): isPlaying = " << this->isPlaying << std::endl)
-		
-		if(this->stopFlag){
-			return true;
-		}
 
 		ASSERT(this->lastFillerInChain)
 
 		return this->lastFillerInChain->FillSmpBuf(buf, freq, chans);
 	}
 	
+protected:	
 	Channel() :
 			lastFillerInChain(this)
 	{}
