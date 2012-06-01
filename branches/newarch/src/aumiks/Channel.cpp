@@ -149,32 +149,3 @@ void Channel::RemoveAllEffects_ts(){
 void Channel::Play_ts(){
 	aumiks::Lib::Inst().PlayChannel_ts(ting::Ref<aumiks::Channel>(this));
 }
-
-
-
-void Channel::Stop_ts(){
-	class StopChannelAction : public aumiks::Lib::Action{
-		ting::Ref<aumiks::Channel> channel;
-		
-		//override
-		virtual void Perform(){
-			if(ting::Ref<MixChannel> parent = this->channel->parent){
-				parent->RemoveChannel(this->channel);
-				this->channel->parent.Reset();
-			}
-		}
-		
-	public:
-		StopChannelAction(
-				const ting::Ref<aumiks::Channel>& channel
-			) :
-				channel(channel)
-		{}
-	};
-	
-	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
-			new StopChannelAction(
-					ting::Ref<Channel>(this)
-				)
-		));
-}

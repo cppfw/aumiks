@@ -57,8 +57,6 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 	if(i != this->channels.end()){//if there is at least one child channel
 		//the very first channel is not mixed, but simply written to the output buffer
 		if((*i)->FillSmpBufAndApplyEffects(buf, freq, chans)){
-			(*i)->parent.Reset();
-			(*i)->OnStop_ts();//notify channel that it has stopped playing
 			i = this->channels.erase(i);
 		}else{
 			++i;
@@ -66,8 +64,6 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 
 		for(; i != this->channels.end();){
 			if((*i)->FillSmpBufAndApplyEffects(this->smpBuf, freq, chans)){
-				(*i)->parent.Reset();
-				(*i)->OnStop_ts();//notify channel that it has stopped playing
 				i = this->channels.erase(i);
 			}else{
 				++i;
@@ -96,16 +92,7 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 		
 		//override
 		virtual void Perform(){
-			if(this->channelToPlay->parent.GetRef()){
-				return; //already playing
-			}
-			
 			this->mixChannel->channels.push_back(this->channelToPlay);
-			
-			this->channelToPlay->parent = this->mixChannel;
-			
-			//notify channel that it has started playing
-			this->channelToPlay->OnStart_ts();
 		}
 		
 	public:
