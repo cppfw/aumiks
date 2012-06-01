@@ -51,6 +51,16 @@ class SampleBufferFiller{
 	//If 0 then this is the last one in the chain.
 	ting::Inited<SampleBufferFiller*, 0> next;
 	
+	ting::Inited<volatile bool, false> isOff;
+	
+	inline bool FillSmpBufInternal(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+		if(this->isOff){
+			return this->FillSmpBufFromNextByChain(buf, freq, chans);
+		}
+		
+		return this->FillSmpBuf(buf, freq, chans);
+	}
+	
 protected:
     //TODO: re-wise docs
 	/**
@@ -64,7 +74,8 @@ protected:
 	 * @param buf - the sample buffer to fill with the data to play.
 	 * @param freq - sampling rate in Hertz.
 	 * @param chans - number of channels (1 = mono, 2 = stereo, etc.).
-	 * @return true if sound playing has finished.
+	 * @return true if sound playing has finished. Returning true will result in that the channel will be removed
+	 *         from the pool of playing channels and the contents of the 'buf' after this call will not be played.
 	 * @return false otherwise.
 	 */
 	virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans) = 0;
@@ -72,9 +83,10 @@ protected:
 	//TODO: doxygen
 	inline bool FillSmpBufFromNextByChain(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 		if(!this->next){
-			return true;
+			memset(buf.Begin(), 0, buf.SizeInBytes());
+			return false;
 		}
-		return this->next->FillSmpBuf(buf, freq, chans);
+		return this->next->FillSmpBufInternal(buf, freq, chans);
 	}
 	
 public:
