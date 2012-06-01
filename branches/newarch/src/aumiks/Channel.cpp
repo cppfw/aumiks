@@ -51,10 +51,7 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 			
 			this->channel->lastFillerInChain = this->channel->effects.back().operator->();
 			
-			//if the channel is currently playing then initialize the newly added effect
-			if(this->channel->isPlaying){
-				this->effect->Init_ts();
-			}
+			this->effect->Init_ts();
 		}
 		
 	public:
@@ -66,7 +63,6 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 				effect(effect)
 		{}
 	};
-	
 	
 	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
 			new AddEffectAction(
@@ -112,7 +108,6 @@ void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 				effect(effect)
 		{}
 	};
-	
 	
 	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
 			new RemoveEffectAction(

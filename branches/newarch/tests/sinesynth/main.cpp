@@ -67,9 +67,7 @@ int main(int argc, char *argv[]){
 		ting::Ref<aumiks::Channel> ch = snd->CreateChannel();
 		ch->Play_ts();
 		
-		while(ch->IsPlaying_ts()){
-			ting::Thread::Sleep(333);
-		}
+		ting::Thread::Sleep(2000);
 		TRACE_ALWAYS(<< "finished playing" << std::endl)
 	}
 	
