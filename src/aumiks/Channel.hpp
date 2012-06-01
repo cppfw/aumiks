@@ -53,7 +53,7 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 	friend class aumiks::Lib;
 	friend class aumiks::MixChannel;
 	
-	ting::WeakRef<MixChannel> parent;//ref to the parent MixChannel
+	ting::Inited<volatile bool, false> stopNowFlag;
 	
 	aumiks::SampleBufferFiller* lastFillerInChain;
 	
@@ -63,12 +63,19 @@ private:
 	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 		ASSERT(buf.Size() % chans == 0)
 
+		if(this->stopNowFlag){
+			return true;
+		}
+		
 		ASSERT(this->lastFillerInChain)
 
 		return this->lastFillerInChain->FillSmpBuf(buf, freq, chans);
 	}
 	
-protected:	
+protected:
+	//TODO: doxygen
+	ting::Inited<volatile bool, false> stopFlag;
+	
 	Channel() :
 			lastFillerInChain(this)
 	{}
@@ -83,9 +90,26 @@ public:
 	void Play_ts();
 
 	/**
-	 * @brief Stop playing of this channel.
+	 * @brief Requests channel to stop playing.
+	 * This is a request to stop playing the channel, the channel may stop not
+	 * immediately, depending on implementation of the particular Channel.
+	 * Once stopped, the channel cannot be started again.
+	 * Instead, one needs to create a new channel.
 	 */
-	void Stop_ts();
+	inline void Stop_ts()throw(){
+		this->stopFlag = true;
+	}
+	
+	/**
+	 * @brief Stop playing the channel.
+	 * Stops playing the channel immediately.
+	 * Once stopped, the channel cannot be started again.
+	 * Instead, one needs to create a new channel.
+     */
+	inline void StopNow_ts()throw(){
+		this->stopNowFlag = true;
+	}
+	
 
 	/**
 	 * @brief Add effect to the channel.
@@ -107,16 +131,6 @@ public:
 	 * @brief Remove all effects from channel.
 	 */
 	void RemoveAllEffects_ts();
-protected:
-	/**
-	 * @brief Called when channel has been added to pool of playing channels.
-	 */
-	virtual void OnStart_ts()throw(){}
-
-	/**
-	 * @brief Called when channel has been removed from pool of playing channels.
-	 */
-	virtual void OnStop_ts()throw(){}
 };
 
 }//~namespace

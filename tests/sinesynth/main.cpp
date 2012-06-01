@@ -32,7 +32,7 @@ class SineSound : public aumiks::Sound{
 			
 //			TRACE_ALWAYS(<< "time = " << this->time << std::endl)
 //			TRACE(<< "this->smpBuf = " << buf << std::endl)
-					
+			
 			return false;
 		}
 		
