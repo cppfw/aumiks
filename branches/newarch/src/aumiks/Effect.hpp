@@ -91,6 +91,12 @@ protected:
 	
 public:
 	virtual ~SampleBufferFiller()throw(){}
+	
+	
+	//TODO: doxygen
+	inline void SwitchOnOff_ts(bool isOff)throw(){
+		this->isOff = isOff;
+	}
 };
 
 
