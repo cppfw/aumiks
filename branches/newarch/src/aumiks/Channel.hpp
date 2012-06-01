@@ -93,7 +93,8 @@ public:
 	 * @brief Requests channel to stop playing.
 	 * This is a request to stop playing the channel, the channel may stop not
 	 * immediately, depending on implementation of the particular Channel.
-	 * Once stopped, the channel cannot be started again.
+	 * Once stopped, the channel cannot be started again, at least trying to
+	 * will result in undefined behavior.
 	 * Instead, one needs to create a new channel.
 	 */
 	inline void Stop_ts()throw(){
@@ -103,7 +104,8 @@ public:
 	/**
 	 * @brief Stop playing the channel.
 	 * Stops playing the channel immediately.
-	 * Once stopped, the channel cannot be started again.
+	 * Once stopped, the channel cannot be started again, at least trying to
+	 * will result in undefined behavior.
 	 * Instead, one needs to create a new channel.
      */
 	inline void StopNow_ts()throw(){
