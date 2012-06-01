@@ -69,7 +69,7 @@ private:
 		
 		ASSERT(this->lastFillerInChain)
 
-		return this->lastFillerInChain->FillSmpBuf(buf, freq, chans);
+		return this->lastFillerInChain->FillSmpBufInternal(buf, freq, chans);
 	}
 	
 protected:
