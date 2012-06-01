@@ -53,8 +53,6 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 	friend class aumiks::Lib;
 	friend class aumiks::MixChannel;
 	
-	ting::Inited<volatile bool, false> isPlaying;
-	
 	ting::WeakRef<MixChannel> parent;//ref to the parent MixChannel
 	
 	aumiks::SampleBufferFiller* lastFillerInChain;
@@ -62,16 +60,8 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 private:
 	Effect::T_EffectsList effects;
 
-	inline void InitEffects()throw(){
-		for(Effect::T_EffectsIter i = this->effects.begin(); i != this->effects.end(); ++i){
-			(*i)->Init_ts();
-		}
-	}
-
 	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 		ASSERT(buf.Size() % chans == 0)
-	
-//		TRACE(<< "Channel::FillSmpBufAndApplyEffects(): isPlaying = " << this->isPlaying << std::endl)
 
 		ASSERT(this->lastFillerInChain)
 
@@ -86,15 +76,6 @@ protected:
 public:
 
 	virtual ~Channel()throw(){}
-	
-	/**
-	 * @brief Check if sound is currently playing.
-	 * @return true if channel is playing.
-	 * @return false otherwise.
-	 */
-	inline bool IsPlaying_ts()const{
-		return this->isPlaying;
-	}
 
 	/**
 	 * @brief Start playing of this channel.
