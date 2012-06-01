@@ -123,12 +123,18 @@ public:
 	/**
 	 * @brief Remove effect from the channel.
 	 * It is allowed to remove effects during channel playing.
+	 * It only sends a request to the audio thread to remove the effect. The audio
+	 * thread will remove the effect as soon as possible. So, it does not mean that the
+	 * effect is removed immediately.
 	 * @param effect - effect to remove.
 	 */
 	void RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect);
 
 	/**
 	 * @brief Remove all effects from channel.
+	 * It only sends a request to the audio thread to remove effects. The audio
+	 * thread will remove effects as soon as possible. So, it does not mean that
+	 * effects are removed immediately.
 	 */
 	void RemoveAllEffects_ts();
 };

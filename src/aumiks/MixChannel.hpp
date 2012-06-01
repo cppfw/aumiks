@@ -83,7 +83,7 @@ public:
 	virtual ~MixChannel()throw(){}
 	
 	//TODO: doxygen
-	//playing the same channel the second time results in undefined behavior
+	//playing the same channel the second time results in undefined behavior!
 	void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel);
 	
 	/**

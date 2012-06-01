@@ -96,13 +96,6 @@ class Effect : public SampleBufferFiller, public virtual ting::RefCounted{
 	typedef T_EffectsList::iterator T_EffectsIter;
 
 public:
-
-	/**
-	 * @brief Called every time when the Channel is about to start playing.
-	 * Called from separate thread, should be thread safe.
-	 * Default implementation does nothing. Override this method if needed.
-	 */
-	virtual void Init_ts()throw(){}
 };
 
 
