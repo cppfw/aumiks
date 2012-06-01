@@ -58,7 +58,8 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 		//the very first channel is not mixed, but simply written to the output buffer
 		if((*i)->FillSmpBufAndApplyEffects(buf, freq, chans)){
 			(*i)->isPlaying = false;//clear playing flag
-			(*i)->OnStop();//notify channel that it has stopped playing
+			(*i)->parent.Reset();
+			(*i)->OnStop_ts();//notify channel that it has stopped playing
 			i = this->channels.erase(i);
 		}else{
 			++i;
@@ -67,7 +68,8 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 		for(; i != this->channels.end();){
 			if((*i)->FillSmpBufAndApplyEffects(this->smpBuf, freq, chans)){
 				(*i)->isPlaying = false;//clear playing flag
-				(*i)->OnStop();//notify channel that it has stopped playing
+				(*i)->parent.Reset();
+				(*i)->OnStop_ts();//notify channel that it has stopped playing
 				i = this->channels.erase(i);
 			}else{
 				++i;
@@ -100,10 +102,10 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 			
 			this->channelToPlay->InitEffects();
 			
-			this->channelToPlay->stopFlag = false;
+			this->channelToPlay->parent = this->mixChannel;
 			
 			//notify channel that it has started playing
-			this->channelToPlay->OnStart();
+			this->channelToPlay->OnStart_ts();
 		}
 		
 	public:
@@ -116,19 +118,13 @@ void MixChannel::PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
 		{}
 	};//~class
 	
-	//mark channel as playing before sending the action because the action may be
-	//handled before setting the flag if it is set after sending the action!
-	channel->isPlaying = true;
+
+	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+			new PlayChannelAction(
+					ting::Ref<MixChannel>(this),
+					channel
+				)
+		));
 	
-	try{
-		aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
-				new PlayChannelAction(
-						ting::Ref<MixChannel>(this),
-						channel
-					)
-			));
-	}catch(...){
-		channel->isPlaying = false;
-		throw;
-	}
+	channel->isPlaying = true;
 }
