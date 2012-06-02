@@ -53,7 +53,7 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 	friend class aumiks::Lib;
 	friend class aumiks::MixChannel;
 	
-	ting::Inited<volatile bool, false> stopNowFlag;
+	ting::Inited<volatile bool, false> stoppedFlag;
 	
 	aumiks::SampleBufferFiller* lastFillerInChain;
 	
@@ -63,7 +63,7 @@ private:
 	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 		ASSERT(buf.Size() % chans == 0)
 
-		if(this->stopNowFlag){
+		if(this->stoppedFlag){
 			return true;
 		}
 		
@@ -109,7 +109,7 @@ public:
 	 * Instead, one needs to create a new channel.
      */
 	inline void StopNow_ts()throw(){
-		this->stopNowFlag = true;
+		this->stoppedFlag = true;
 	}
 
 	/**
@@ -121,7 +121,7 @@ public:
 	 * @return false otherwise.
      */
 	inline bool IsPlaying_ts()throw(){
-		return !this->stopNowFlag;
+		return !this->stoppedFlag;
 	}
 
 	/**

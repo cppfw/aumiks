@@ -57,7 +57,7 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 	if(i != this->channels.end()){//if there is at least one child channel
 		//the very first channel is not mixed, but simply written to the output buffer
 		if((*i)->FillSmpBufAndApplyEffects(buf, freq, chans)){
-			(*i)->stopNowFlag = true;
+			(*i)->stoppedFlag = true;
 			i = this->channels.erase(i);
 		}else{
 			++i;
@@ -65,7 +65,7 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 
 		for(; i != this->channels.end();){
 			if((*i)->FillSmpBufAndApplyEffects(this->smpBuf, freq, chans)){
-				(*i)->stopNowFlag = true;
+				(*i)->stoppedFlag = true;
 				i = this->channels.erase(i);
 			}else{
 				++i;
