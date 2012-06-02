@@ -111,7 +111,18 @@ public:
 	inline void StopNow_ts()throw(){
 		this->stopNowFlag = true;
 	}
-	
+
+	/**
+	 * @brief Tells if channel has finished playing.
+	 * Even if channel is paused it is considered as not stopped, i.e. playing.
+	 * Right after creation the channel is not stopped. Once stopped the channel
+	 * cannot be started again. One needs to create a new channel instead.
+     * @return true if channel has not stopped playing yet.
+	 * @return false otherwise.
+     */
+	inline bool IsPlaying_ts()throw(){
+		return !this->stopNowFlag;
+	}
 
 	/**
 	 * @brief Add effect to the channel.
