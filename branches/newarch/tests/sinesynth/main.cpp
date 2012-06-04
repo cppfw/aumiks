@@ -15,7 +15,7 @@ class SineSound : public aumiks::Sound{
 		bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 //			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
 			
-			if(this->time > 2){
+			if(this->time > 1){//play sound for 1 second
 //				TRACE_ALWAYS(<< "returned true" << std::endl)
 				return true;
 			}
@@ -56,82 +56,63 @@ public:
 
 
 
+void Play(){
+	ting::Ref<SineSound> snd = SineSound::New();
+	
+	ting::Ref<aumiks::Channel> ch = snd->CreateChannel();
+	ch->Play_ts();
+
+	while(!ch->IsStopped_ts()){
+		ting::Thread::Sleep(333);
+	}
+}
+
+
 
 int main(int argc, char *argv[]){
-	ting::Ref<SineSound> snd = SineSound::New();
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
 		aumiks::Lib aumiksLibrary(11025, 1, 100);
 
-		ting::Ref<aumiks::Channel> ch = snd->CreateChannel();
-		ch->Play_ts();
-		
-		while(!ch->IsStopped_ts()){
-			ting::Thread::Sleep(333);
-		}
+		Play();
 		TRACE_ALWAYS(<< "finished playing" << std::endl)
 	}
 	
-//	{
-//		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
-//		aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_11025);
-//
-//		Play("../samples/sample11025mono16.wav");
-//		Play("../samples/sample11025stereo16.wav");
-//		Play("../samples/sample22050mono16.wav");
-//		Play("../samples/sample22050stereo16.wav");
-//		Play("../samples/sample44100mono16.wav");
-//		Play("../samples/sample44100stereo16.wav");
-//	}
-//	
-//	{
-//		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
-//		aumiks::Lib aumiksLibrary(100, aumiks::MONO_16_22050);
-//
-//		Play("../samples/sample11025mono16.wav");
-//		Play("../samples/sample11025stereo16.wav");
-//		Play("../samples/sample22050mono16.wav");
-//		Play("../samples/sample22050stereo16.wav");
-//		Play("../samples/sample44100mono16.wav");
-//		Play("../samples/sample44100stereo16.wav");
-//	}
-//	
-//	{
-//		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 22050" << std::endl)
-//		aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_22050);
-//
-//		Play("../samples/sample11025mono16.wav");
-//		Play("../samples/sample11025stereo16.wav");
-//		Play("../samples/sample22050mono16.wav");
-//		Play("../samples/sample22050stereo16.wav");
-//		Play("../samples/sample44100mono16.wav");
-//		Play("../samples/sample44100stereo16.wav");
-//	}
-//	
-//	{
-//		TRACE_ALWAYS(<< "Opening audio playback device: Mono 44100" << std::endl)
-//		aumiks::Lib aumiksLibrary(100, aumiks::MONO_16_44100);
-//
-//		Play("../samples/sample11025mono16.wav");
-//		Play("../samples/sample11025stereo16.wav");
-//		Play("../samples/sample22050mono16.wav");
-//		Play("../samples/sample22050stereo16.wav");
-//		Play("../samples/sample44100mono16.wav");
-//		Play("../samples/sample44100stereo16.wav");
-//	}
-//	
-//	{
-//		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
-//		aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_44100);
-//
-//		Play("../samples/sample11025mono16.wav");
-//		Play("../samples/sample11025stereo16.wav");
-//		Play("../samples/sample22050mono16.wav");
-//		Play("../samples/sample22050stereo16.wav");
-//		Play("../samples/sample44100mono16.wav");
-//		Play("../samples/sample44100stereo16.wav");
-//	}
+	{
+		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
+		aumiks::Lib aumiksLibrary(11025, 2, 100);
+
+		Play();
+	}
+	
+	{
+		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
+		aumiks::Lib aumiksLibrary(22050, 1, 100);
+
+		Play();
+	}
+	
+	{
+		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 22050" << std::endl)
+		aumiks::Lib aumiksLibrary(22050, 2, 100);
+
+		Play();
+	}
+	
+	{
+		TRACE_ALWAYS(<< "Opening audio playback device: Mono 44100" << std::endl)
+		aumiks::Lib aumiksLibrary(44100, 1, 100);
+
+		Play();
+	}
+	
+	{
+		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
+		aumiks::Lib aumiksLibrary(44100, 2, 100);
+
+		Play();
+	}
 	
 	return 0;
 }
