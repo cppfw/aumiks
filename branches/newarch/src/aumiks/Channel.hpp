@@ -93,6 +93,8 @@ public:
 	 * @brief Requests channel to stop playing.
 	 * This is a request to stop playing the channel, the channel may stop not
 	 * immediately, depending on implementation of the particular Channel.
+	 * Eventually, channel normally moves to stopped state, but it may depend on
+	 * the implementation of a particular channel.
 	 * Once stopped, the channel cannot be started again, at least trying to
 	 * will result in undefined behavior.
 	 * Instead, one needs to create a new channel.
@@ -103,7 +105,8 @@ public:
 	
 	/**
 	 * @brief Stop playing the channel.
-	 * Stops playing the channel immediately.
+	 * Stops playing the channel immediately. After calling this method the
+	 * channel is moved to stopped state.
 	 * Once stopped, the channel cannot be started again, at least trying to
 	 * will result in undefined behavior.
 	 * Instead, one needs to create a new channel.
@@ -114,14 +117,14 @@ public:
 
 	/**
 	 * @brief Tells if channel has finished playing.
-	 * Even if channel is paused it is considered as not stopped, i.e. playing.
+	 * Even if channel is paused it is considered as not stopped.
 	 * Right after creation the channel is not stopped. Once stopped the channel
 	 * cannot be started again. One needs to create a new channel instead.
-     * @return true if channel has not stopped playing yet.
+     * @return true if channel has stopped playing.
 	 * @return false otherwise.
      */
-	inline bool IsPlaying_ts()throw(){
-		return !this->stoppedFlag;
+	inline bool IsStopped_ts()throw(){
+		return this->stoppedFlag;
 	}
 
 	/**
