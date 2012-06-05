@@ -27,6 +27,7 @@ THE SOFTWARE. */
 #include <ting/Buffer.hpp>
 #include <ting/fs/FSFile.hpp>
 
+#include "Exc.hpp"
 #include "WavSound.hpp"
 
 
@@ -471,7 +472,7 @@ template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2
 
 
 
-template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl : public WavSound{
+template <class TSampleType, unsigned channels, unsigned frequency> class WavSoundImpl : public WavSound{
 	Array<TSampleType> data;
 	
 	//    ==============================
@@ -490,33 +491,9 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 
 	private:
 		//override
-		virtual bool FillSmpBuf11025Mono16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::FillSmpBuf<1, 11025>(this, mixBuf);
-		}
-
-		//override
-		virtual bool FillSmpBuf11025Stereo16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::FillSmpBuf<2, 11025>(this, mixBuf);
-		}
-
-		//override
-		virtual bool FillSmpBuf22050Mono16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::FillSmpBuf<1, 22050>(this, mixBuf);
-		}
-
-		//override
-		virtual bool FillSmpBuf22050Stereo16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::FillSmpBuf<2, 22050>(this, mixBuf);
-		}
-
-		//override
-		virtual bool FillSmpBuf44100Mono16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::FillSmpBuf<1, 44100>(this, mixBuf);
-		}
-		
-		//override
-		virtual bool FillSmpBuf44100Stereo16(ting::Buffer<ting::s32>& mixBuf){
-			return WavSoundImpl::FillSmpBuf<2, 44100>(this, mixBuf);
+		virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+			//TODO:
+			return false;
 		}
 		
 	public:
@@ -526,158 +503,158 @@ template <class TSampleType, unsigned chans, unsigned freq> class WavSoundImpl :
 	};//~class Channel
 
 private:
-	//NOTE: local classes are not allowed to have template members by C++ standard, this is why this method is
-	//      defined here as static, instead of being a member of Channel class
-	template <unsigned outputChans, unsigned outputFreq> static bool FillSmpBuf(Channel* ch, ting::Buffer<ting::s32>& buf){
-		ASSERT(buf.Size() % outputChans == 0)
-
-		ASSERT(ch->wavSound->data.Size() % chans == 0)
-		ASSERT(ch->curPos < ch->wavSound->data.Size())
-		ASSERT(ch->curPos % chans == 0)//make sure curPos is not corrupted
-
-		const TSampleType* src = &ch->wavSound->data[ch->curPos];
-
-		s32* dst = buf.Begin();
-
-		for(;;){
-			ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-			unsigned samplesTillEndOfBuffer = buf.End() - dst;
-			ASSERT(samplesTillEndOfBuffer % outputChans == 0)
-			unsigned framesTillEndOfBuffer = samplesTillEndOfBuffer / outputChans;
-
-			ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
-			
-			unsigned samplesTillEndOfSound = ch->wavSound->data.End() - src;
-			ASSERT(samplesTillEndOfSound % chans == 0)
-			unsigned framesTillEndOfSound =  samplesTillEndOfSound / chans;
-			
-			unsigned bufFramesTillEndOfSound;
-			if(outputFreq >= freq){//rely on optimizer to optimize this 'if' out since it evaluates to constant expression upon template instantiation
-				//NOTE: we support only 11025, 22050 and 44100 Hz, so expect ratio of 1, 2 or 4 only
-				ASSERT((outputFreq / freq == 1) || (outputFreq / freq == 2) || (outputFreq / freq == 4))
-				bufFramesTillEndOfSound = framesTillEndOfSound * (outputFreq / freq);
-			}else{
-				ASSERT((freq / outputFreq == 1) || (freq / outputFreq == 2) || (freq / outputFreq == 4))
-//				ASSERT(framesTillEndOfSound % (freq / outputFreq) == 0)//make sure there is a proper granularity
-				bufFramesTillEndOfSound = framesTillEndOfSound / (freq / outputFreq);
-				//NOTE: this is the number of integral frames. Because the source sound is of higher
-				//      sampling rate than playback we might have to take into account the
-				//      fraction of a playback frame later.
-			}
-
-//			TRACE(<< "framesTillEndOfSound = " << framesTillEndOfSound << std::endl)
-//			TRACE(<< "bufFramesTillEndOfSound = " << bufFramesTillEndOfSound << std::endl)
-//			TRACE(<< "framesTillEndOfBuffer = " << framesTillEndOfBuffer << std::endl)
-				
-			//if sound end will be reached
-			if(bufFramesTillEndOfSound < framesTillEndOfBuffer){
-				ting::s32* end = dst + (bufFramesTillEndOfSound * outputChans);
-				for(; dst != end;){
-					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-					ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
-					FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
-				}
-				ch->curPos = 0;
-				
-				//NOTE: in cases when outputFreq is below freq we might need to deal with sound tail
-				//      if it does not match the full frame of output buffer.
-				
-				//Hope that in cases when this buffer is is not used (freq / outputFreq == 0), it should be optimized out by compiler
-				ting::StaticBuffer<TSampleType, (freq / outputFreq) * chans > tail;
-				TSampleType* tailIter = tail.Begin();
-				
-				if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
-					for(; src != ch->wavSound->data.End(); ++src, ++tailIter){
-						ASSERT(tail.Size() > 0)
-						ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
-						ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
-						*tailIter = *src;
-					}
-				}else{
-					ASSERT(tail.Size() == 0)
-				}
-				
-				if(ch->numLoops == 1){
-					//this was the last repeat of playing
-					
-					if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
-						if(tailIter != tail.Begin()){//if we have copied something to the tail buffer
-							for(; tailIter != tail.End(); ++tailIter){
-								ASSERT(tail.Size() > 0)
-								ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
-								*tailIter = 0;//fill the rest of sound tail with silence
-							}
-
-							const TSampleType *s = tail.Begin();
-							ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-							FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
-							ASSERT((buf.Begin() <= dst && dst <= buf.End() - 1) || dst == buf.End())
-						}
-					}
-					
-					//fill the rest of the sample buffer with zeros
-					for(; dst != buf.End(); ++dst){
-						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-						*dst = 0;
-					}
-					ASSERT(ch->curPos == 0)
-					ASSERT(ch->numLoops == 1)//Leaving ch->numLoops in default state
-					return true;
-				}else{
-					//if repeating
-					
-					//decrement loops counter if needed
-					if(ch->numLoops != 0){
-						ASSERT(ch->numLoops > 1)
-						--ch->numLoops;
-					}
-					
-					if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
-						if(tailIter != tail.Begin()){//if we have copied something to the tail buffer
-							//fill the rest of the tail with data from beginning of the sound
-							do{
-								src = ch->wavSound->data.Begin();
-								ASSERT(ch->curPos == 0)
-
-								for(; tailIter != tail.End() && src != ch->wavSound->data.End(); ++src, ++tailIter){
-									ASSERT(tail.Size() > 0)
-									ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
-									ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
-									*tailIter = *src;
-									++ch->curPos;
-								}
-							}while(tailIter != tail.End());
-
-							const TSampleType *s = tail.Begin();
-							ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-							FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
-						}else{
-							src = ch->wavSound->data.Begin();
-							ASSERT(ch->curPos == 0)
-						}
-					}else{
-						ASSERT(tail.Size() == 0)
-						src = ch->wavSound->data.Begin();
-						ASSERT(ch->curPos == 0)
-					}
-					continue;//for(;;)
-				}
-			}else{//no end of sound will be reached
-				ASSERT(framesTillEndOfBuffer * outputChans == unsigned(buf.End() - dst))
-				for(; dst != buf.End();){
-					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
-					ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
-					FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
-				}
-				
-				ch->curPos += framesTillEndOfBuffer * chans * freq / outputFreq;
-				
-				ASSERT(ch->curPos < ch->wavSound->data.Size())
-				return false;
-			}
-		}//~for(;;)
-		ASSERT(false)
-	}
+//	//NOTE: local classes are not allowed to have template members by C++ standard, this is why this method is
+//	//      defined here as static, instead of being a member of Channel class
+//	template <unsigned outputChans, unsigned outputFreq> static bool FillSmpBuf(Channel* ch, ting::Buffer<ting::s32>& buf){
+//		ASSERT(buf.Size() % outputChans == 0)
+//
+//		ASSERT(ch->wavSound->data.Size() % chans == 0)
+//		ASSERT(ch->curPos < ch->wavSound->data.Size())
+//		ASSERT(ch->curPos % chans == 0)//make sure curPos is not corrupted
+//
+//		const TSampleType* src = &ch->wavSound->data[ch->curPos];
+//
+//		s32* dst = buf.Begin();
+//
+//		for(;;){
+//			ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+//			unsigned samplesTillEndOfBuffer = buf.End() - dst;
+//			ASSERT(samplesTillEndOfBuffer % outputChans == 0)
+//			unsigned framesTillEndOfBuffer = samplesTillEndOfBuffer / outputChans;
+//
+//			ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+//			
+//			unsigned samplesTillEndOfSound = ch->wavSound->data.End() - src;
+//			ASSERT(samplesTillEndOfSound % chans == 0)
+//			unsigned framesTillEndOfSound =  samplesTillEndOfSound / chans;
+//			
+//			unsigned bufFramesTillEndOfSound;
+//			if(outputFreq >= freq){//rely on optimizer to optimize this 'if' out since it evaluates to constant expression upon template instantiation
+//				//NOTE: we support only 11025, 22050 and 44100 Hz, so expect ratio of 1, 2 or 4 only
+//				ASSERT((outputFreq / freq == 1) || (outputFreq / freq == 2) || (outputFreq / freq == 4))
+//				bufFramesTillEndOfSound = framesTillEndOfSound * (outputFreq / freq);
+//			}else{
+//				ASSERT((freq / outputFreq == 1) || (freq / outputFreq == 2) || (freq / outputFreq == 4))
+////				ASSERT(framesTillEndOfSound % (freq / outputFreq) == 0)//make sure there is a proper granularity
+//				bufFramesTillEndOfSound = framesTillEndOfSound / (freq / outputFreq);
+//				//NOTE: this is the number of integral frames. Because the source sound is of higher
+//				//      sampling rate than playback we might have to take into account the
+//				//      fraction of a playback frame later.
+//			}
+//
+////			TRACE(<< "framesTillEndOfSound = " << framesTillEndOfSound << std::endl)
+////			TRACE(<< "bufFramesTillEndOfSound = " << bufFramesTillEndOfSound << std::endl)
+////			TRACE(<< "framesTillEndOfBuffer = " << framesTillEndOfBuffer << std::endl)
+//				
+//			//if sound end will be reached
+//			if(bufFramesTillEndOfSound < framesTillEndOfBuffer){
+//				ting::s32* end = dst + (bufFramesTillEndOfSound * outputChans);
+//				for(; dst != end;){
+//					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+//					ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+//					FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
+//				}
+//				ch->curPos = 0;
+//				
+//				//NOTE: in cases when outputFreq is below freq we might need to deal with sound tail
+//				//      if it does not match the full frame of output buffer.
+//				
+//				//Hope that in cases when this buffer is is not used (freq / outputFreq == 0), it should be optimized out by compiler
+//				ting::StaticBuffer<TSampleType, (freq / outputFreq) * chans > tail;
+//				TSampleType* tailIter = tail.Begin();
+//				
+//				if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
+//					for(; src != ch->wavSound->data.End(); ++src, ++tailIter){
+//						ASSERT(tail.Size() > 0)
+//						ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
+//						ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+//						*tailIter = *src;
+//					}
+//				}else{
+//					ASSERT(tail.Size() == 0)
+//				}
+//				
+//				if(ch->numLoops == 1){
+//					//this was the last repeat of playing
+//					
+//					if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
+//						if(tailIter != tail.Begin()){//if we have copied something to the tail buffer
+//							for(; tailIter != tail.End(); ++tailIter){
+//								ASSERT(tail.Size() > 0)
+//								ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
+//								*tailIter = 0;//fill the rest of sound tail with silence
+//							}
+//
+//							const TSampleType *s = tail.Begin();
+//							ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+//							FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
+//							ASSERT((buf.Begin() <= dst && dst <= buf.End() - 1) || dst == buf.End())
+//						}
+//					}
+//					
+//					//fill the rest of the sample buffer with zeros
+//					for(; dst != buf.End(); ++dst){
+//						ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+//						*dst = 0;
+//					}
+//					ASSERT(ch->curPos == 0)
+//					ASSERT(ch->numLoops == 1)//Leaving ch->numLoops in default state
+//					return true;
+//				}else{
+//					//if repeating
+//					
+//					//decrement loops counter if needed
+//					if(ch->numLoops != 0){
+//						ASSERT(ch->numLoops > 1)
+//						--ch->numLoops;
+//					}
+//					
+//					if(freq / outputFreq != 0){//constant expression, should be optimized out by compiler where necessary
+//						if(tailIter != tail.Begin()){//if we have copied something to the tail buffer
+//							//fill the rest of the tail with data from beginning of the sound
+//							do{
+//								src = ch->wavSound->data.Begin();
+//								ASSERT(ch->curPos == 0)
+//
+//								for(; tailIter != tail.End() && src != ch->wavSound->data.End(); ++src, ++tailIter){
+//									ASSERT(tail.Size() > 0)
+//									ASSERT(tail.Begin() <= tailIter && tailIter <= tail.End() - 1)
+//									ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+//									*tailIter = *src;
+//									++ch->curPos;
+//								}
+//							}while(tailIter != tail.End());
+//
+//							const TSampleType *s = tail.Begin();
+//							ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+//							FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(s, dst);
+//						}else{
+//							src = ch->wavSound->data.Begin();
+//							ASSERT(ch->curPos == 0)
+//						}
+//					}else{
+//						ASSERT(tail.Size() == 0)
+//						src = ch->wavSound->data.Begin();
+//						ASSERT(ch->curPos == 0)
+//					}
+//					continue;//for(;;)
+//				}
+//			}else{//no end of sound will be reached
+//				ASSERT(framesTillEndOfBuffer * outputChans == unsigned(buf.End() - dst))
+//				for(; dst != buf.End();){
+//					ASSERT(buf.Begin() <= dst && dst <= buf.End() - 1)
+//					ASSERT(ch->wavSound->data.Begin() <= src && src <= ch->wavSound->data.End() - 1)
+//					FrameToSmpBufPutter<TSampleType, chans, freq, outputChans, outputFreq>::Put(src, dst);
+//				}
+//				
+//				ch->curPos += framesTillEndOfBuffer * chans * freq / outputFreq;
+//				
+//				ASSERT(ch->curPos < ch->wavSound->data.Size())
+//				return false;
+//			}
+//		}//~for(;;)
+//		ASSERT(false)
+//	}
 	//=============class Channel============
 	//  ==================================
 	//    ==============================
@@ -689,7 +666,9 @@ private:
 	
 private:
 	//NOTE: assume that data in d is little-endian
-	WavSoundImpl(const ting::Buffer<ting::u8>& d){
+	WavSoundImpl(const ting::Buffer<ting::u8>& d) :
+			WavSound(channels, frequency)
+	{
 		ASSERT(d.Size() % (chans * sizeof(TSampleType)) == 0)
 
 		this->data.Init(d.Size() / sizeof(TSampleType));

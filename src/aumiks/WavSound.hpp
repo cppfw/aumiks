@@ -39,21 +39,25 @@ THE SOFTWARE. */
 
 namespace aumiks{
 
-using namespace ting;
-
 
 
 class WavSound : public aumiks::Sound{
 	
+	unsigned chans;
+	unsigned freq;
+	
 protected:
-	WavSound(){}
+	WavSound(unsigned chans, unsigned freq) :
+			chans(chans),
+			freq(freq)
+	{}
 	
 public:
 	class Channel : public aumiks::Channel{
 	protected:
 		ting::Inited<unsigned, 1> numLoops;//0 means loop infinitely
 		
-		ting::Inited<unsigned, 0> curPos;//current index in samples into sound data buffer
+		ting::Inited<unsigned, 0> curSmp;//current index in samples into sound data buffer
 		
 	public:
 		/**
@@ -68,7 +72,15 @@ public:
 	};
 
 public:
-	virtual Ref<WavSound::Channel> CreateWavChannel()const = 0;
+	inline unsigned NumChannels()const throw(){
+		return this->chans;
+	}
+	
+	inline unsigned SamplingRate()const throw(){
+		return this->freq;
+	}
+	
+	virtual ting::Ref<WavSound::Channel> CreateWavChannel()const = 0;
 
 	//TODO:
 //	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{
@@ -77,12 +89,12 @@ public:
 //		return ret;
 //	}
 
-	static Ref<WavSound> LoadWAV(const std::string& fileName);
-	static Ref<WavSound> LoadWAV(ting::fs::File& fi);
+	static ting::Ref<WavSound> LoadWAV(const std::string& fileName);
+	static ting::Ref<WavSound> LoadWAV(ting::fs::File& fi);
 	
 	
 	//override
-	virtual Ref<aumiks::Channel> CreateChannel()const{
+	virtual ting::Ref<aumiks::Channel> CreateChannel()const{
 		return this->CreateWavChannel();
 	}
 };
