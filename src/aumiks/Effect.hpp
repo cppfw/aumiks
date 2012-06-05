@@ -55,10 +55,14 @@ class SampleBufferFiller{
 	
 	inline bool FillSmpBufInternal(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 		if(this->isOff){
+//			TRACE(<< "SampleBufferFiller::FillSmpBufInternal(): isOff is true: this->isOff = " << this->isOff << std::endl)
 			return this->FillSmpBufFromNextByChain(buf, freq, chans);
 		}
 		
-		return this->FillSmpBuf(buf, freq, chans);
+//		TRACE(<< "SampleBufferFiller::FillSmpBufInternal(): calling FillSmpBuf" << std::endl)
+		bool ret = this->FillSmpBuf(buf, freq, chans);
+//		TRACE(<< "SampleBufferFiller::FillSmpBufInternal(): ret = " << ret << std::endl)
+		return ret;
 	}
 	
 protected:
@@ -83,6 +87,7 @@ protected:
 	//TODO: doxygen
 	//NOTE: the size of the supplied buf should contain integer number of frames!
 	inline bool FillSmpBufFromNextByChain(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+//		TRACE(<< "SampleBufferFiller::FillSmpBufFromNextByChain(): this->next = " << this->next << std::endl)
 		if(!this->next){
 			memset(buf.Begin(), 0, buf.SizeInBytes());
 			return false;
