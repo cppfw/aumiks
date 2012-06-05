@@ -44,9 +44,7 @@ namespace{
 template <class TSampleType, unsigned channels, unsigned frequency> class WavSoundImpl : public WavSound{
 	ting::Array<TSampleType> data;
 	
-	//    ==============================
-	//  ==================================
-	//=============class Channel============
+
 	class Channel : public WavSound::Channel{
 		friend class WavSoundImpl;
 
@@ -57,6 +55,10 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 		inline Channel(const ting::Ref<const WavSoundImpl>& sound) :
 				wavSound(ASS(sound))
 		{}
+	public:
+		static inline ting::Ref<Channel> New(const ting::Ref<const WavSoundImpl>& sound){
+			return ting::Ref<Channel>(new Channel(sound));
+		}
 
 	private:
 		//override
@@ -90,11 +92,6 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 			
 			//TODO:
 			return true;
-		}
-		
-	public:
-		static inline ting::Ref<Channel> New(const ting::Ref<const WavSoundImpl>& sound){
-			return ting::Ref<Channel>(new Channel(sound));
 		}
 	};//~class Channel
 
