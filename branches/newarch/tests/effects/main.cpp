@@ -1,7 +1,58 @@
+#include "../../src/aumiks/Lib.hpp"
 #include "../../src/aumiks/WavSound.hpp"
 
 #include <ting/fs/FSFile.hpp>
 #include <ting/util.hpp>
+
+
+
+class SineSound : public aumiks::Sound{
+	
+	class Channel : public aumiks::Channel{
+		ting::Inited<float, 0> time;
+		
+		//override
+		bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+//			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
+			
+			if(this->time > 100){//play sound for 100 seconds
+//				TRACE_ALWAYS(<< "returned true" << std::endl)
+				return true;
+			}
+			
+			for(ting::s32* dst = buf.Begin(); dst != buf.End();){
+				ting::s32 v = float(0x7fff) * ting::math::Sin<float>(this->time * ting::math::D2Pi<float>() * 440.0f);
+				this->time += 1 / float(freq);
+				for(unsigned i = 0; i != chans; ++i){
+					ASSERT(buf.Overlaps(dst))
+					*dst = v;
+					++dst;
+				}
+			}
+			
+//			TRACE_ALWAYS(<< "time = " << this->time << std::endl)
+//			TRACE(<< "this->smpBuf = " << buf << std::endl)
+			
+			return false;
+		}
+		
+	public:
+		inline static ting::Ref<Channel> New(){
+			return ting::Ref<Channel>(new Channel());
+		}
+	};
+	
+public:
+	
+	//override
+	virtual ting::Ref<aumiks::Channel> CreateChannel()const{
+		return Channel::New();
+	}
+	
+	inline static ting::Ref<SineSound> New(){
+		return ting::Ref<SineSound>(new SineSound());
+	}
+};
 
 
 
@@ -13,18 +64,25 @@ public:
 	}
 	
 	//override
-	virtual aumiks::Effect::E_Result ApplyToBuf44100Stereo16(ting::Buffer<ting::s32>& buf, bool soundStopped){
+	virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+//		TRACE_ALWAYS(<< "effect FillSmpBuf(): enter" << std::endl)
+		
+		if(this->FillSmpBufFromNextByChain(buf, freq, chans)){
+//			TRACE_ALWAYS(<< "effect FillSmpBuf(): true from next by chain" << std::endl)
+			return true;
+		}
+		
 		ting::u8 vol = this->vol; //save volatile value
 		if(vol == ting::u8(-1)){
 			//do nothing
-			return aumiks::Effect::NORMAL;
+			return false;
 		}
 		
 		for(ting::s32* i = buf.Begin(); i != buf.End(); ++i){
 			*i = (*i) * vol / ting::u8(-1);
 		}
 		
-		return aumiks::Effect::NORMAL;
+		return false;
 	}
 	
 	static inline ting::Ref<VolumeEffect> New(){
@@ -35,19 +93,20 @@ public:
 
 int main(int argc, char *argv[]){
 	TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
-	aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_44100);
+	aumiks::Lib aumiksLibrary(44100, 2, 100);
 	
-	ting::Ref<aumiks::WavSound> snd = aumiks::WavSound::LoadWAV("../samples/sine44100mono16.wav");
+	ting::Ref<aumiks::Sound> snd = SineSound::New();
 
 	ASSERT(snd)
 	
-	ting::Ref<aumiks::WavSound::Channel> ch = snd->CreateWavChannel();
+	ting::Ref<aumiks::Channel> ch = snd->CreateChannel();
+//	TRACE_ALWAYS(<< "ch = " << static_cast<aumiks::SampleBufferFiller*>(ch.operator->()) << std::endl)
 	
 	ting::Ref<VolumeEffect> eff = VolumeEffect::New();
 	
 	ch->AddEffect_ts(eff);
 	
-	ch->Play(0);//infinite loop
+	ch->Play_ts();
 	
 	ting::s8 d = -1;
 	ting::s8 step = 20;

@@ -2,7 +2,7 @@ subdirs :=
 #TODO:
 subdirs += playwav
 subdirs += playparallel
-#subdirs += effects
+subdirs += effects
 subdirs += sinesynth
 
 
