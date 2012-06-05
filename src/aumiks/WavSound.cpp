@@ -26,6 +26,7 @@ THE SOFTWARE. */
 
 #include <ting/Buffer.hpp>
 #include <ting/fs/FSFile.hpp>
+#include <ting/util.hpp>
 
 #include "Exc.hpp"
 #include "WavSound.hpp"
@@ -39,436 +40,436 @@ using namespace aumiks;
 
 namespace{
 
-//puts sound frame to output sample buffer.
-//NOTE: partial specialization of a function template is not allowed by C++, therefore use static class member
-template <class TSampleType, unsigned chans, unsigned freq, unsigned outputChans, unsigned outputFreq>
-		struct FrameToSmpBufPutter
-{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst);
-};
-
-
-
-//========== Mono 11025 output
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = ting::s32(*src);
-		++dst;
-		++src;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		ting::s32 tmp = ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp /= 2;
-		
-		*dst = tmp;
-		++dst;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		ting::s32 tmp = ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp /= 4;
-		
-		*dst = tmp;
-		++dst;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		ting::s32 tmp = ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		
-		tmp /= 8;
-		
-		*dst = tmp;
-		++dst;
-	}
-};
-
-
-
-//========== Stereo 11025 output
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		
-		++src;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = s32(*src);
-		++dst;
-		++src;
-		*dst = s32(*src);
-		++dst;
-		++src;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = ting::s32(*src);
-		++src;
-		tmp += ting::s32(*src);
-		++src;
-		tmp /= 2;
-		
-		*dst = tmp;
-		++dst;
-		*dst = tmp;
-		++dst;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		ting::s32 tmp1 = ting::s32(*src);
-		++src;
-		ting::s32 tmp2 = ting::s32(*src);
-		++src;
-		tmp1 += ting::s32(*src);
-		++src;
-		tmp2 += ting::s32(*src);
-		++src;
-		tmp1 /= 2;
-		tmp2 /= 2;
-		
-		*dst = tmp1;
-		++dst;
-		*dst = tmp2;
-		++dst;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		tmp += s32(*src);
-		++src;
-		tmp += s32(*src);
-		++src;
-		tmp += s32(*src);
-		++src;
-		tmp /= 4;
-		
-		*dst = tmp;
-		++dst;
-		*dst = tmp;
-		++dst;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 11025>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp1 = s32(*src);
-		++src;
-		s32 tmp2 = s32(*src);
-		++src;
-		tmp1 += s32(*src);
-		++src;
-		tmp2 += s32(*src);
-		++src;
-		tmp1 += s32(*src);
-		++src;
-		tmp2 += s32(*src);
-		++src;
-		tmp1 += s32(*src);
-		++src;
-		tmp2 += s32(*src);
-		++src;
-		tmp1 /= 4;
-		tmp2 /= 4;
-		
-		*dst = tmp1;
-		++dst;
-		*dst = tmp2;
-		++dst;
-	}
-};
-
-
-
-//========== Mono 22050 output
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 22050>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 11025>::Put(src, dst);
-	}
-};
-
-
-
-//========== Stereo 22050 output
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		
-		++src;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		
-		*dst = tmp;
-		++dst;
-		*dst = s32(*src);
-		++dst;
-		
-		*dst = tmp;
-		++dst;
-		*dst = s32(*src);
-		++dst;
-		
-		++src;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 22050>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 11025>::Put(src, dst);
-	}
-};
-
-
-
-//========== Mono 44100 output
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 22050>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		tmp += s32(*src);
-		tmp /= 2;
-		++src;
-		
-		*dst = tmp;
-		++dst;
-		*dst = tmp;
-		++dst;
-		*dst = tmp;
-		++dst;
-		*dst = tmp;
-		++dst;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>::Put(src, dst);
-	}
-};
-
-
-
-//========== Stereo 44100 output
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		*dst = ting::s32(*src);
-		++dst;
-		
-		++src;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		s32 tmp = s32(*src);
-		++src;
-		
-		*dst = tmp;
-		++dst;
-		*dst = s32(*src);
-		++dst;
-		
-		*dst = tmp;
-		++dst;
-		*dst = s32(*src);
-		++dst;
-		
-		*dst = tmp;
-		++dst;
-		*dst = s32(*src);
-		++dst;
-
-		*dst = tmp;
-		++dst;
-		*dst = s32(*src);
-		++dst;
-
-		++src;
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 22050>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 22050>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>::Put(src, dst);
-	}
-};
-
-template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 44100>{
-	static inline void Put(const TSampleType*& src, ting::s32*& dst){
-		FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 11025>::Put(src, dst);
-	}
-};
+////puts sound frame to output sample buffer.
+////NOTE: partial specialization of a function template is not allowed by C++, therefore use static class member
+//template <class TSampleType, unsigned chans, unsigned freq, unsigned outputChans, unsigned outputFreq>
+//		struct FrameToSmpBufPutter
+//{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst);
+//};
+//
+//
+//
+////========== Mono 11025 output
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		*dst = ting::s32(*src);
+//		++dst;
+//		++src;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		ting::s32 tmp = ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp /= 2;
+//		
+//		*dst = tmp;
+//		++dst;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		ting::s32 tmp = ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp /= 4;
+//		
+//		*dst = tmp;
+//		++dst;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		ting::s32 tmp = ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		
+//		tmp /= 8;
+//		
+//		*dst = tmp;
+//		++dst;
+//	}
+//};
+//
+//
+//
+////========== Stereo 11025 output
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		
+//		++src;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		*dst = s32(*src);
+//		++dst;
+//		++src;
+//		*dst = s32(*src);
+//		++dst;
+//		++src;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		s32 tmp = ting::s32(*src);
+//		++src;
+//		tmp += ting::s32(*src);
+//		++src;
+//		tmp /= 2;
+//		
+//		*dst = tmp;
+//		++dst;
+//		*dst = tmp;
+//		++dst;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		ting::s32 tmp1 = ting::s32(*src);
+//		++src;
+//		ting::s32 tmp2 = ting::s32(*src);
+//		++src;
+//		tmp1 += ting::s32(*src);
+//		++src;
+//		tmp2 += ting::s32(*src);
+//		++src;
+//		tmp1 /= 2;
+//		tmp2 /= 2;
+//		
+//		*dst = tmp1;
+//		++dst;
+//		*dst = tmp2;
+//		++dst;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		s32 tmp = s32(*src);
+//		++src;
+//		tmp += s32(*src);
+//		++src;
+//		tmp += s32(*src);
+//		++src;
+//		tmp += s32(*src);
+//		++src;
+//		tmp /= 4;
+//		
+//		*dst = tmp;
+//		++dst;
+//		*dst = tmp;
+//		++dst;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 11025>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		s32 tmp1 = s32(*src);
+//		++src;
+//		s32 tmp2 = s32(*src);
+//		++src;
+//		tmp1 += s32(*src);
+//		++src;
+//		tmp2 += s32(*src);
+//		++src;
+//		tmp1 += s32(*src);
+//		++src;
+//		tmp2 += s32(*src);
+//		++src;
+//		tmp1 += s32(*src);
+//		++src;
+//		tmp2 += s32(*src);
+//		++src;
+//		tmp1 /= 4;
+//		tmp2 /= 4;
+//		
+//		*dst = tmp1;
+//		++dst;
+//		*dst = tmp2;
+//		++dst;
+//	}
+//};
+//
+//
+//
+////========== Mono 22050 output
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 22050>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 11025>::Put(src, dst);
+//	}
+//};
+//
+//
+//
+////========== Stereo 22050 output
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		
+//		++src;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		s32 tmp = s32(*src);
+//		++src;
+//		
+//		*dst = tmp;
+//		++dst;
+//		*dst = s32(*src);
+//		++dst;
+//		
+//		*dst = tmp;
+//		++dst;
+//		*dst = s32(*src);
+//		++dst;
+//		
+//		++src;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 22050>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 11025>::Put(src, dst);
+//	}
+//};
+//
+//
+//
+////========== Mono 44100 output
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 22050>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		s32 tmp = s32(*src);
+//		++src;
+//		tmp += s32(*src);
+//		tmp /= 2;
+//		++src;
+//		
+//		*dst = tmp;
+//		++dst;
+//		*dst = tmp;
+//		++dst;
+//		*dst = tmp;
+//		++dst;
+//		*dst = tmp;
+//		++dst;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 1, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 1, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 1, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 11025, 1, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 1, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 11025, 1, 11025>::Put(src, dst);
+//	}
+//};
+//
+//
+//
+////========== Stereo 44100 output
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		*dst = ting::s32(*src);
+//		++dst;
+//		
+//		++src;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		s32 tmp = s32(*src);
+//		++src;
+//		
+//		*dst = tmp;
+//		++dst;
+//		*dst = s32(*src);
+//		++dst;
+//		
+//		*dst = tmp;
+//		++dst;
+//		*dst = s32(*src);
+//		++dst;
+//		
+//		*dst = tmp;
+//		++dst;
+//		*dst = s32(*src);
+//		++dst;
+//
+//		*dst = tmp;
+//		++dst;
+//		*dst = s32(*src);
+//		++dst;
+//
+//		++src;
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 22050, 2, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 22050>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 22050, 2, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 22050>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 1, 44100, 2, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 1, 11025, 2, 11025>::Put(src, dst);
+//	}
+//};
+//
+//template <class TSampleType> struct FrameToSmpBufPutter<TSampleType, 2, 44100, 2, 44100>{
+//	static inline void Put(const TSampleType*& src, ting::s32*& dst){
+//		FrameToSmpBufPutter<TSampleType, 2, 11025, 2, 11025>::Put(src, dst);
+//	}
+//};
 
 
 
@@ -492,8 +493,34 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 	private:
 		//override
 		virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+			ASSERT(buf.Size() % chans == 0)
+			
+			if(this->wavSound->NumChannels() == chans){
+				if(this->wavSound->SamplingRate() == freq){
+					size_t samplesToCopy = this->wavSound->data.Size() - this->curSmp;
+					if(samplesToCopy == 0){
+						return true;
+					}
+					
+					ting::util::ClampTop(samplesToCopy, buf.Size());
+					
+					ASSERT(buf.Overlaps(buf.Begin() + samplesToCopy) || (buf.Begin() + samplesToCopy) == buf.End())
+					
+					ting::s32 *dst = buf.Begin();
+					for(const TSampleType *src = &this->wavSound->data[this->curSmp]; dst != buf.Begin() + samplesToCopy; ++dst, ++src){
+						*dst = ting::s32(*src);
+					}
+					this->curSmp += samplesToCopy;
+					
+					for(; dst != buf.End(); ++dst){
+						*dst = 0;
+					}
+					return false;
+				}
+			}
+			
 			//TODO:
-			return false;
+			return true;
 		}
 		
 	public:
@@ -655,9 +682,9 @@ private:
 //		}//~for(;;)
 //		ASSERT(false)
 //	}
-	//=============class Channel============
-	//  ==================================
-	//    ==============================
+//	//=============class Channel============
+//	//  ==================================
+//	//    ==============================
 	
 	//override
 	virtual Ref<WavSound::Channel> CreateWavChannel()const{
@@ -806,8 +833,8 @@ Ref<WavSound> WavSound::LoadWAV(ting::fs::File& fi){
 //		//convert data to signed format
 //		for(s8* ptr=r->buf.Buf(); ptr<(r->buf.Buf()+r->buf.SizeOfArray()); ++ptr)
 //			*ptr=s8(int(*ptr)-0x80);
-		//TODO: support it
-		throw Exc("WavSound::LoadWAV(): unsupported bit depth (8 bit) wav file");
+		//TODO: support it by converting to 16bit
+		throw Exc("WavSound::LoadWAV(): unsupported bit depth (8 bit) wav file (TODO:)");
 	}else if(bitDepth == 16){
 		//set the format
 		switch(chans){

@@ -81,6 +81,7 @@ protected:
 	virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans) = 0;
 	
 	//TODO: doxygen
+	//NOTE: the size of the supplied buf should contain integer number of frames!
 	inline bool FillSmpBufFromNextByChain(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 		if(!this->next){
 			memset(buf.Begin(), 0, buf.SizeInBytes());

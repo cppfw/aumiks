@@ -1,3 +1,4 @@
+#include "../../src/aumiks/Lib.hpp"
 #include "../../src/aumiks/WavSound.hpp"
 
 #include <ting/fs/FSFile.hpp>
@@ -10,11 +11,11 @@ void Play(const std::string& fileName){
 	ASSERT(snd)
 	
 	ting::Ref<aumiks::WavSound::Channel> ch = snd->CreateWavChannel();
-	ch->Play(2);
+	ch->Play_ts();
 	
-	while(ch->IsPlaying()){
+	while(!ch->IsStopped_ts()){
 //		TRACE(<< "Loop" << std::endl)
-		ting::Thread::Sleep(50);
+		ting::Thread::Sleep(333);
 	}
 }
 
@@ -22,7 +23,7 @@ void Play(const std::string& fileName){
 int main(int argc, char *argv[]){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
-		aumiks::Lib aumiksLibrary(100, aumiks::MONO_16_11025);
+		aumiks::Lib aumiksLibrary(11025, 1, 100);
 
 		Play("../samples/sample11025mono16.wav");
 		Play("../samples/sample11025stereo16.wav");
@@ -34,7 +35,7 @@ int main(int argc, char *argv[]){
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
-		aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_11025);
+		aumiks::Lib aumiksLibrary(11025, 2, 100);
 
 		Play("../samples/sample11025mono16.wav");
 		Play("../samples/sample11025stereo16.wav");
@@ -46,7 +47,7 @@ int main(int argc, char *argv[]){
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
-		aumiks::Lib aumiksLibrary(100, aumiks::MONO_16_22050);
+		aumiks::Lib aumiksLibrary(22050, 1, 100);
 
 		Play("../samples/sample11025mono16.wav");
 		Play("../samples/sample11025stereo16.wav");
@@ -58,7 +59,7 @@ int main(int argc, char *argv[]){
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 22050" << std::endl)
-		aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_22050);
+		aumiks::Lib aumiksLibrary(22050, 2, 100);
 
 		Play("../samples/sample11025mono16.wav");
 		Play("../samples/sample11025stereo16.wav");
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]){
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 44100" << std::endl)
-		aumiks::Lib aumiksLibrary(100, aumiks::MONO_16_44100);
+		aumiks::Lib aumiksLibrary(44100, 1, 100);
 
 		Play("../samples/sample11025mono16.wav");
 		Play("../samples/sample11025stereo16.wav");
@@ -82,7 +83,7 @@ int main(int argc, char *argv[]){
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
-		aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_44100);
+		aumiks::Lib aumiksLibrary(44100, 2, 100);
 
 		Play("../samples/sample11025mono16.wav");
 		Play("../samples/sample11025stereo16.wav");
