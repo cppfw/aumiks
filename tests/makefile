@@ -1,5 +1,4 @@
 subdirs :=
-#TODO:
 subdirs += playwav
 subdirs += playparallel
 subdirs += effects

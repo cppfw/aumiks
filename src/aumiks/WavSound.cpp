@@ -65,14 +65,16 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 		virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 			ASSERT(buf.Size() % chans == 0)
 			
+			size_t samplesTillEnd = this->wavSound->data.Size() - this->curSmp;
+			if(samplesTillEnd == 0){
+				return true;
+			}
+			
 			if(this->wavSound->NumChannels() == chans){
 				if(this->wavSound->SamplingRate() == freq){
 					ASSERT(this->curSmp <= this->wavSound->data.Size())
-					size_t samplesToCopy = this->wavSound->data.Size() - this->curSmp;
-					if(samplesToCopy == 0){
-						return true;
-					}
 					
+					size_t samplesToCopy = samplesTillEnd;
 					ting::util::ClampTop(samplesToCopy, buf.Size());
 					
 					ASSERT(samplesToCopy <= buf.Size())
