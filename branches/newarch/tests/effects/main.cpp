@@ -91,6 +91,7 @@ public:
 };
 
 
+
 int main(int argc, char *argv[]){
 	TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
 	aumiks::Lib aumiksLibrary(44100, 2, 100);
