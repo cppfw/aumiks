@@ -90,6 +90,36 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 					}
 					return false;
 				}
+			}else{
+				if(this->wavSound->SamplingRate() == freq){
+					ASSERT(this->curSmp <= this->wavSound->data.Size())
+					
+					size_t samplesToCopy = samplesTillEnd;
+					ting::util::ClampTop(samplesToCopy, (buf.Size() / chans) * this->wavSound->NumChannels());
+					
+					ASSERT(samplesToCopy <= buf.Size())
+					
+					ting::s32 *dst = buf.Begin();
+					for(const TSampleType *src = &this->wavSound->data[this->curSmp]; src != &this->wavSound->data[this->curSmp] + samplesToCopy;){
+						ting::s32 smp = *src;
+						++src;
+						for(unsigned i = 1; i != this->wavSound->NumChannels(); ++i, ++src){
+							smp += *src;
+						}
+						
+						smp /= ting::s32(this->wavSound->NumChannels());
+						
+						for(unsigned i = 0; i != chans; ++i, ++dst){
+							*dst = smp;
+						}
+					}
+					this->curSmp += samplesToCopy;
+					
+					for(; dst != buf.End(); ++dst){
+						*dst = 0;
+					}
+					return false;
+				}
 			}
 			
 			//TODO:
