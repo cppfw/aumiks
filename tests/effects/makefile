@@ -1,6 +1,6 @@
 platform := linux
 
-binary_name := effects
+binary_name := tests
 
 ifeq ($(platform),win32)
 binary_name := $(binary_name).exe
