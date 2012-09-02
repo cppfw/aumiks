@@ -17,7 +17,7 @@ int main(int argc, char *argv[]){
 	ting::Ref<aumiks::Channel> ch1 = snd1->CreateChannel();
 	ch1->Play_ts();
 	
-	ting::Thread::Sleep(1000);
+	ting::mt::Thread::Sleep(1000);
 	
 	TRACE_ALWAYS(<< "Playing 2" << std::endl)
 	ting::Ref<aumiks::Channel> ch2 = snd2->CreateChannel();
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]){
 	
 	while(!ch1->IsStopped_ts() || !ch2->IsStopped_ts()){
 //		TRACE(<< "Loop" << std::endl)
-		ting::Thread::Sleep(50);
+		ting::mt::Thread::Sleep(50);
 	}
 	
 	return 0;

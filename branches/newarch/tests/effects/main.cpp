@@ -114,7 +114,7 @@ void Run(){
 	ting::u8 vol = 0xff;
 	for(unsigned i = 0; i != 100; ++i){
 //		TRACE(<< "Loop" << std::endl)
-		ting::Thread::Sleep(100);
+		ting::mt::Thread::Sleep(100);
 		
 		if(vol < step && d < 0){
 			d = 1;
@@ -173,7 +173,7 @@ void Run(){
 	ch->Play_ts();
 	
 	while(!ch->IsStopped_ts()){
-		ting::Thread::Sleep(333);
+		ting::mt::Thread::Sleep(333);
 	}
 }
 

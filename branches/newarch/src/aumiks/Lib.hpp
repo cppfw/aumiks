@@ -32,6 +32,7 @@ THE SOFTWARE. */
 #include <ting/debug.hpp>
 #include <ting/Singleton.hpp>
 #include <ting/atomic.hpp>
+#include <ting/Ptr.hpp>
 
 #include "MixChannel.hpp"
 
