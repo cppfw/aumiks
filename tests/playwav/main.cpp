@@ -15,7 +15,7 @@ void Play(const std::string& fileName){
 	
 	while(!ch->IsStopped_ts()){
 //		TRACE(<< "Loop" << std::endl)
-		ting::Thread::Sleep(333);
+		ting::mt::Thread::Sleep(333);
 	}
 }
 

@@ -63,7 +63,7 @@ void Play(){
 	ch->Play_ts();
 
 	while(!ch->IsStopped_ts()){
-		ting::Thread::Sleep(333);
+		ting::mt::Thread::Sleep(333);
 	}
 }
 

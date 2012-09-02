@@ -28,7 +28,7 @@ THE SOFTWARE. */
 
 #pragma once
 
-#include <ting/Thread.hpp>
+#include <ting/mt/MsgThread.hpp>
 #include <ting/Array.hpp>
 
 
@@ -39,7 +39,7 @@ THE SOFTWARE. */
 
 namespace{
 
-class WriteBasedBackend : public AudioBackend, public ting::MsgThread{
+class WriteBasedBackend : public AudioBackend, public ting::mt::MsgThread{
 	ting::Array<ting::u8> playBuf;
 protected:
 	WriteBasedBackend(
@@ -67,7 +67,7 @@ private:
 	void Run(){
 		while(!this->quitFlag){
 //			TRACE(<< "Backend loop" << std::endl)
-			while(ting::Ptr<ting::Message> m = this->queue.PeekMsg()){
+			while(ting::Ptr<ting::mt::Message> m = this->queue.PeekMsg()){
 				m->Handle();
 			}
 

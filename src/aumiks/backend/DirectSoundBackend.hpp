@@ -111,7 +111,7 @@ public:
 
 
 
-class DirectSoundBackend : public AudioBackend, public ting::MsgThread{
+class DirectSoundBackend : public AudioBackend, public ting::mt::MsgThread{
 	struct DirectSound{
 		LPDIRECTSOUND8 ds;//LP prefix means long pointer
 		
@@ -272,7 +272,7 @@ class DirectSoundBackend : public AudioBackend, public ting::MsgThread{
 			ws.Wait();
 			
 			if(this->queue.CanRead()){
-				while(ting::Ptr<ting::Message> m = this->queue.PeekMsg()){
+				while(ting::Ptr<ting::mt::Message> m = this->queue.PeekMsg()){
 					m->Handle();
 				}
 			}
