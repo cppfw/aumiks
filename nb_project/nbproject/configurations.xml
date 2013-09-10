@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="80">
+<configurationDescriptor version="84">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df name="jni" root="../android/jni">
       <df name="AssetFile">
@@ -35,6 +35,19 @@
             <in>File.cpp</in>
             <in>File.hpp</in>
           </df>
+          <df name="mt">
+            <in>Message.hpp</in>
+            <in>MsgThread.cpp</in>
+            <in>MsgThread.hpp</in>
+            <in>Mutex.cpp</in>
+            <in>Mutex.hpp</in>
+            <in>Queue.cpp</in>
+            <in>Queue.hpp</in>
+            <in>Semaphore.cpp</in>
+            <in>Semaphore.hpp</in>
+            <in>Thread.cpp</in>
+            <in>Thread.hpp</in>
+          </df>
           <df name="net">
             <in>Exc.hpp</in>
             <in>HostNameResolver.cpp</in>
@@ -61,8 +74,6 @@
           <in>Ref.hpp</in>
           <in>Signal.hpp</in>
           <in>Singleton.hpp</in>
-          <in>Thread.cpp</in>
-          <in>Thread.hpp</in>
           <in>WaitSet.cpp</in>
           <in>WaitSet.hpp</in>
           <in>atomic.hpp</in>
@@ -73,6 +84,7 @@
           <in>timer.cpp</in>
           <in>timer.hpp</in>
           <in>types.hpp</in>
+          <in>utf8.hpp</in>
           <in>util.hpp</in>
         </df>
       </df>
@@ -148,6 +160,8 @@
         <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>default</compilerSet>
       </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>..</buildCommandWorkingDir>
@@ -159,48 +173,48 @@
       <item path="../android/jni/aumiks/aumiks/MixChannel.hpp"
             ex="true"
             tool="3"
-            flavor="0">
+            flavor2="0">
       </item>
       <item path="../android/jni/aumiks/aumiks/backend/ALSABackend.hpp"
             ex="true"
             tool="3"
-            flavor="0">
+            flavor2="0">
       </item>
       <item path="../android/jni/aumiks/aumiks/backend/DirectSoundBackend.hpp"
             ex="true"
             tool="3"
-            flavor="0">
+            flavor2="0">
       </item>
       <item path="../android/jni/aumiks/aumiks/backend/OpenSLESBackend.hpp"
             ex="true"
             tool="3"
-            flavor="0">
+            flavor2="0">
       </item>
-      <item path="../android/jni/ting/ting/Signal.hpp" ex="true" tool="3" flavor="0">
+      <item path="../android/jni/ting/ting/Signal.hpp" ex="true" tool="3" flavor2="0">
       </item>
-      <item path="../android/jni/ting/ting/codegen.h" ex="true" tool="3" flavor="0">
+      <item path="../android/jni/ting/ting/codegen.h" ex="true" tool="3" flavor2="0">
       </item>
-      <item path="../src/aumiks/Sound.hpp" ex="true" tool="3" flavor="0">
+      <item path="../src/aumiks/Sound.hpp" ex="true" tool="3" flavor2="0">
       </item>
       <item path="../src/aumiks/backend/ALSABackend.hpp"
             ex="true"
             tool="3"
-            flavor="0">
+            flavor2="0">
       </item>
       <item path="../src/aumiks/backend/AudioBackend.hpp"
             ex="true"
             tool="3"
-            flavor="0">
+            flavor2="0">
       </item>
       <item path="../src/aumiks/backend/DirectSoundBackend.hpp"
             ex="true"
             tool="3"
-            flavor="0">
+            flavor2="0">
       </item>
       <item path="../src/aumiks/backend/OpenSLESBackend.hpp"
             ex="true"
             tool="3"
-            flavor="0">
+            flavor2="0">
       </item>
     </conf>
   </confs>
