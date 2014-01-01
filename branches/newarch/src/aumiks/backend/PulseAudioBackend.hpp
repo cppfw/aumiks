@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009-2012 Ivan Gagis
+Copyright (c) 2009-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@ public:
 			unsigned freq,
 			unsigned chans
 		) :
-			WriteBasedBackend(lib, callback, bufferSizeFrames * aumiks::BytesPerFrame(chans))
+			WriteBasedBackend(lib, callback, bufferSizeFrames * aumiks::BytesPerOutputFrame(chans))
 	{
 		TRACE(<< "opening device" << std::endl)
 
@@ -81,7 +81,7 @@ public:
 		ss.channels = chans;
 		ss.rate = freq;
 
-		unsigned bufferSizeInBytes = bufferSizeFrames * aumiks::BytesPerFrame(chans);
+		unsigned bufferSizeInBytes = bufferSizeFrames * aumiks::BytesPerOutputFrame(chans);
 		pa_buffer_attr ba;
 		ba.fragsize = bufferSizeInBytes;
 		ba.tlength = bufferSizeInBytes;

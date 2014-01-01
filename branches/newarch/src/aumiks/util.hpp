@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2012 Ivan Gagis
+Copyright (c) 2012-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ namespace aumiks{
  * @param chans - number of channels. 1 = mono, 2 = stereo, etc.
  * @return the size of the frame in bytes.
  */
-inline unsigned BytesPerFrame(unsigned chans){
+inline unsigned BytesPerOutputFrame(unsigned chans){
 	return 2 * chans; //we only support 16 bits per sample
 }
 
