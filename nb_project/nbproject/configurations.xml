@@ -1,26 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="84">
+<configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <df name="jni" root="../android/jni">
+    <df root="../android/jni" name="0">
       <df name="AssetFile">
         <in>AssetFile.cpp</in>
-        <in>AssetFile.hpp</in>
       </df>
       <df name="aumiks">
         <df name="aumiks">
-          <df name="backend">
-            <in>ALSABackend.hpp</in>
-            <in>DirectSoundBackend.hpp</in>
-            <in>OpenSLESBackend.hpp</in>
-            <in>PulseAudioBackend.hpp</in>
-            <in>WriteBasedBackend.hpp</in>
-          </df>
-          <in>Exc.hpp</in>
-          <in>MixChannel.hpp</in>
           <in>WavSound.cpp</in>
-          <in>WavSound.hpp</in>
           <in>aumiks.cpp</in>
-          <in>aumiks.hpp</in>
         </df>
       </df>
       <df name="test">
@@ -29,101 +17,48 @@
       <df name="ting">
         <df name="ting">
           <df name="fs">
-            <in>Exc.hpp</in>
             <in>FSFile.cpp</in>
-            <in>FSFile.hpp</in>
             <in>File.cpp</in>
-            <in>File.hpp</in>
           </df>
           <df name="mt">
-            <in>Message.hpp</in>
             <in>MsgThread.cpp</in>
-            <in>MsgThread.hpp</in>
             <in>Mutex.cpp</in>
-            <in>Mutex.hpp</in>
             <in>Queue.cpp</in>
-            <in>Queue.hpp</in>
             <in>Semaphore.cpp</in>
-            <in>Semaphore.hpp</in>
             <in>Thread.cpp</in>
-            <in>Thread.hpp</in>
           </df>
           <df name="net">
-            <in>Exc.hpp</in>
             <in>HostNameResolver.cpp</in>
-            <in>HostNameResolver.hpp</in>
             <in>IPAddress.cpp</in>
-            <in>IPAddress.hpp</in>
             <in>Lib.cpp</in>
-            <in>Lib.hpp</in>
             <in>Socket.cpp</in>
-            <in>Socket.hpp</in>
             <in>TCPServerSocket.cpp</in>
-            <in>TCPServerSocket.hpp</in>
             <in>TCPSocket.cpp</in>
-            <in>TCPSocket.hpp</in>
             <in>UDPSocket.cpp</in>
-            <in>UDPSocket.hpp</in>
           </df>
-          <in>Array.hpp</in>
-          <in>Buffer.hpp</in>
-          <in>Exc.hpp</in>
-          <in>PoolStored.hpp</in>
-          <in>Ptr.hpp</in>
           <in>Ref.cpp</in>
-          <in>Ref.hpp</in>
-          <in>Signal.hpp</in>
-          <in>Singleton.hpp</in>
           <in>WaitSet.cpp</in>
-          <in>WaitSet.hpp</in>
-          <in>atomic.hpp</in>
-          <in>codegen.h</in>
-          <in>config.hpp</in>
-          <in>debug.hpp</in>
-          <in>math.hpp</in>
           <in>timer.cpp</in>
-          <in>timer.hpp</in>
-          <in>types.hpp</in>
-          <in>utf8.hpp</in>
-          <in>util.hpp</in>
         </df>
       </df>
     </df>
-    <df name="src" root="../src">
+    <df root="../src" name="1">
       <df name="aumiks">
-        <df name="backend">
-          <in>ALSABackend.hpp</in>
-          <in>AudioBackend.hpp</in>
-          <in>DirectSoundBackend.hpp</in>
-          <in>OpenSLESBackend.hpp</in>
-          <in>PulseAudioBackend.hpp</in>
-          <in>WriteBasedBackend.hpp</in>
+        <df name="resampler">
+          <in>SlowdownResampler.cpp</in>
+          <in>SlowdownResampler.hpp</in>
+          <in>SpeedupResampler.cpp</in>
+          <in>SpeedupResampler.hpp</in>
         </df>
         <in>Channel.cpp</in>
-        <in>Channel.hpp</in>
         <in>Effect.cpp</in>
-        <in>Effect.hpp</in>
-        <in>Exc.hpp</in>
         <in>Lib.cpp</in>
-        <in>Lib.hpp</in>
         <in>MixChannel.cpp</in>
-        <in>MixChannel.hpp</in>
-        <in>Sound.hpp</in>
         <in>WavSound.cpp</in>
-        <in>WavSound.hpp</in>
         <in>util.cpp</in>
-        <in>util.hpp</in>
-      </df>
-      <df name="obj">
-        <df name="1">
-          <df name="2">
-            <df name="aumiks">
-            </df>
-          </df>
-        </df>
       </df>
     </df>
-    <df name="tests" root="../tests">
+    <df root="../tests" name="2">
       <df name="effects">
         <in>main.cpp</in>
       </df>
@@ -132,8 +67,6 @@
       </df>
       <df name="playwav">
         <in>main.cpp</in>
-      </df>
-      <df name="samples">
       </df>
       <df name="sinesynth">
         <in>main.cpp</in>
@@ -157,8 +90,9 @@
   <confs>
     <conf name="Default" type="0">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <codeAssistance>
       </codeAssistance>
@@ -167,55 +101,205 @@
           <buildCommandWorkingDir>..</buildCommandWorkingDir>
           <buildCommand>${MAKE} -f makefile</buildCommand>
           <cleanCommand>${MAKE} -f makefile clean</cleanCommand>
-          <executablePath></executablePath>
+          <executablePath>/home/ivan/prj/aumiks/tests/playwav/playwav</executablePath>
         </makeTool>
       </makefileType>
-      <item path="../android/jni/aumiks/aumiks/MixChannel.hpp"
-            ex="true"
+      <item path="../android/jni/AssetFile/AssetFile.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/aumiks/aumiks/WavSound.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/aumiks/aumiks/aumiks.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/test/main.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/Ref.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/WaitSet.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/fs/FSFile.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/fs/File.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/mt/MsgThread.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/mt/Mutex.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/mt/Queue.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/mt/Semaphore.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/mt/Thread.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/net/HostNameResolver.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/net/IPAddress.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/net/Lib.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/net/Socket.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/net/TCPServerSocket.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/net/TCPSocket.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/net/UDPSocket.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../android/jni/ting/ting/timer.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="../src/aumiks/Channel.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/aumiks/Effect.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/aumiks/Lib.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/aumiks/MixChannel.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/aumiks/resampler/SlowdownResampler.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="../src/aumiks/resampler/SlowdownResampler.hpp"
+            ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="../android/jni/aumiks/aumiks/backend/ALSABackend.hpp"
-            ex="true"
+      <item path="../src/aumiks/resampler/SpeedupResampler.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="../src/aumiks/resampler/SpeedupResampler.hpp"
+            ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="../android/jni/aumiks/aumiks/backend/DirectSoundBackend.hpp"
-            ex="true"
-            tool="3"
-            flavor2="0">
+      <item path="../src/aumiks/util.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="../android/jni/aumiks/aumiks/backend/OpenSLESBackend.hpp"
-            ex="true"
-            tool="3"
-            flavor2="0">
+      <item path="../tests/effects/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="../android/jni/ting/ting/Signal.hpp" ex="true" tool="3" flavor2="0">
+      <item path="../tests/playparallel/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="../android/jni/ting/ting/codegen.h" ex="true" tool="3" flavor2="0">
+      <item path="../tests/playwav/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="../src/aumiks/Sound.hpp" ex="true" tool="3" flavor2="0">
+      <item path="../tests/sinesynth/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="../src/aumiks/backend/ALSABackend.hpp"
-            ex="true"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../src/aumiks/backend/AudioBackend.hpp"
-            ex="true"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../src/aumiks/backend/DirectSoundBackend.hpp"
-            ex="true"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../src/aumiks/backend/OpenSLESBackend.hpp"
-            ex="true"
-            tool="3"
-            flavor2="0">
-      </item>
+      <folder path="1">
+        <ccTool>
+          <incDir>
+            <pElem>../src</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>__PIC__=2</Elem>
+            <Elem>__pic__=2</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="2">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
     </conf>
   </confs>
 </configurationDescriptor>

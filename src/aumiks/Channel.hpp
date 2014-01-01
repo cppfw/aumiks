@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2012 Ivan Gagis
+Copyright (c) 2012-2013 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ class MixChannel;
 
 /**
  * @brief Base class of a channel for playing the sound.
- * Usually, the effects are created by Sound class implementations using CreateChannel() method.
+ * Usually, channels are created by Sound class implementations using CreateChannel() method.
  */
 class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 	friend class aumiks::Lib;
@@ -94,7 +94,8 @@ public:
 	 * This is a request to stop playing the channel, the channel may stop not
 	 * immediately, depending on implementation of the particular Channel.
 	 * Eventually, channel normally moves to stopped state, but it may depend on
-	 * the implementation of a particular channel.
+	 * the implementation of a particular channel. For example, the sound may stop
+	 * by quickly fading out to avoid clicks and gaps.
 	 * Once stopped, the channel cannot be started again, at least trying to
 	 * will result in undefined behavior.
 	 * Instead, one needs to create a new channel.

@@ -187,7 +187,7 @@ ting::Ref<WavSound> WavSound::LoadWAV(ting::fs::File& fi){
 		}
 	}
 
-	fi.SeekForward(4);//Skip "Wav-file size minus 7". We are not intrested in this information
+	fi.SeekForward(4);//Skip "Wav-file size minus 7". We are not interested in this information
 
 	{
 		ting::StaticBuffer<ting::u8, 4> wave;
