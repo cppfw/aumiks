@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009-2013 Ivan Gagis
+Copyright (c) 2009-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -65,64 +65,92 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 		virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 			ASSERT(buf.Size() % chans == 0)
 			
-			size_t samplesTillEnd = this->wavSound->data.Size() - this->curSmp;
-			if(samplesTillEnd == 0){
+			ASSERT(this->wavSound->data.Size() % this->wavSound->NumChannels() == 0)
+			ASSERT(this->curSmp % this->wavSound->NumChannels() == 0)
+			
+			size_t framesInBuf = buf.Size() / chans;
+			
+			size_t framesToCopy = (this->wavSound->data.Size() - this->curSmp) / this->wavSound->NumChannels();
+			ting::util::ClampTop(framesToCopy, framesInBuf);
+
+			ASSERT(framesToCopy <= framesInBuf)
+			
+			if(framesToCopy == 0){
+				//TODO: check number of replays
 				return true;
 			}
+
+			ASSERT(this->curSmp <= this->wavSound->data.Size())			
+			const TSampleType *startSmp = &this->wavSound->data[this->curSmp];
+			
+			this->curSmp += framesToCopy * this->wavSound->NumChannels();
 			
 			if(this->wavSound->NumChannels() == chans){
 				if(this->wavSound->SamplingRate() == freq){
-					ASSERT(this->curSmp <= this->wavSound->data.Size())
-					
-					size_t samplesToCopy = samplesTillEnd;
-					ting::util::ClampTop(samplesToCopy, buf.Size());
-					
-					ASSERT(samplesToCopy <= buf.Size())
-					
 					ting::s32 *dst = buf.Begin();
-					for(const TSampleType *src = &this->wavSound->data[this->curSmp]; dst != buf.Begin() + samplesToCopy; ++dst, ++src){
+					for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * chans; ++dst, ++src){
 						*dst = ting::s32(*src);
 					}
-					this->curSmp += samplesToCopy;
+					
+					//fill the rest with zeroes
+					for(; dst != buf.End(); ++dst){
+						*dst = 0;
+					}
+					return false;
+				}else{
+					//TODO: resample
+					return true;
+				}
+			}else if(this->wavSound->NumChannels() < chans){
+				if(this->wavSound->SamplingRate() == freq){
+					ting::s32 *dst = buf.Begin();
+					for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * chans;){
+						unsigned c = 0;
+						ting::s32 avg = 0;
+						for(; c != this->wavSound->NumChannels(); ++c, ++dst, ++src){
+							*dst = ting::s32(*src);
+							avg += *dst;
+						}
+						for(; c != chans; ++c, ++dst){
+							*dst = avg;
+						}
+					}
 					
 					for(; dst != buf.End(); ++dst){
 						*dst = 0;
 					}
 					return false;
+				}else{
+					//TODO: resample
+					return true;
 				}
 			}else{
+				// this->wavSound->NumChannels() > chans
+				
+				//TODO:
 				if(this->wavSound->SamplingRate() == freq){
-					ASSERT(this->curSmp <= this->wavSound->data.Size())
-					
-					size_t samplesToCopy = samplesTillEnd;
-					ting::util::ClampTop(samplesToCopy, (buf.Size() / chans) * this->wavSound->NumChannels());
-					
-					ASSERT(samplesToCopy <= buf.Size())
-					
 					ting::s32 *dst = buf.Begin();
-					for(const TSampleType *src = &this->wavSound->data[this->curSmp]; src != &this->wavSound->data[this->curSmp] + samplesToCopy;){
-						ting::s32 smp = *src;
-						++src;
-						for(unsigned i = 1; i != this->wavSound->NumChannels(); ++i, ++src){
-							smp += *src;
+					for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * chans;){						
+						ting::s32 avg = 0;
+						for(unsigned c = chans; c != this->wavSound->NumChannels(); ++c){
+							avg += ting::s32(src[c]);
 						}
 						
-						smp /= ting::s32(this->wavSound->NumChannels());
-						
-						for(unsigned i = 0; i != chans; ++i, ++dst){
-							*dst = smp;
+						for(unsigned c = 0; c != chans; ++c, ++dst, ++src){
+							*dst = ting::s32(*src);//(ting::s32(*src) + avg) / ting::s32(this->wavSound->NumChannels() - chans + 1);
 						}
 					}
-					this->curSmp += samplesToCopy;
 					
 					for(; dst != buf.End(); ++dst){
 						*dst = 0;
 					}
 					return false;
+				}else{
+					//TODO: resample
+					return true;
 				}
 			}
-			
-			//TODO:
+
 			return true;
 		}
 	};//~class Channel
