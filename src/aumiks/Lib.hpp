@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2012 Ivan Gagis
+Copyright (c) 2012-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -84,10 +84,10 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 	
 	
 	
-	//sampling rate
+	//sampling rate [Hz]
 	unsigned freq;
 	
-	//channels (mono, stereo, quadro, 5.1, 7.1, etc.)
+	//channels (mono = 1, stereo = 2, quadro = 4, 5.1 = 6, 7.1 = 8, etc.)
 	unsigned chans;
 	
 	//size of the playing buffer in frames
