@@ -1,5 +1,152 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="84">
+<configurationDescriptor version="90">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="../android/jni" name="0">
+      <df name="AssetFile">
+        <in>AssetFile.cpp</in>
+        <in>AssetFile.hpp</in>
+      </df>
+      <df name="aumiks">
+        <df name="aumiks">
+          <df name="backend">
+            <in>ALSABackend.hpp</in>
+            <in>DirectSoundBackend.hpp</in>
+            <in>OpenSLESBackend.hpp</in>
+            <in>PulseAudioBackend.hpp</in>
+            <in>WriteBasedBackend.hpp</in>
+          </df>
+          <in>Exc.hpp</in>
+          <in>MixChannel.hpp</in>
+          <in>WavSound.cpp</in>
+          <in>WavSound.hpp</in>
+          <in>aumiks.cpp</in>
+          <in>aumiks.hpp</in>
+        </df>
+      </df>
+      <df name="test">
+        <in>main.cpp</in>
+      </df>
+      <df name="ting">
+        <df name="ting">
+          <df name="fs">
+            <in>Exc.hpp</in>
+            <in>FSFile.cpp</in>
+            <in>FSFile.hpp</in>
+            <in>File.cpp</in>
+            <in>File.hpp</in>
+          </df>
+          <df name="mt">
+            <in>Message.hpp</in>
+            <in>MsgThread.cpp</in>
+            <in>MsgThread.hpp</in>
+            <in>Mutex.cpp</in>
+            <in>Mutex.hpp</in>
+            <in>Queue.cpp</in>
+            <in>Queue.hpp</in>
+            <in>Semaphore.cpp</in>
+            <in>Semaphore.hpp</in>
+            <in>Thread.cpp</in>
+            <in>Thread.hpp</in>
+          </df>
+          <df name="net">
+            <in>Exc.hpp</in>
+            <in>HostNameResolver.cpp</in>
+            <in>HostNameResolver.hpp</in>
+            <in>IPAddress.cpp</in>
+            <in>IPAddress.hpp</in>
+            <in>Lib.cpp</in>
+            <in>Lib.hpp</in>
+            <in>Socket.cpp</in>
+            <in>Socket.hpp</in>
+            <in>TCPServerSocket.cpp</in>
+            <in>TCPServerSocket.hpp</in>
+            <in>TCPSocket.cpp</in>
+            <in>TCPSocket.hpp</in>
+            <in>UDPSocket.cpp</in>
+            <in>UDPSocket.hpp</in>
+          </df>
+          <in>Array.hpp</in>
+          <in>Buffer.hpp</in>
+          <in>Exc.hpp</in>
+          <in>PoolStored.hpp</in>
+          <in>Ptr.hpp</in>
+          <in>Ref.cpp</in>
+          <in>Ref.hpp</in>
+          <in>Signal.hpp</in>
+          <in>Singleton.hpp</in>
+          <in>WaitSet.cpp</in>
+          <in>WaitSet.hpp</in>
+          <in>atomic.hpp</in>
+          <in>codegen.h</in>
+          <in>config.hpp</in>
+          <in>debug.hpp</in>
+          <in>math.hpp</in>
+          <in>timer.cpp</in>
+          <in>timer.hpp</in>
+          <in>types.hpp</in>
+          <in>utf8.hpp</in>
+          <in>util.hpp</in>
+        </df>
+      </df>
+    </df>
+    <df root="../src" name="1">
+      <df name="aumiks">
+        <df name="backend">
+          <in>ALSABackend.hpp</in>
+          <in>AudioBackend.hpp</in>
+          <in>DirectSoundBackend.hpp</in>
+          <in>OpenSLESBackend.hpp</in>
+          <in>PulseAudioBackend.hpp</in>
+          <in>WriteBasedBackend.hpp</in>
+        </df>
+        <df name="resampler">
+          <in>SlowdownResampler.cpp</in>
+          <in>SlowdownResampler.hpp</in>
+          <in>SpeedupResampler.cpp</in>
+          <in>SpeedupResampler.hpp</in>
+        </df>
+        <in>Channel.cpp</in>
+        <in>Channel.hpp</in>
+        <in>Effect.cpp</in>
+        <in>Effect.hpp</in>
+        <in>Exc.hpp</in>
+        <in>Lib.cpp</in>
+        <in>Lib.hpp</in>
+        <in>MixChannel.cpp</in>
+        <in>MixChannel.hpp</in>
+        <in>SampleBufferFiller.hpp</in>
+        <in>Sound.hpp</in>
+        <in>WavSound.cpp</in>
+        <in>WavSound.hpp</in>
+        <in>util.cpp</in>
+        <in>util.hpp</in>
+      </df>
+      <df name="obj">
+        <df name="1">
+          <df name="2">
+            <df name="aumiks">
+            </df>
+          </df>
+        </df>
+      </df>
+    </df>
+    <df root="../tests" name="2">
+      <df name="effects">
+        <in>main.cpp</in>
+      </df>
+      <df name="playparallel">
+        <in>main.cpp</in>
+      </df>
+      <df name="playwav">
+        <in>main.cpp</in>
+      </df>
+      <df name="samples">
+      </df>
+      <df name="sinesynth">
+        <in>main.cpp</in>
+      </df>
+    </df>
+  </logicalFolder>
   <projectmakefile>../makefile</projectmakefile>
   <confs>
     <conf name="Default" type="0">
@@ -7,6 +154,18 @@
         <developmentServer>localhost</developmentServer>
         <platform>2</platform>
       </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
       <dbx_gdbdebugger version="1">
         <gdb_pathmaps>
         </gdb_pathmaps>
