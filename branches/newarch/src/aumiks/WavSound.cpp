@@ -65,12 +65,12 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 		virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
 			ASSERT(buf.Size() % chans == 0)
 			
-			ASSERT(this->wavSound->data.Size() % this->wavSound->NumChannels() == 0)
-			ASSERT(this->curSmp % this->wavSound->NumChannels() == 0)
+			ASSERT(this->wavSound->data.Size() % channels == 0)
+			ASSERT(this->curSmp % channels == 0)
 			
 			size_t framesInBuf = buf.Size() / chans;
 			
-			size_t framesToCopy = (this->wavSound->data.Size() - this->curSmp) / this->wavSound->NumChannels();
+			size_t framesToCopy = (this->wavSound->data.Size() - this->curSmp) / channels;
 			ting::util::ClampTop(framesToCopy, framesInBuf);
 
 			ASSERT(framesToCopy <= framesInBuf)
@@ -83,10 +83,10 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 			ASSERT(this->curSmp <= this->wavSound->data.Size())			
 			const TSampleType *startSmp = &this->wavSound->data[this->curSmp];
 			
-			this->curSmp += framesToCopy * this->wavSound->NumChannels();
+			this->curSmp += framesToCopy * channels;
 			
-			if(this->wavSound->NumChannels() == chans){
-				if(this->wavSound->SamplingRate() == freq){
+			if(channels == chans){
+				if(frequency == freq){
 					ting::s32 *dst = buf.Begin();
 					for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * chans; ++dst, ++src){
 						*dst = ting::s32(*src);
@@ -101,13 +101,13 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 					//TODO: resample
 					return true;
 				}
-			}else if(this->wavSound->NumChannels() < chans){
-				if(this->wavSound->SamplingRate() == freq){
+			}else if(channels < chans){
+				if(frequency == freq){
 					ting::s32 *dst = buf.Begin();
 					for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * chans;){
 						unsigned c = 0;
 						ting::s32 avg = 0;
-						for(; c != this->wavSound->NumChannels(); ++c, ++dst, ++src){
+						for(; c != channels; ++c, ++dst, ++src){
 							*dst = ting::s32(*src);
 							avg += *dst;
 						}
@@ -125,7 +125,7 @@ template <class TSampleType, unsigned channels, unsigned frequency> class WavSou
 					return true;
 				}
 			}else{
-				// this->wavSound->NumChannels() > chans
+				// channels > chans
 				
 				//TODO:
 				if(this->wavSound->SamplingRate() == freq){
@@ -303,7 +303,7 @@ ting::Ref<WavSound> WavSound::LoadWAV(ting::fs::File& fi){
 //		//convert data to signed format
 //		for(s8* ptr=r->buf.Buf(); ptr<(r->buf.Buf()+r->buf.SizeOfArray()); ++ptr)
 //			*ptr=s8(int(*ptr)-0x80);
-		//TODO: support it by converting to 16bit
+		//TODO: support it
 		throw Exc("WavSound::LoadWAV(): unsupported bit depth (8 bit) wav file (TODO:)");
 	}else if(bitDepth == 16){
 		//set the format
