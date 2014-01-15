@@ -99,6 +99,12 @@
           <in>PulseAudioBackend.hpp</in>
           <in>WriteBasedBackend.hpp</in>
         </df>
+        <df name="rechanneler">
+          <in>MonoToStereo.cpp</in>
+          <in>MonoToStereo.hpp</in>
+          <in>StereoToMono.cpp</in>
+          <in>StereoToMono.hpp</in>
+        </df>
         <df name="resampler">
           <in>SlowdownResampler.cpp</in>
           <in>SlowdownResampler.hpp</in>
