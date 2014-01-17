@@ -33,6 +33,24 @@ namespace aumiks{
 
 class AudioFormat {
 public:
+	struct Channels{
+		enum Enum{
+			MONO,
+			STEREO,
+			QUADRO,
+			FIVE_DOT_ONE,
+			SEVEN_DOT_ONE
+		};
+	};
+	
+	struct Frequency{
+		enum Enum{
+			//TODO:
+		};
+	};
+	
+	//TODO:
+	
 	AudioFormat();
 private:
 
