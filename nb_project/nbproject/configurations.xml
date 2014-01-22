@@ -91,6 +91,11 @@
     </df>
     <df root="../src" name="1">
       <df name="aumiks">
+        <df name="audout">
+          <in>Player.cpp</in>
+          <in>Player.hpp</in>
+          <in>PlayerListener.hpp</in>
+        </df>
         <df name="backend">
           <in>ALSABackend.hpp</in>
           <in>AudioBackend.hpp</in>
@@ -111,8 +116,6 @@
           <in>SpeedupResampler.cpp</in>
           <in>SpeedupResampler.hpp</in>
         </df>
-        <in>AudioFormat.cpp</in>
-        <in>AudioFormat.hpp</in>
         <in>Channel.cpp</in>
         <in>Channel.hpp</in>
         <in>Effect.cpp</in>
@@ -505,10 +508,6 @@
       </item>
       <item path="../android/jni/ting/ting/util.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="../src/aumiks/AudioFormat.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="../src/aumiks/AudioFormat.hpp" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="../src/aumiks/Channel.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/aumiks/Channel.hpp" ex="false" tool="3" flavor2="0">
@@ -532,6 +531,15 @@
       <item path="../src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/aumiks/WavSound.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/aumiks/audout/Player.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/aumiks/audout/Player.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/aumiks/audout/PlayerListener.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="../src/aumiks/backend/ALSABackend.hpp"
             ex="false"

@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-// Home page: http://aumiks.googlecode.com
+// Home page: http://audout.googlecode.com
 
 /**
  * @author Ivan Gagis <igagis@gmail.com>
@@ -33,7 +33,6 @@ THE SOFTWARE. */
 #include <pulse/simple.h>
 #include <pulse/error.h>
 
-#include "../util.hpp"
 #include "WriteBasedBackend.hpp"
 
 
@@ -64,24 +63,28 @@ class PulseAudioBackend : public WriteBasedBackend{
 		//TODO:
 	}
 	
+	//override
+	virtual void Start(){
+		this->StartThread();
+	}
+	
 public:
 	PulseAudioBackend(
-			aumiks::Lib& lib,
-			void(aumiks::Lib::*callback)(ting::Buffer<ting::u8>&),
-			unsigned bufferSizeFrames,
-			unsigned freq,
-			unsigned chans
+			audout::AudioFormat outputFormat,
+			ting::u32 bufferSizeFrames,
+			audout::PlayerListener* listener
+			
 		) :
-			WriteBasedBackend(lib, callback, bufferSizeFrames * aumiks::BytesPerOutputFrame(chans))
+			WriteBasedBackend(listener, bufferSizeFrames * outputFormat.frame.NumChannels() * 2)//2 bytes per sample, i.e. 16 bit
 	{
 		TRACE(<< "opening device" << std::endl)
 
 		pa_sample_spec ss;
 		ss.format = PA_SAMPLE_S16NE;//Native endian
-		ss.channels = chans;
-		ss.rate = freq;
+		ss.channels = outputFormat.frame.NumChannels();
+		ss.rate = outputFormat.samplingRate.Frequency();
 
-		unsigned bufferSizeInBytes = bufferSizeFrames * aumiks::BytesPerOutputFrame(chans);
+		unsigned bufferSizeInBytes = bufferSizeFrames * aumiks::BytesPerOutputFrame(outputFormat.frame.NumChannels());
 		pa_buffer_attr ba;
 		ba.fragsize = bufferSizeInBytes;
 		ba.tlength = bufferSizeInBytes;
@@ -96,10 +99,10 @@ public:
 
 		this->handle = pa_simple_new(
 				0, // Use the default server.
-				"aumiks", // Our application's name.
+				"audout", // Our application's name.
 				PA_STREAM_PLAYBACK,
 				0, // Use the default device.
-				"Music", // Description of our stream.
+				"sound stream", // Description of our stream.
 				&ss, // our sample format.
 				&cm, // channel map
 				&ba, // buffering attributes.
@@ -109,13 +112,9 @@ public:
 		if(!this->handle){
 			TRACE(<< "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl)
 			//TODO: more informative error message
-			throw aumiks::Exc("error opening PulseAudio connection");
+			throw ting::Exc("error opening PulseAudio connection");
 		}
-		
-		this->Start();//start thread
 	}
-
-	
 	
 	virtual ~PulseAudioBackend()throw(){
 		this->StopThread();

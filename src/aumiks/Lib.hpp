@@ -35,6 +35,7 @@ THE SOFTWARE. */
 #include <ting/Ptr.hpp>
 
 #include "MixChannel.hpp"
+#include "AudioFormat.hpp"
 
 
 
@@ -84,11 +85,7 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 	
 	
 	
-	//sampling rate [Hz]
-	unsigned freq;
-	
-	//channels (mono = 1, stereo = 2, quadro = 4, 5.1 = 6, 7.1 = 8, etc.)
-	unsigned chans;
+	AudioFormat outputFormat;
 	
 	//size of the playing buffer in frames
 	unsigned bufSizeInFrames;
@@ -120,6 +117,7 @@ public:
 	
 	
 	
+	//TODO: re-doxygen
 	/**
 	 * @brief Create sound library singleton instance.
 	 * Creates singleton instance of sound library object and
@@ -129,7 +127,7 @@ public:
 	 * @param freq - sampling rate in Hertz.
 	 * @param chans - number of channels. 1 = mono, 2 = stereo, etc.
 	 */
-	Lib(unsigned freq, unsigned chans, ting::u16 bufferSizeMillis = 100);
+	Lib(AudioFormat outputFormat, ting::u16 bufferSizeMillis = 100);
 	
 	
 	

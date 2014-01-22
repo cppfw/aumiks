@@ -37,48 +37,17 @@ ting::IntrusiveSingleton<Lib>::T_Instance Lib::instance;
 
 
 
-#include "backend/AudioBackend.hpp"
-
-#if M_OS == M_OS_WIN32 || M_OS == M_OS_WIN64
-#	include "backend/DirectSoundBackend.hpp"
-#elif M_OS == M_OS_LINUX
-#	if defined(__ANDROID__)
-#		include "backend/OpenSLESBackend.hpp"
-#	else
-#		include "backend/PulseAudioBackend.hpp"
-//#		include "backend/ALSABackend.hpp"
-#	endif
-#else
-#	error "Unknown OS"
-#endif
-
-
-
-Lib::Lib(unsigned freq, unsigned chans, ting::u16 bufferSizeMillis) :
+Lib::Lib(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis) :
 		addList(&actionsList1),
 		handleList(&actionsList2),
-		freq(freq),
-		chans(chans),
-		bufSizeInFrames(freq * bufferSizeMillis / 1000),
+		outputFormat(outputFormat),
+		bufSizeInFrames(outputFormat.samplingRate.Frequency() * bufferSizeMillis / 1000),
 		masterChannel(aumiks::MixChannel::New(true)),
-		smpBuf(bufSizeInFrames * chans)
+		smpBuf(bufSizeInFrames * outputFormat.frame.NumChannels())
 {
 	//backend must be initialized after all the essential parts of aumiks are initialized,
 	//because after the backend object is created, it starts calling the FillPlayBuf() method periodically.
-	this->backend = reinterpret_cast<void*>(static_cast<AudioBackend*>(
-#if M_OS == M_OS_WIN32 || M_OS == M_OS_WIN64
-			new DirectSoundBackend(this->bufSizeInFrames, freq, chans)
-#elif M_OS == M_OS_LINUX
-#	if defined(__ANDROID__)
-			new OpenSLESBackend(this->bufSizeInFrames, freq, chans)
-#	else
-			new PulseAudioBackend(*this, &aumiks::Lib::FillPlayBuf, this->bufSizeInFrames, freq, chans)
-//			new ALSABackend(this->bufSizeInFrames, freq, chans)
-#	endif
-#else
-#	error "undefined OS"
-#endif
-		));
+	this->backend->Start();
 }
 
 
@@ -107,7 +76,7 @@ void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
 	}
 	
 	//mix channels to smpBuf
-	this->masterChannel->FillSmpBufAndApplyEffects(this->smpBuf, this->freq, this->chans);
+	this->masterChannel->FillSmpBufAndApplyEffects(this->smpBuf, this->outputFormat.samplingRate.Frequency(), this->outputFormat.frame.NumChannels());
 
 //	TRACE(<< "mixed, copying to playbuf..." << std::endl)
 //	TRACE(<< "this->smpBuf = " << this->smpBuf << std::endl)
