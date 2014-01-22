@@ -33,30 +33,37 @@ namespace aumiks{
 
 class AudioFormat {
 public:
-	struct Channels{
-		enum Enum{
+	struct Frame{
+		enum Type{
 			MONO = 1,
 			STEREO = 2,
 			QUADRO = 4,
 			FIVE_DOT_ONE = 6,
 			SEVEN_DOT_ONE = 8
-		};
-	};
+		} type;
+		
+		unsigned NumChannels()throw(){
+			return unsigned(this->type);
+		}
+	} frame;
 	
-	struct Frequency{
-		enum Enum{
+	struct SamplingRate{
+		enum Type{
 			HZ_11025 = 11025,
 			HZ_22050 = 22050,
 			HZ_44100 = 44100,
 			HZ_48000 = 48000
-		};
-	};
+		} type;
+		
+		inline ting::u32 Frequency()throw(){
+			return ting::u32(this->type);
+		}
+	} samplingRate;
 	
-	//TODO:
-	
-	AudioFormat();
 private:
 
 };
+
+
 
 }//~namespace
