@@ -28,6 +28,8 @@ THE SOFTWARE. */
 
 #pragma once
 
+#include <ting/types.hpp>
+
 namespace aumiks{
 
 
