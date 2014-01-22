@@ -35,7 +35,9 @@ THE SOFTWARE. */
 #include <ting/Ptr.hpp>
 
 #include "MixChannel.hpp"
-#include "AudioFormat.hpp"
+#include "audout/AudioFormat.hpp"
+#include "audout/PlayerListener.hpp"
+#include "audout/Player.hpp"
 
 
 
@@ -59,7 +61,7 @@ namespace aumiks{
  * It will perform necessary sound output initializations and open sound output device.
  * Destroying the object will close the sound output device and clean all the resources.
  */
-class Lib : public ting::IntrusiveSingleton<Lib>{
+class Lib : public ting::IntrusiveSingleton<Lib>, private audout::PlayerListener{
 	friend class ting::IntrusiveSingleton<Lib>;
 	static ting::IntrusiveSingleton<Lib>::T_Instance instance;
 
@@ -83,22 +85,13 @@ class Lib : public ting::IntrusiveSingleton<Lib>{
 	T_ActionsList actionsList1, actionsList2;
 	T_ActionsList *addList, *handleList;
 	
-	
-	
-	AudioFormat outputFormat;
-	
-	//size of the playing buffer in frames
-	unsigned bufSizeInFrames;
-	
-	inline unsigned BufSizeInSamples()const throw(){
-		return this->bufSizeInFrames * this->chans;
-	}
+	audout::AudioFormat outputFormat;
 
 	ting::Ref<aumiks::MixChannel> masterChannel;
 	
 	ting::Array<ting::s32> smpBuf;
 	
-	void *backend;
+	ting::Ptr<audout::Player> player;
 
 public:
 	
@@ -127,7 +120,7 @@ public:
 	 * @param freq - sampling rate in Hertz.
 	 * @param chans - number of channels. 1 = mono, 2 = stereo, etc.
 	 */
-	Lib(AudioFormat outputFormat, ting::u16 bufferSizeMillis = 100);
+	Lib(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis = 100);
 	
 	
 	
@@ -219,6 +212,7 @@ private:
 	void CopySmpBufToPlayBuf(ting::Buffer<ting::u8>& playBuf);
 	
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
+	//override
 	void FillPlayBuf(ting::Buffer<ting::u8>& playBuf);
 	
 	

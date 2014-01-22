@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-// Home page: http://aumiks.googlecode.com
+// Home page: http://audout.googlecode.com
 
 /**
  * @author Ivan Gagis <igagis@gmail.com>
@@ -48,7 +48,7 @@ private:
 protected:
 	Player(PlayerListener* listener);
 	
-	inline const PlayerListener* Listener()throw(){
+	inline PlayerListener* Listener()throw(){
 		return this->listener;
 	}
 public:

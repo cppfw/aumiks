@@ -41,19 +41,19 @@ Lib::Lib(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis) :
 		addList(&actionsList1),
 		handleList(&actionsList2),
 		outputFormat(outputFormat),
-		bufSizeInFrames(outputFormat.samplingRate.Frequency() * bufferSizeMillis / 1000),
 		masterChannel(aumiks::MixChannel::New(true)),
-		smpBuf(bufSizeInFrames * outputFormat.frame.NumChannels())
+		smpBuf((outputFormat.samplingRate.Frequency() * bufferSizeMillis / 1000) * outputFormat.frame.NumChannels())
 {
 	//backend must be initialized after all the essential parts of aumiks are initialized,
 	//because after the backend object is created, it starts calling the FillPlayBuf() method periodically.
-	this->backend->Start();
+	this->player = audout::Player::CreatePlayer(outputFormat, smpBuf.Size() / outputFormat.frame.NumChannels(), this);
+	this->player->Start();
 }
 
 
 
 Lib::~Lib()throw(){
-	delete reinterpret_cast<AudioBackend*>(this->backend);
+	
 }
 
 
