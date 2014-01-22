@@ -32,15 +32,16 @@ THE SOFTWARE. */
 
 #include <SLES/OpenSLES.h>
 
-#if defined(__ANDROID__)
+#if M_OS_NAME == M_OS_NAME_ANDROID
 #	include <SLES/OpenSLES_Android.h>
 #endif
 
+#include "../Player.hpp"
 
 
 namespace{
 
-class OpenSLESBackend : public AudioBackend{
+class OpenSLESBackend : public audout::Player{
 	
 	struct Engine{
 		SLObjectItf object; //object
@@ -49,19 +50,19 @@ class OpenSLESBackend : public AudioBackend{
 		Engine(){
 			//create engine object
 			if(slCreateEngine(&this->object, 0, NULL, 0, NULL, NULL) != SL_RESULT_SUCCESS){
-				throw aumiks::Exc("OpenSLES: Creating engine object failed");
+				throw ting::Exc("OpenSLES: Creating engine object failed");
 			}
 			
 			//realize the engine
 			if((*this->object)->Realize(this->object, SL_BOOLEAN_FALSE) != SL_RESULT_SUCCESS){
 				this->Destroy();
-				throw aumiks::Exc("OpenSLES: Realizing engine object failed");
+				throw ting::Exc("OpenSLES: Realizing engine object failed");
 			}
 			
 			//get the engine interface, which is needed in order to create other objects
 			if((*this->object)->GetInterface(this->object, SL_IID_ENGINE, &this->engine) != SL_RESULT_SUCCESS){
 				this->Destroy();
-				throw aumiks::Exc("OpenSLES: Obtaining Engine interface failed");
+				throw ting::Exc("OpenSLES: Obtaining Engine interface failed");
 			}
 		}
 		
@@ -85,13 +86,13 @@ class OpenSLESBackend : public AudioBackend{
 		
 		OutputMix(Engine& engine){
 			if((*engine.engine)->CreateOutputMix(engine.engine, &this->object, 0, NULL, NULL) != SL_RESULT_SUCCESS){
-				throw aumiks::Exc("OpenSLES: Creating output mix object failed");
+				throw ting::Exc("OpenSLES: Creating output mix object failed");
 			}
 			
 			// realize the output mix
 			if((*this->object)->Realize(this->object, SL_BOOLEAN_FALSE) != SL_RESULT_SUCCESS){
 				this->Destroy();
-				throw aumiks::Exc("OpenSLES: Realizing output mix object failed");
+				throw ting::Exc("OpenSLES: Realizing output mix object failed");
 			}
 		}
 		
@@ -115,7 +116,7 @@ class OpenSLESBackend : public AudioBackend{
 		
 		SLObjectItf object;
 		SLPlayItf play;
-#if defined(__ANDROID__)
+#if M_OS_NAME == M_OS_NAME_ANDROID
 		SLAndroidSimpleBufferQueueItf
 #else
 		SLBufferQueueItf
@@ -127,7 +128,7 @@ class OpenSLESBackend : public AudioBackend{
 	
 		//this callback handler is called every time a buffer finishes playing
 		static void Callback(
-#if defined(__ANDROID__)
+#if M_OS_NAME == M_OS_NAME_ANDROID
 				SLAndroidSimpleBufferQueueItf queue,
 				void *context
 #else
@@ -145,7 +146,7 @@ class OpenSLESBackend : public AudioBackend{
 			ASSERT(context)
 			Player* player = static_cast<Player*>(context);
 			
-#if defined(__ANDROID__)
+#if M_OS_NAME == M_OS_NAME_ANDROID
 #else
 			ASSERT(buffer == player->bufs[0].Begin())
 			ASSERT(bufferSize == player->bufs[0].Size())
@@ -155,7 +156,7 @@ class OpenSLESBackend : public AudioBackend{
 			ASSERT(player->bufs.Size() == 2)
 			std::swap(player->bufs[0], player->bufs[1]); //swap buffers, the 0th one is the buffer which is currently playing
 			
-#if defined(__ANDROID__)
+#if M_OS_NAME == M_OS_NAME_ANDROID
 			SLresult res = (*queue)->Enqueue(queue, player->bufs[0].Begin(), player->bufs[0].Size());
 #else
 			SLresult res = (*queue)->Enqueue(queue, player->bufs[0].Begin(), player->bufs[0].Size(), SL_BOOLEAN_FALSE);
@@ -184,7 +185,7 @@ class OpenSLESBackend : public AudioBackend{
 			
 			//========================
 			// configure audio source
-#if defined(__ANDROID__)
+#if M_OS_NAME == M_OS_NAME_ANDROID
 			SLDataLocator_AndroidSimpleBufferQueue bufferQueueStruct = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2}; //2 buffers in queue
 #else
 			SLDataLocator_BufferQueue bufferQueueStruct = {SL_DATALOCATOR_BUFFERQUEUE, 2}; //2 buffers in queue
@@ -235,25 +236,25 @@ class OpenSLESBackend : public AudioBackend{
 					req
 				) != SL_RESULT_SUCCESS)
 			{
-				throw aumiks::Exc("OpenSLES: Creating player object failed");
+				throw ting::Exc("OpenSLES: Creating player object failed");
 			}
 			
 			//realize the player
 			if((*this->object)->Realize(this->object, SL_BOOLEAN_FALSE) != SL_RESULT_SUCCESS){
 				this->Destroy();
-				throw aumiks::Exc("OpenSLES: Realizing player object failed");
+				throw ting::Exc("OpenSLES: Realizing player object failed");
 			}
 
 			//get the play interface
 			if((*this->object)->GetInterface(this->object, SL_IID_PLAY, &this->play) != SL_RESULT_SUCCESS){
 				this->Destroy();
-				throw aumiks::Exc("OpenSLES: Obtaining Play interface failed");
+				throw ting::Exc("OpenSLES: Obtaining Play interface failed");
 			}
 
 			//get the buffer queue interface
 			if((*this->object)->GetInterface(this->object, SL_IID_BUFFERQUEUE, &this->bufferQueue) != SL_RESULT_SUCCESS){
 				this->Destroy();
-				throw aumiks::Exc("OpenSLES: Obtaining Play interface failed");
+				throw ting::Exc("OpenSLES: Obtaining Play interface failed");
 			}
 
 			//register callback on the buffer queue
@@ -264,7 +265,7 @@ class OpenSLESBackend : public AudioBackend{
 				) != SL_RESULT_SUCCESS)
 			{
 				this->Destroy();
-				throw aumiks::Exc("OpenSLES: Registering callback on the buffer queue failed");
+				throw ting::Exc("OpenSLES: Registering callback on the buffer queue failed");
 			}
 		}
 		
@@ -301,17 +302,17 @@ public:
 //		TRACE(<< "OpenSLESBackend::OpenSLESBackend(): Starting player" << std::endl)
 		// Set player to playing state
 		if((*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING) != SL_RESULT_SUCCESS){
-			throw aumiks::Exc("OpenSLES: Setting player state to PLAYING failed");
+			throw ting::Exc("OpenSLES: Setting player state to PLAYING failed");
 		}
 		
 		//Enqueue the first buffer for playing, otherwise it will not start playing
-#if defined(__ANDROID__)
+#if M_OS_NAME == M_OS_NAME_ANDROID
 		SLresult res = (*this->player.bufferQueue)->Enqueue(this->player.bufferQueue, this->player.bufs[0].Begin(), this->player.bufs[0].Size());
 #else
 		SLresult res = (*this->player.bufferQueue)->Enqueue(this->player.bufferQueue, this->player.bufs[0].Begin(), this->player.bufs[0].Size(), SL_BOOLEAN_FALSE);
 #endif
 		if(res != SL_RESULT_SUCCESS){
-			throw aumiks::Exc("OpenSLES: unable to enqueue");
+			throw ting::Exc("OpenSLES: unable to enqueue");
 		}
 	}
 

@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
 /*
- * aumiks 0.1
+ * audout 0.1
  *
  * File:   ALSA.hpp
  * Author: ivan

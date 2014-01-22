@@ -91,6 +91,21 @@
     </df>
     <df root="../src" name="1">
       <df name="aumiks">
+        <df name="audout">
+          <df name="backend">
+            <in>ALSABackend.hpp</in>
+            <in>DirectSoundBackend.hpp</in>
+            <in>OpenSLESBackend.hpp</in>
+            <in>PulseAudioBackend.hpp</in>
+            <in>WriteBasedBackend.hpp</in>
+          </df>
+          <in>AudioBackend.hpp</in>
+          <in>AudioFormat.cpp</in>
+          <in>AudioFormat.hpp</in>
+          <in>Player.cpp</in>
+          <in>Player.hpp</in>
+          <in>PlayerListener.hpp</in>
+        </df>
         <df name="backend">
           <in>ALSABackend.hpp</in>
           <in>AudioBackend.hpp</in>
@@ -111,8 +126,6 @@
           <in>SpeedupResampler.cpp</in>
           <in>SpeedupResampler.hpp</in>
         </df>
-        <in>AudioFormat.cpp</in>
-        <in>AudioFormat.hpp</in>
         <in>Channel.cpp</in>
         <in>Channel.hpp</in>
         <in>Effect.cpp</in>
@@ -164,13 +177,13 @@
       </toolsSet>
       <compile>
         <compiledirpicklist>
-          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
           <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
         </compiledirpicklist>
         <compiledir>${AUTO_FOLDER}</compiledir>
         <compilecommandpicklist>
-          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
           <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
         </compilecommandpicklist>
         <compilecommand>${AUTO_COMPILE}</compilecommand>
       </compile>

@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2012 Ivan Gagis
+Copyright (c) 2011-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,42 +22,61 @@ THE SOFTWARE. */
 
 // Home page: http://aumiks.googlecode.com
 
+/**
+ * @author Ivan Gagis <igagis@gmail.com>
+ */
 
 #pragma once
 
+#include <ting/mt/MsgThread.hpp>
+#include <ting/Array.hpp>
 
-#include <ting/Buffer.hpp>
-
-
-#include "../Lib.hpp"
-
+#include "../Player.hpp"
+#include "../PlayerListener.hpp"
 
 
 namespace{
 
-//base class for audio backends
-class AudioBackend{
-	aumiks::Lib& lib;
-	void(aumiks::Lib::*callback)(ting::Buffer<ting::u8>&);
-	
+class WriteBasedBackend : public audout::Player, private ting::mt::MsgThread{
+	ting::Array<ting::u8> playBuf;
 protected:
-	inline void FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
-		ASSERT(aumiks::Lib::IsCreated())
-		(this->lib.*(this->callback))(playBuf);
-	}
-
-	inline AudioBackend(
-			aumiks::Lib& lib,
-			void(aumiks::Lib::*callback)(ting::Buffer<ting::u8>&)
+	WriteBasedBackend(
+			audout::PlayerListener* listener,
+			size_t playBufSizeInBytes
 		) :
-			lib(lib),
-			callback(callback)
+			audout::Player(listener),
+			playBuf(playBufSizeInBytes)
 	{}
 	
-public:
-	virtual ~AudioBackend()throw(){}
+	inline void StopThread()throw(){
+		this->PushPreallocatedQuitMessage();
+		this->Join();
+	}
 	
-	virtual void SetPaused(bool pause) = 0;
+	inline void StartThread(){
+		this->Thread::Start();
+	}
+	
+	virtual void Write(const ting::Buffer<ting::u8>& buf) = 0;
+	
+public:
+	virtual ~WriteBasedBackend()throw(){}
+	
+private:
+	
+	//override
+	void Run(){
+		while(!this->quitFlag){
+//			TRACE(<< "Backend loop" << std::endl)
+			while(ting::Ptr<ting::mt::Message> m = this->queue.PeekMsg()){
+				m->Handle();
+			}
+
+			this->Listener()->FillPlayBuf(this->playBuf);
+			
+			this->Write(this->playBuf);
+		}//~while
+	}
 };
 
 }//~namespace

@@ -30,7 +30,7 @@ THE SOFTWARE. */
 #include <ting/config.hpp>
 
 
-#if M_OS != M_OS_WIN32 && M_OS != M_OS_WIN64
+#if M_OS != M_OS_WINDOWS
 #	error "compiling in non-Windows environment"
 #endif
 
@@ -43,8 +43,7 @@ THE SOFTWARE. */
 #include <ting/WaitSet.hpp>
 #include <ting/Thread.hpp>
 
-#include "AudioBackend.hpp"
-#include "../Exc.hpp"
+#include "../Player.hpp"
 
 
 
@@ -111,7 +110,7 @@ public:
 
 
 
-class DirectSoundBackend : public AudioBackend, public ting::mt::MsgThread{
+class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
 	struct DirectSound{
 		LPDIRECTSOUND8 ds;//LP prefix means long pointer
 		

@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2011-2012 Ivan Gagis
+Copyright (c) 2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,60 +28,44 @@ THE SOFTWARE. */
 
 #pragma once
 
-#include <ting/mt/MsgThread.hpp>
-#include <ting/Array.hpp>
+#include <ting/types.hpp>
+
+namespace audout{
 
 
-#include "AudioBackend.hpp"
-#include "../Exc.hpp"
-
-
-
-namespace{
-
-class WriteBasedBackend : public AudioBackend, public ting::mt::MsgThread{
-	ting::Array<ting::u8> playBuf;
-protected:
-	WriteBasedBackend(
-			aumiks::Lib& lib,
-			void(aumiks::Lib::*callback)(ting::Buffer<ting::u8>&),
-			size_t playBufSizeInBytes
-		) :
-			AudioBackend(lib, callback),
-			playBuf(playBufSizeInBytes)
-	{}
-	
-	inline void StopThread()throw(){
-		this->PushPreallocatedQuitMessage();
-		this->Join();
-	}
-	
-	virtual void Write(const ting::Buffer<ting::u8>& buf) = 0;
-	
+class AudioFormat {
 public:
-	virtual ~WriteBasedBackend()throw(){}
+	struct Frame{
+		enum Type{
+			MONO = 1,
+			STEREO = 2,
+			QUADRO = 4,
+			FIVE_DOT_ONE = 6,
+			SEVEN_DOT_ONE = 8
+		} type;
+		
+		unsigned NumChannels()throw(){
+			return unsigned(this->type);
+		}
+	} frame;
+	
+	struct SamplingRate{
+		enum Type{
+			HZ_11025 = 11025,
+			HZ_22050 = 22050,
+			HZ_44100 = 44100,
+			HZ_48000 = 48000
+		} type;
+		
+		inline ting::u32 Frequency()throw(){
+			return ting::u32(this->type);
+		}
+	} samplingRate;
 	
 private:
-	
-	//override
-	void Run(){
-		while(!this->quitFlag){
-//			TRACE(<< "Backend loop" << std::endl)
-			while(ting::Ptr<ting::mt::Message> m = this->queue.PeekMsg()){
-				m->Handle();
-			}
 
-			this->FillPlayBuf(this->playBuf);
-			
-			//call virtual Write() function
-			try{
-				this->Write(this->playBuf);
-			}catch(aumiks::Exc& e){
-				ASSERT_INFO(false, e.What())
-				return;//exit thread
-			}
-		}//~while
-	}
 };
+
+
 
 }//~namespace
