@@ -54,8 +54,6 @@ protected:
 public:
 	virtual ~Player()throw();
 	
-	virtual void Start() = 0;
-	
 	virtual void SetPaused(bool pause) = 0;
 	
 	static ting::Ptr<Player> CreatePlayer(AudioFormat outputFormat, ting::u32 bufSizeInFrames, PlayerListener* listener);

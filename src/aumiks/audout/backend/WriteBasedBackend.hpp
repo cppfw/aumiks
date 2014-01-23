@@ -40,6 +40,8 @@ namespace{
 class WriteBasedBackend : public audout::Player, private ting::mt::MsgThread{
 	ting::Array<ting::s16> playBuf;
 protected:
+	ting::Inited<bool, true> isPaused;
+	
 	WriteBasedBackend(
 			audout::PlayerListener* listener,
 			size_t playBufSizeInSamples
@@ -68,6 +70,12 @@ private:
 	void Run(){
 		while(!this->quitFlag){
 //			TRACE(<< "Backend loop" << std::endl)
+			
+			if(this->isPaused){
+				this->queue.GetMsg()->Handle();
+				continue;
+			}
+			
 			while(ting::Ptr<ting::mt::Message> m = this->queue.PeekMsg()){
 				m->Handle();
 			}
@@ -76,6 +84,28 @@ private:
 			
 			this->Write(this->playBuf);
 		}//~while
+	}
+	
+	class SetPausedMessage : public ting::mt::Message{
+		WriteBasedBackend &wbe;
+		bool pause;
+	public:
+		SetPausedMessage(WriteBasedBackend &wbe, bool pause) :
+				wbe(wbe),
+				pause(pause)
+		{}
+		
+		//override
+		void Handle(){
+			this->wbe.isPaused = this->pause;
+		}
+	};
+	
+	//override
+	virtual void SetPaused(bool pause){
+		this->PushMessage(ting::Ptr<ting::mt::Message>(
+				new SetPausedMessage(*this, pause)
+			));
 	}
 };
 
