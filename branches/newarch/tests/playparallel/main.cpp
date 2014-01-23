@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]){
 	TRACE_ALWAYS(<< "Opening audio playback device: mono 44100" << std::endl)
-	aumiks::Lib aumiksLibrary(44100, 1, 100);
+	aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::MONO, audout::AudioFormat::SamplingRate::HZ_44100), 100);
 	
 	ting::Ref<aumiks::WavSound> snd1 = aumiks::WavSound::LoadWAV("../samples/sample44100mono16.wav");
 	ting::Ref<aumiks::WavSound> snd2 = aumiks::WavSound::LoadWAV("../samples/ice_break.wav");
