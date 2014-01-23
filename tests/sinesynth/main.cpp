@@ -73,7 +73,7 @@ int main(int argc, char *argv[]){
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
-		aumiks::Lib aumiksLibrary(11025, 1, 100);
+		aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::MONO, audout::AudioFormat::SamplingRate::HZ_11025), 100);
 
 		Play();
 		TRACE_ALWAYS(<< "finished playing" << std::endl)
@@ -81,35 +81,35 @@ int main(int argc, char *argv[]){
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
-		aumiks::Lib aumiksLibrary(11025, 2, 100);
+		aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::STEREO, audout::AudioFormat::SamplingRate::HZ_11025), 100);
 
 		Play();
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
-		aumiks::Lib aumiksLibrary(22050, 1, 100);
+		aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::MONO, audout::AudioFormat::SamplingRate::HZ_22050), 100);
 
 		Play();
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 22050" << std::endl)
-		aumiks::Lib aumiksLibrary(22050, 2, 100);
+		aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::STEREO, audout::AudioFormat::SamplingRate::HZ_22050), 100);
 
 		Play();
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 44100" << std::endl)
-		aumiks::Lib aumiksLibrary(44100, 1, 100);
+		aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::MONO, audout::AudioFormat::SamplingRate::HZ_44100), 100);
 
 		Play();
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
-		aumiks::Lib aumiksLibrary(44100, 2, 100);
+		aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::STEREO, audout::AudioFormat::SamplingRate::HZ_44100), 100);
 
 		Play();
 	}

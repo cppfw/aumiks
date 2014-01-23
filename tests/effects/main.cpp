@@ -94,7 +94,7 @@ public:
 
 void Run(){
 	TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
-	aumiks::Lib aumiksLibrary(44100, 2, 100);
+	aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::STEREO, audout::AudioFormat::SamplingRate::HZ_44100), 100);
 	
 	ting::Ref<aumiks::Sound> snd = SineSound::New();
 
@@ -157,7 +157,7 @@ public:
 
 void Run(){
 	TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
-	aumiks::Lib aumiksLibrary(44100, 2, 100);
+	aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::STEREO, audout::AudioFormat::SamplingRate::HZ_44100), 100);
 	
 	ting::Ref<aumiks::Sound> snd = SineSound::New();
 
