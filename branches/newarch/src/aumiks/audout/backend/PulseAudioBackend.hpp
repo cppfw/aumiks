@@ -42,7 +42,7 @@ class PulseAudioBackend : public WriteBasedBackend{
 	pa_simple *handle;
 	
 	//override
-	virtual void Write(const ting::Buffer<ting::u8>& buf){
+	virtual void Write(const ting::Buffer<ting::s16>& buf){
 //		ASSERT(buf.Size() == this->BufferSizeInBytes())
 
 		if(pa_simple_write(
@@ -75,7 +75,7 @@ public:
 			audout::PlayerListener* listener
 			
 		) :
-			WriteBasedBackend(listener, bufferSizeFrames * outputFormat.frame.NumChannels() * 2)//2 bytes per sample, i.e. 16 bit
+			WriteBasedBackend(listener, bufferSizeFrames * outputFormat.frame.NumChannels())
 	{
 		TRACE(<< "opening device" << std::endl)
 

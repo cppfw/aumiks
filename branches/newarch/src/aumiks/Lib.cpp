@@ -58,8 +58,8 @@ Lib::~Lib()throw(){
 
 
 
-void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
-	ASSERT(playBuf.Size() == this->smpBuf.Size() * 2)
+void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::s16>& playBuf){
+	ASSERT(playBuf.Size() == this->smpBuf.Size())
 	
 	//handle actions if any
 	
@@ -86,23 +86,18 @@ void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::u8>& playBuf){
 
 
 
-void aumiks::Lib::CopySmpBufToPlayBuf(ting::Buffer<ting::u8>& playBuf){
-	//playBuf size is in bytes and we have 2 bytes per sample always.
-	ASSERT((this->smpBuf.Size() * 2) == playBuf.Size())
+void aumiks::Lib::CopySmpBufToPlayBuf(ting::Buffer<ting::s16>& playBuf){
+	ASSERT((this->smpBuf.Size()) == playBuf.Size())
 
 	const ting::s32 *src = this->smpBuf.Begin();
-	ting::u8* dst = playBuf.Begin();
-	for(; src != this->smpBuf.End(); ++src){
+	ting::s16* dst = playBuf.Begin();
+	for(; src != this->smpBuf.End(); ++src, ++dst){
 		ting::s32 tmp = *src;
 		ting::util::ClampTop(tmp, 0x7fff);
 		ting::util::ClampBottom(tmp, -0x7fff);
 
 		ASSERT(playBuf.Begin() <= dst && dst <= playBuf.End() - 1)
-		*dst = ting::u8(tmp);
-		++dst;
-		ASSERT(playBuf.Begin() <= dst && dst <= playBuf.End() - 1)
-		*dst = ting::u8(tmp >> 8);
-		++dst;
+		*dst = ting::s16(tmp);
 	}
 	ASSERT(dst == playBuf.End())
 }

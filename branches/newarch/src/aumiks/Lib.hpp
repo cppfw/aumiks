@@ -209,11 +209,11 @@ public:
 
 
 private:
-	void CopySmpBufToPlayBuf(ting::Buffer<ting::u8>& playBuf);
+	void CopySmpBufToPlayBuf(ting::Buffer<ting::s16>& playBuf);
 	
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	//override
-	void FillPlayBuf(ting::Buffer<ting::u8>& playBuf);
+	void FillPlayBuf(ting::Buffer<ting::s16>& playBuf);
 	
 	
 	inline void PushAction_ts(ting::Ptr<Action> action){
