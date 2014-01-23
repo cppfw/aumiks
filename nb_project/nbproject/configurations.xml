@@ -96,14 +96,6 @@
           <in>Player.hpp</in>
           <in>PlayerListener.hpp</in>
         </df>
-        <df name="backend">
-          <in>ALSABackend.hpp</in>
-          <in>AudioBackend.hpp</in>
-          <in>DirectSoundBackend.hpp</in>
-          <in>OpenSLESBackend.hpp</in>
-          <in>PulseAudioBackend.hpp</in>
-          <in>WriteBasedBackend.hpp</in>
-        </df>
         <df name="rechanneler">
           <in>MonoToStereo.cpp</in>
           <in>MonoToStereo.hpp</in>
@@ -537,36 +529,6 @@
       <item path="../src/aumiks/audout/Player.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/aumiks/audout/PlayerListener.hpp"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../src/aumiks/backend/ALSABackend.hpp"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../src/aumiks/backend/AudioBackend.hpp"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../src/aumiks/backend/DirectSoundBackend.hpp"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../src/aumiks/backend/OpenSLESBackend.hpp"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../src/aumiks/backend/PulseAudioBackend.hpp"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../src/aumiks/backend/WriteBasedBackend.hpp"
             ex="false"
             tool="3"
             flavor2="0">

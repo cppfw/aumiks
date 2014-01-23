@@ -38,14 +38,14 @@ THE SOFTWARE. */
 namespace{
 
 class WriteBasedBackend : public audout::Player, private ting::mt::MsgThread{
-	ting::Array<ting::u8> playBuf;
+	ting::Array<ting::s16> playBuf;
 protected:
 	WriteBasedBackend(
 			audout::PlayerListener* listener,
-			size_t playBufSizeInBytes
+			size_t playBufSizeInSamples
 		) :
 			audout::Player(listener),
-			playBuf(playBufSizeInBytes)
+			playBuf(playBufSizeInSamples)
 	{}
 	
 	inline void StopThread()throw(){
@@ -57,7 +57,7 @@ protected:
 		this->Thread::Start();
 	}
 	
-	virtual void Write(const ting::Buffer<ting::u8>& buf) = 0;
+	virtual void Write(const ting::Buffer<ting::s16>& buf) = 0;
 	
 public:
 	virtual ~WriteBasedBackend()throw(){}

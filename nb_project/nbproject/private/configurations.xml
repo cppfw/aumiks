@@ -99,20 +99,11 @@
             <in>PulseAudioBackend.hpp</in>
             <in>WriteBasedBackend.hpp</in>
           </df>
-          <in>AudioBackend.hpp</in>
           <in>AudioFormat.cpp</in>
           <in>AudioFormat.hpp</in>
           <in>Player.cpp</in>
           <in>Player.hpp</in>
           <in>PlayerListener.hpp</in>
-        </df>
-        <df name="backend">
-          <in>ALSABackend.hpp</in>
-          <in>AudioBackend.hpp</in>
-          <in>DirectSoundBackend.hpp</in>
-          <in>OpenSLESBackend.hpp</in>
-          <in>PulseAudioBackend.hpp</in>
-          <in>WriteBasedBackend.hpp</in>
         </df>
         <df name="rechanneler">
           <in>MonoToStereo.cpp</in>
@@ -146,6 +137,8 @@
         <df name="1">
           <df name="2">
             <df name="aumiks">
+              <df name="audout">
+              </df>
             </df>
           </df>
         </df>
