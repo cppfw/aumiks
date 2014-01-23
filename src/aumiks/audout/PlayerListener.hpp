@@ -34,6 +34,8 @@ namespace audout{
 class PlayerListener{
 public:
 	virtual void FillPlayBuf(ting::Buffer<ting::u8>& playBuf) = 0;
+	
+	virtual ~PlayerListener()throw(){}
 };
 
 }

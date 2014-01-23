@@ -84,7 +84,7 @@ public:
 		ss.channels = outputFormat.frame.NumChannels();
 		ss.rate = outputFormat.samplingRate.Frequency();
 
-		unsigned bufferSizeInBytes = bufferSizeFrames * aumiks::BytesPerOutputFrame(outputFormat.frame.NumChannels());
+		unsigned bufferSizeInBytes = bufferSizeFrames * outputFormat.frame.NumChannels() * 2;//2 bytes per sample, i.e. 16 bit
 		pa_buffer_attr ba;
 		ba.fragsize = bufferSizeInBytes;
 		ba.tlength = bufferSizeInBytes;
