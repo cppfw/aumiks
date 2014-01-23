@@ -47,6 +47,8 @@ public:
 		unsigned NumChannels()throw(){
 			return unsigned(this->type);
 		}
+		
+		Frame(Type type) : type(type) {}
 	} frame;
 	
 	struct SamplingRate{
@@ -60,8 +62,14 @@ public:
 		inline ting::u32 Frequency()throw(){
 			return ting::u32(this->type);
 		}
+		
+		SamplingRate(Type type) : type(type) {}
 	} samplingRate;
 	
+	AudioFormat(Frame::Type frameType, SamplingRate::Type samplingRateType) :
+			frame(frameType),
+			samplingRate(samplingRateType)
+	{}
 private:
 
 };

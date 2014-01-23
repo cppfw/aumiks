@@ -43,6 +43,7 @@ srcs += aumiks/Lib.cpp
 srcs += aumiks/MixChannel.cpp
 srcs += aumiks/util.cpp
 srcs += aumiks/WavSound.cpp
+srcs += aumiks/audout/Player.cpp
 
 
 
