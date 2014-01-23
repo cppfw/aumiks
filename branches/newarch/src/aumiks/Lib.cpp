@@ -47,7 +47,7 @@ Lib::Lib(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis) :
 	//backend must be initialized after all the essential parts of aumiks are initialized,
 	//because after the backend object is created, it starts calling the FillPlayBuf() method periodically.
 	this->player = audout::Player::CreatePlayer(outputFormat, smpBuf.Size() / outputFormat.frame.NumChannels(), this);
-	this->player->Start();
+	this->player->SetPaused(false);
 }
 
 

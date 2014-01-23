@@ -57,16 +57,6 @@ class PulseAudioBackend : public WriteBasedBackend{
 			TRACE(<< "pa_simple_write(): error" << std::endl)
 		}
 	}
-
-	//override
-	virtual void SetPaused(bool pause){
-		//TODO:
-	}
-	
-	//override
-	virtual void Start(){
-		this->StartThread();
-	}
 	
 public:
 	PulseAudioBackend(
@@ -114,6 +104,8 @@ public:
 			//TODO: more informative error message
 			throw ting::Exc("error opening PulseAudio connection");
 		}
+		
+		this->StartThread();
 	}
 	
 	virtual ~PulseAudioBackend()throw(){
