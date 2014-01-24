@@ -14,11 +14,12 @@
             <file>file:/home/igagis/prj/aumiks/src/aumiks/audout/Player.hpp</file>
             <file>file:/home/igagis/prj/aumiks/src/aumiks/Lib.hpp</file>
             <file>file:/home/igagis/prj/aumiks/src/aumiks/audout/Player.cpp</file>
+            <file>file:/home/igagis/prj/aumiks/src/aumiks/audout/backend/DirectSoundBackend.hpp</file>
             <file>file:/home/igagis/prj/aumiks/src/aumiks/audout/PlayerListener.hpp</file>
             <file>file:/home/igagis/prj/aumiks/src/aumiks/Lib.cpp</file>
-            <file>file:/home/igagis/prj/aumiks/src/aumiks/audout/backend/PulseAudioBackend.hpp</file>
             <file>file:/home/igagis/prj/aumiks/src/aumiks/audout/backend/WriteBasedBackend.hpp</file>
-            <file>file:/home/igagis/prj/aumiks/src/aumiks/audout/AudioBackend.hpp</file>
+            <file>file:/home/igagis/prj/aumiks/src/aumiks/audout/backend/PulseAudioBackend.hpp</file>
+            <file>file:/home/igagis/prj/aumiks/src/aumiks/audout/AudioFormat.hpp</file>
         </group>
     </open-files>
 </project-private>
