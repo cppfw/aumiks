@@ -94,7 +94,9 @@ class Lib : public ting::IntrusiveSingleton<Lib>, private audout::PlayerListener
 	ting::Ptr<audout::Player> player;
 
 public:
-	
+	inline const audout::AudioFormat& OutputFormat()throw(){
+		return this->outputFormat;
+	}
 	
 	//TODO: doxygen comments
 	inline const ting::Ref<aumiks::MixChannel>& MasterChannel()throw(){

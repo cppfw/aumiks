@@ -62,7 +62,7 @@ class MixChannel : public aumiks::Channel{
 	
 	
 	//override
-	bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans);
+	bool FillSmpBuf(ting::Buffer<ting::s32>& buf);
 	
 	
 	void MixSmpBufTo(ting::Buffer<ting::s32>& buf);

@@ -60,16 +60,14 @@ class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
 private:
 	Effect::T_EffectsList effects;
 
-	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
-		ASSERT(buf.Size() % chans == 0)
-
+	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf){
 		if(this->stoppedFlag){
 			return true;
 		}
 		
 		ASSERT(this->lastFillerInChain)
 
-		return this->lastFillerInChain->FillSmpBufInternal(buf, freq, chans);
+		return this->lastFillerInChain->FillSmpBufInternal(buf);
 	}
 	
 protected:

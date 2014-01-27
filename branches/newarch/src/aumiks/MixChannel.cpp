@@ -46,7 +46,9 @@ void MixChannel::MixSmpBufTo(ting::Buffer<ting::s32>& buf){
 
 
 
-bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf){
+	ASSERT(buf.Size() % aumiks::Lib::Inst().OutputFormat().frame.NumChannels() == 0)
+	
 	//check if this mix channel holds sample buffer of a correct size
 	//TODO: assign buffer in the audio thread when channel starts to play
 	if(this->smpBuf.Size() != buf.Size()){
@@ -56,7 +58,7 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 	T_ChannelIter i = this->channels.begin();
 	if(i != this->channels.end()){//if there is at least one child channel
 		//the very first channel is not mixed, but simply written to the output buffer
-		if((*i)->FillSmpBufAndApplyEffects(buf, freq, chans)){
+		if((*i)->FillSmpBufAndApplyEffects(buf)){
 			(*i)->stoppedFlag = true;
 			i = this->channels.erase(i);
 		}else{
@@ -64,7 +66,7 @@ bool MixChannel::FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigne
 		}
 
 		for(; i != this->channels.end();){
-			if((*i)->FillSmpBufAndApplyEffects(this->smpBuf, freq, chans)){
+			if((*i)->FillSmpBufAndApplyEffects(this->smpBuf)){
 				(*i)->stoppedFlag = true;
 				i = this->channels.erase(i);
 			}else{
