@@ -29,11 +29,15 @@
       <df name="ting">
         <df name="ting">
           <df name="fs">
+            <in>BufferFile.cpp</in>
+            <in>BufferFile.hpp</in>
             <in>Exc.hpp</in>
             <in>FSFile.cpp</in>
             <in>FSFile.hpp</in>
             <in>File.cpp</in>
             <in>File.hpp</in>
+            <in>MemoryFile.cpp</in>
+            <in>MemoryFile.hpp</in>
           </df>
           <df name="mt">
             <in>Message.hpp</in>

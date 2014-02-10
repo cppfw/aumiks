@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2012 Ivan Gagis
+Copyright (c) 2012-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -83,7 +83,7 @@ public:
 	virtual ~MixChannel()throw(){}
 	
 	//TODO: doxygen
-	//playing the same channel the second time results in undefined behavior!
+	//playing same channel second time results in undefined behavior!
 	void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel);
 	
 	/**
