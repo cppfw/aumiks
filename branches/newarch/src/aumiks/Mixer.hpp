@@ -20,6 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
+#include "Source.hpp"
+
+
 // Home page: http://aumiks.googlecode.com
 
 /**
@@ -28,24 +31,40 @@ THE SOFTWARE. */
 
 #pragma once
 
-#include <ting/types.hpp>
-#include <ting/Buffer.hpp>
-#include <ting/Ref.hpp>
+#include "Source.hpp"
+
+#include <list>
 
 namespace aumiks{
 
-template <class T_Sample, ting::u8 num_channels> class Source : virtual public ting::RefCounted{
-	Source(const Source&);
-	Source& operator=(const Source&);
+//TODO: doxygen
+template <class T_Sample, ting::u8 num_channels> class Mixer : public Source<T_Sample, num_channels>{
+	Mixer(const Mixer&);
+	Mixer& operator=(const Mixer&);
 	
-protected:
-	Source(){}
+	typedef std::list<ting::Ref<Source<T_Sample, num_channels> > > T_List;
+	
+	T_List sources;
+	
+	bool isPersistent;
+	
+	Mixer(bool isPersistent) :
+			isPersistent(isPersistent)
+	{}
 public:
-	virtual ~Source()throw(){}
 	
-	virtual bool FillSampleBuffer(const ting::Buffer<T_Sample>& buf)throw() = 0;
-private:
-
+	//override
+	bool FillSampleBuffer(const ting::Buffer<T_Sample>& buf)throw(){
+		//TODO:
+	}
+	
+	void AddSource(const ting::Ref<Source<T_Sample, num_channels> >& src){
+		//TODO:
+	}
+	
+	ting::Ref<Mixer> New(bool isPersistent = false){
+		return ting::Ref<Mixer>(new Mixer(isPersistent));
+	}
 };
 
 }
