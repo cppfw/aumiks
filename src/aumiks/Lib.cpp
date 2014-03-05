@@ -41,7 +41,7 @@ Lib::Lib(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis) :
 		addList(&actionsList1),
 		handleList(&actionsList2),
 		outputFormat(outputFormat),
-		masterChannel(aumiks::MixChannel::New(true)),
+		mixer(aumiks::Mixer::New(true)),
 		smpBuf((outputFormat.samplingRate.Frequency() * bufferSizeMillis / 1000) * outputFormat.frame.NumChannels())
 {
 	//backend must be initialized after all the essential parts of aumiks are initialized,
