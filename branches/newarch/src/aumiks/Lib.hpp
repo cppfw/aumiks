@@ -39,6 +39,7 @@ THE SOFTWARE. */
 #include "audout/PlayerListener.hpp"
 #include "audout/Player.hpp"
 
+#include "Mixer.hpp"
 
 
 //#define M_ENABLE_AUMIKS_TRACE
@@ -87,7 +88,7 @@ class Lib : public ting::IntrusiveSingleton<Lib>, private audout::PlayerListener
 	
 	audout::AudioFormat outputFormat;
 
-	ting::Ref<aumiks::MixChannel> masterChannel;
+	ting::Ref<ting::RefCounted> mixer;
 	
 	ting::Array<ting::s32> smpBuf;
 	
@@ -99,15 +100,8 @@ public:
 	}
 	
 	//TODO: doxygen comments
-	inline const ting::Ref<aumiks::MixChannel>& MasterChannel()throw(){
-		return this->masterChannel;
-	}
-	
-	
-	
-	//TODO: doxygen comments
-	inline void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel){
-		this->MasterChannel()->PlayChannel_ts(channel);
+	template <ting::u8 num_channels> aumiks::Mixer<ting::s32, num_channels>& MasterMixer()throw(){
+		return *static_cast<aumiks::Mixer<ting::s32, num_channels>*>(this->mixer.operator->());
 	}
 	
 	
