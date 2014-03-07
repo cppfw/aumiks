@@ -43,19 +43,74 @@ template <class T_Sample, ting::u8 num_channels> class Mixer : public Source<T_S
 	Mixer& operator=(const Mixer&);
 	
 	typedef std::list<ting::Ref<Source<T_Sample, num_channels> > > T_List;
+	typedef T_List::iterator T_Iter;
 	
 	T_List sources;
+	
+	ting::Array<ting::s32> smpBuf;
 	
 	bool isPersistent;
 	
 	Mixer(bool isPersistent) :
 			isPersistent(isPersistent)
 	{}
+	
+	void MixSmpBufTo(ting::Buffer<ting::s32>& buf){
+		ASSERT(this->smpBuf.Size() == buf.Size())
+
+		ting::s32* src = this->smpBuf.Begin();
+		ting::s32* dst = buf.Begin();
+
+		for(; dst != buf.End(); ++src, ++dst){
+			*dst += *src;
+		}
+	}
+	
 public:
 	
 	//override
 	bool FillSampleBuffer(const ting::Buffer<T_Sample>& buf)throw(){
-		//TODO:
+		ASSERT(buf.Size() % num_channels == 0)
+	
+		//check if this mix channel holds sample buffer of a correct size
+		if(this->smpBuf.Size() != buf.Size()){
+			this->smpBuf.Init(buf.Size());
+		}
+
+		T_Iter i = this->sources.begin();
+		
+		if(i == this->sources.end()){//if there is no sources to play
+			//no any child channels to play initially
+			if(!this->isPersistent){
+				return true;
+			}
+
+			//zero out the sample buffer
+			memset(buf.Begin(), 0, buf.SizeInBytes());
+			return false;
+		}
+		
+		//the very first channel is not mixed, but simply written to the output buffer
+		if((*i)->FillSampleBuffer(buf)){
+//TODO: ?
+//			(*i)->stoppedFlag = true;
+			i = this->sources.erase(i);
+		}else{
+			++i;
+		}
+
+		for(; i != this->sources.end();){
+			if((*i)->FillSampleBuffer(this->smpBuf)){
+//TODO: ?
+//				(*i)->stoppedFlag = true;
+				i = this->sources.erase(i);
+			}else{
+				++i;
+			}
+			this->MixSmpBufTo(buf);
+		}
+
+		return !this->isPersistent && (this->sources.size() == 0);
 	}
 	
 	void AddSource(const ting::Ref<Source<T_Sample, num_channels> >& src){

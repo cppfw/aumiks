@@ -51,7 +51,6 @@ class MixChannel : public aumiks::Channel{
 	typedef T_ChannelList::iterator T_ChannelIter;
 	T_ChannelList channels;//should be accessed from audio thread only
 	
-	//TODO: assign buffer in the audio thread when channel starts to play
 	ting::Array<ting::s32> smpBuf;
 	
 	bool isPersistent;
