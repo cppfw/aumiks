@@ -32,6 +32,8 @@ THE SOFTWARE. */
 #include <ting/Buffer.hpp>
 #include <ting/Ref.hpp>
 
+#include <audout/AudioFormat.hpp>
+
 namespace aumiks{
 
 template <class T_Sample, ting::u8 num_channels> class Source : virtual public ting::RefCounted{

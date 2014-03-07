@@ -35,9 +35,10 @@ THE SOFTWARE. */
 #include <ting/Ptr.hpp>
 
 #include "MixChannel.hpp"
-#include "audout/AudioFormat.hpp"
-#include "audout/PlayerListener.hpp"
-#include "audout/Player.hpp"
+
+#include <audout/AudioFormat.hpp>
+#include <audout/PlayerListener.hpp>
+#include <audout/Player.hpp>
 
 #include "Mixer.hpp"
 
@@ -90,6 +91,10 @@ class Lib : public ting::IntrusiveSingleton<Lib>, private audout::PlayerListener
 
 	ting::Ref<ting::RefCounted> mixer;
 	
+	template <ting::u8 num_channels> aumiks::Mixer<ting::s32, num_channels>& MasterMixer()throw(){
+		return *static_cast<aumiks::Mixer<ting::s32, num_channels>*>(this->mixer.operator->());
+	}
+	
 	ting::Array<ting::s32> smpBuf;
 	
 	ting::Ptr<audout::Player> player;
@@ -97,11 +102,6 @@ class Lib : public ting::IntrusiveSingleton<Lib>, private audout::PlayerListener
 public:
 	inline const audout::AudioFormat& OutputFormat()throw(){
 		return this->outputFormat;
-	}
-	
-	//TODO: doxygen comments
-	template <ting::u8 num_channels> aumiks::Mixer<ting::s32, num_channels>& MasterMixer()throw(){
-		return *static_cast<aumiks::Mixer<ting::s32, num_channels>*>(this->mixer.operator->());
 	}
 	
 	
@@ -121,6 +121,12 @@ public:
 	
 	
 	~Lib()throw();
+	
+	
+	
+	template <class T_Sample, ting::u8 num_channels> void PlaySource(ting::Ref<Source<T_Sample, num_channels> >& s){
+		//TODO:
+	}
 	
 	
 
