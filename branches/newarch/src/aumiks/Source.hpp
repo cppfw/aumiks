@@ -36,12 +36,18 @@ THE SOFTWARE. */
 
 namespace aumiks{
 
-template <class T_Sample, ting::u8 num_channels> class Source : virtual public ting::RefCounted{
+template <class T_Sample> class Source : virtual public ting::RefCounted{
 	Source(const Source&);
 	Source& operator=(const Source&);
 	
+	ting::Inited<bool, false> isConnected;
+	
+	audout::AudioFormat outputFormat;
+	
 protected:
-	Source(){}
+	Source(audout::AudioFormat outputFormat) :
+			outputFormat(outputFormat)
+	{}
 public:
 	virtual ~Source()throw(){}
 	
