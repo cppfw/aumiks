@@ -32,28 +32,42 @@ THE SOFTWARE. */
 #include <ting/Buffer.hpp>
 #include <ting/Ref.hpp>
 
-#include <audout/AudioFormat.hpp>
 
 namespace aumiks{
 
-template <class T_Sample> class Source : virtual public ting::RefCounted{
-	Source(const Source&);
-	Source& operator=(const Source&);
+
+//TODO: doxygen
+template <class T_Sample> class AbstractSource : virtual public ting::RefCounted{
+	AbstractSource(const AbstractSource&);
+	AbstractSource& operator=(const AbstractSource&);
 	
 	ting::Inited<bool, false> isConnected;
 	
-	audout::AudioFormat outputFormat;
+	ting::u8 numChannels;
 	
-protected:
-	Source(audout::AudioFormat outputFormat) :
-			outputFormat(outputFormat)
+	AbstractSource(ting::u8 numChannels) :
+			numChannels(numChannels)
 	{}
 public:
-	virtual ~Source()throw(){}
+	virtual ~AbstractSource()throw(){}
 	
 	virtual bool FillSampleBuffer(const ting::Buffer<T_Sample>& buf)throw() = 0;
 private:
 
 };
+
+
+
+template <class T_Sample, ting::u8 num_channels> class Source : public AbstractSource<T_Sample>{
+	Source(const Source&);
+	Source& operator=(const Source&);
+	
+protected:
+	Source() :
+			AbstractSource(num_channels)
+	{}
+};
+
+
 
 }
