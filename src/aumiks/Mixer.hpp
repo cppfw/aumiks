@@ -33,6 +33,8 @@ THE SOFTWARE. */
 
 #include "Source.hpp"
 
+#include <ting/atomic.hpp>
+
 #include <list>
 
 namespace aumiks{
@@ -45,6 +47,11 @@ template <class T_Sample, ting::u8 num_channels> class Mixer : public Source<T_S
 	typedef std::list<ting::Ref<Source<T_Sample, num_channels> > > T_List;
 	typedef T_List::iterator T_Iter;
 	
+	atomic::SpinLock addSpinLock;
+	T_List* sourcesPendingAddition;
+	T_List* sourcesBeingAdded;
+	T_List addList1, addList2;
+	
 	T_List sources;
 	
 	ting::Array<ting::s32> smpBuf;
@@ -52,6 +59,8 @@ template <class T_Sample, ting::u8 num_channels> class Mixer : public Source<T_S
 	bool isPersistent;
 	
 	Mixer(bool isPersistent) :
+			sourcesPendingAddition(addList1),
+			sourcesBeingAdded(addList2),
 			isPersistent(isPersistent)
 	{}
 	
@@ -71,7 +80,19 @@ public:
 	//override
 	bool FillSampleBuffer(const ting::Buffer<T_Sample>& buf)throw(){
 		ASSERT(buf.Size() % num_channels == 0)
-	
+		
+		{
+			atomic::SpinLock::GuardYield guard(this->addSpinLock);
+			if(this->sourcesPendingAddition->size() != 0){
+				std::swap(this->sourcesPendingAddition, this->sourcesBeingAdded);
+			}
+		}
+		
+		//add pending sources
+		while(this->sourcesBeingAdded->size() != 0){
+			this->sources.push_back(this->sourcesBeingAdded->pop_back());
+		}
+		
 		//check if this mix channel holds sample buffer of a correct size
 		if(this->smpBuf.Size() != buf.Size()){
 			this->smpBuf.Init(buf.Size());
@@ -114,7 +135,8 @@ public:
 	}
 	
 	void AddSource(const ting::Ref<Source<T_Sample, num_channels> >& src){
-		//TODO:
+		atomic::SpinLock::GuardYield guard(this->addSpinLock);
+		this->sourcesPendingAddition->push_back(src);
 	}
 	
 	static ting::Ref<Mixer> New(bool isPersistent = false){
