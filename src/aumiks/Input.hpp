@@ -28,40 +28,34 @@ THE SOFTWARE. */
 
 #pragma once
 
-#include "Input.hpp"
-#include "Exc.hpp"
-
+#include "Source.hpp"
 
 namespace aumiks{
 
-//TODO: doxygen
-template <class T_Sample> class AbstractSink{
-	ting::u8 numChannels;
+template <class T_Sample, ting::u8 num_channels> class Input{
+	ting::Ref<aumiks::Source<T_Sample, num_channels> > src;
 	
-protected:
-	AbstractSink(ting::u8 numChannles) :
-			numChannles(numChannles)
-	{}
 public:
+	bool IsConnected()const{
+		return this->src.IsValid();
+	}
 	
-	virtual ~AbstractSink()throw(){}
+	void Connect(const ting::Ref<aumiks::Source<T_Sample, num_channels> >& src){
+		if(this->IsConnected()){
+			throw aumiks::Exc("Input already connected");
+		}
+		
+		this->src = src;
+	}
 	
-	virtual void Start() = 0;
+	const ting::Ref<aumiks::Source<T_Sample, num_channels> >& Source(){
+		return this->src;
+	}
 	
-	virtual void Stop(){
-		throw aumiks::Exc("AbstractSink::Stop(): unsupported");
+	const ting::Ref<const aumiks::Source<T_Sample, num_channels> >& Source()const{
+		return this->src;
 	}
 };
 
-
-
-template <class T_Sample, ting::u8 num_channels> class Sink : public AbstractSink<T_Sample>{
-protected:
-	Sink() :
-			AbstractSink(num_channels)
-	{}
-public:
-	aumiks::Input<T_Sample, num_channels> input;
-};
 
 }

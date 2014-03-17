@@ -110,6 +110,7 @@
         <in>Element.cpp</in>
         <in>Element.hpp</in>
         <in>Exc.hpp</in>
+        <in>Inputs.hpp</in>
         <in>Lib.cpp</in>
         <in>Lib.hpp</in>
         <in>MixChannel.cpp</in>
@@ -511,6 +512,8 @@
       <item path="../src/aumiks/Element.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/aumiks/Exc.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/aumiks/Inputs.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/aumiks/Lib.cpp" ex="false" tool="1" flavor2="0">
       </item>
