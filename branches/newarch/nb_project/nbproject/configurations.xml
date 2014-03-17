@@ -114,6 +114,7 @@
         <in>Lib.hpp</in>
         <in>MixChannel.cpp</in>
         <in>MixChannel.hpp</in>
+        <in>Sink.hpp</in>
         <in>Sound.hpp</in>
         <in>WavSound.cpp</in>
         <in>WavSound.hpp</in>
@@ -518,6 +519,8 @@
       <item path="../src/aumiks/MixChannel.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/aumiks/MixChannel.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/aumiks/Sink.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/aumiks/Sound.hpp" ex="false" tool="3" flavor2="0">
       </item>
