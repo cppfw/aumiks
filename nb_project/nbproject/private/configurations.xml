@@ -120,6 +120,7 @@
         <in>MixChannel.hpp</in>
         <in>Mixer.hpp</in>
         <in>SampleBufferFiller.hpp</in>
+        <in>Sink.hpp</in>
         <in>Sound.hpp</in>
         <in>Source.hpp</in>
         <in>WavSound.cpp</in>
