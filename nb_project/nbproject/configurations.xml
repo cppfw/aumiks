@@ -116,6 +116,8 @@
         <in>MixChannel.hpp</in>
         <in>Sink.hpp</in>
         <in>Sound.hpp</in>
+        <in>SpeakersSink.cpp</in>
+        <in>SpeakersSink.hpp</in>
         <in>WavSound.cpp</in>
         <in>WavSound.hpp</in>
         <in>util.cpp</in>
@@ -523,6 +525,10 @@
       <item path="../src/aumiks/Sink.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/aumiks/Sound.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/aumiks/SpeakersSink.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/aumiks/SpeakersSink.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="0">
       </item>

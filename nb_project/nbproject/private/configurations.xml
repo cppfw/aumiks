@@ -124,6 +124,8 @@
         <in>Sink.hpp</in>
         <in>Sound.hpp</in>
         <in>Source.hpp</in>
+        <in>SpeakersSink.cpp</in>
+        <in>SpeakersSink.hpp</in>
         <in>WavSound.cpp</in>
         <in>WavSound.hpp</in>
         <in>util.cpp</in>
