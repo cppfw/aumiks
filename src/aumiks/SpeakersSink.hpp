@@ -37,16 +37,24 @@ namespace aumiks{
 template <ting::u8 num_channels> class SpeakersSink : public aumiks::Sink<ting::s32, num_channels>, private audout::PlayerListener{
 
 	SpeakersSink(const SpeakersSink&);
-	
+
 	ting::Ptr<audout::Player> player;
-	
+
+	ting::Array<ting::s32> smpBuf;
+
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	//override
 	void FillPlayBuf(ting::Buffer<ting::s16>& playBuf);
-	
+
 protected:
 
 	SpeakersSink(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis = 100);
+
+	//override
+	void Start();
+
+	//override
+	void Stop();
 };
 
 }
