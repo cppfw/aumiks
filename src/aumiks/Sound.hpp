@@ -42,10 +42,12 @@ namespace aumiks{
  * A sound object is an object which holds all the initial data required to play a particular sound.
  * Sound object is normally used to create an instances of a channel to play that sound.
  */
-class Sound : public ting::RefCounted{
+class Sound : virtual public ting::RefCounted{
 protected:
 	Sound(){}
 public:
+	
+	virtual ~Sound()throw(){}
 
 	/**
 	 * @brief Channel factory method.
