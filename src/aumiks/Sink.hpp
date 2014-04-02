@@ -44,6 +44,10 @@ protected:
 	{}
 public:
 	
+	ting::u8 NumChannels()throw(){
+		return this->numChannels;
+	}
+	
 	virtual ~Sink()throw(){}
 	
 	virtual void Start() = 0;
