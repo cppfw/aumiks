@@ -2,10 +2,6 @@
 <configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="../android/jni" name="0">
-      <df name="AssetFile">
-        <in>AssetFile.cpp</in>
-        <in>AssetFile.hpp</in>
-      </df>
       <df name="aumiks">
         <df name="aumiks">
           <df name="backend">
