@@ -9,10 +9,14 @@
 
 using namespace aumiks;
 
-SpeakersSink::SpeakersSink(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis) :
-		smpBuf((outputFormat.samplingRate.Frequency() * bufferSizeMillis / 1000) * outputFormat.frame.NumChannels())
+SpeakersSink::SpeakersSink(audout::AudioFormat::SamplingRate::Type samplingRate, ting::u16 bufferSizeMillis) :
+		smpBuf((audout::AudioFormat::SamplingRate(samplingRate).Frequency() * bufferSizeMillis / 1000) * this->NumChannels())
 {
-	this->player = audout::Player::CreatePlayer(outputFormat, smpBuf.Size() / outputFormat.frame.NumChannels(), this);
+	this->player = audout::Player::CreatePlayer(
+			audout::AudioFormat(frame_type, samplingRate),
+			smpBuf.Size() / this->NumChannels(),
+			this
+		);
 }
 
 //override
