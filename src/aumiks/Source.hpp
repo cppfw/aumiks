@@ -38,6 +38,8 @@ namespace aumiks{
 
 //TODO: doxygen
 class Source : virtual public ting::RefCounted{
+	template <ting::u8> friend class Input;
+	
 	Source(const Source&);
 	Source& operator=(const Source&);
 	
@@ -52,6 +54,10 @@ public:
 	virtual ~Source()throw(){}
 	
 	virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw() = 0;
+	
+	bool IsConnected()throw(){
+		return this->isConnected;
+	}
 private:
 
 };

@@ -35,17 +35,33 @@ namespace aumiks{
 template <ting::u8 num_channels> class Input{
 	ting::Ref<aumiks::ChanSource<num_channels> > src;
 	
+	ting::Ref<aumiks::ChanSource<num_channels> > srcInUse;
+	
 public:
 	bool IsConnected()const{
 		return this->src.IsValid();
 	}
 	
 	void Connect(const ting::Ref<aumiks::ChanSource<num_channels> >& src){
+		ASSERT(src.IsValid())
+		
 		if(this->IsConnected()){
 			throw aumiks::Exc("Input already connected");
 		}
 		
+		if(src->IsConnected()){
+			throw aumiks::Exc("Source is already connected");
+		}
+		
+		src->isConnected = true;
 		this->src = src;
+	}
+	
+	void Disconnect()throw(){
+		ASSERT(this->src.IsValid())
+		
+		this->src->isConnected = false;
+		this->src.Reset();
 	}
 	
 	const ting::Ref<aumiks::ChanSource<num_channels> >& Source(){
