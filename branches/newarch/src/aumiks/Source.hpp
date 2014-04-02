@@ -37,34 +37,34 @@ namespace aumiks{
 
 
 //TODO: doxygen
-template <class T_Sample> class AbstractSource : virtual public ting::RefCounted{
-	AbstractSource(const AbstractSource&);
-	AbstractSource& operator=(const AbstractSource&);
+class Source : virtual public ting::RefCounted{
+	Source(const Source&);
+	Source& operator=(const Source&);
 	
 	ting::Inited<bool, false> isConnected;
 	
 	ting::u8 numChannels;
 	
-	AbstractSource(ting::u8 numChannels) :
+	Source(ting::u8 numChannels) :
 			numChannels(numChannels)
 	{}
 public:
-	virtual ~AbstractSource()throw(){}
+	virtual ~Source()throw(){}
 	
-	virtual bool FillSampleBuffer(const ting::Buffer<T_Sample>& buf)throw() = 0;
+	virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw() = 0;
 private:
 
 };
 
 
 
-template <class T_Sample, ting::u8 num_channels> class Source : public AbstractSource<T_Sample>{
-	Source(const Source&);
-	Source& operator=(const Source&);
+template <ting::u8 num_channels> class ChanSource : public Source{
+	ChanSource(const ChanSource&);
+	ChanSource& operator=(const ChanSource&);
 	
 protected:
-	Source() :
-			AbstractSource(num_channels)
+	ChanSource() :
+			Source(num_channels)
 	{}
 };
 

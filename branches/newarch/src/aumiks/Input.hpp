@@ -32,15 +32,15 @@ THE SOFTWARE. */
 
 namespace aumiks{
 
-template <class T_Sample, ting::u8 num_channels> class Input{
-	ting::Ref<aumiks::Source<T_Sample, num_channels> > src;
+template <ting::u8 num_channels> class Input{
+	ting::Ref<aumiks::ChanSource<num_channels> > src;
 	
 public:
 	bool IsConnected()const{
 		return this->src.IsValid();
 	}
 	
-	void Connect(const ting::Ref<aumiks::Source<T_Sample, num_channels> >& src){
+	void Connect(const ting::Ref<aumiks::ChanSource<num_channels> >& src){
 		if(this->IsConnected()){
 			throw aumiks::Exc("Input already connected");
 		}
@@ -48,11 +48,11 @@ public:
 		this->src = src;
 	}
 	
-	const ting::Ref<aumiks::Source<T_Sample, num_channels> >& Source(){
+	const ting::Ref<aumiks::ChanSource<num_channels> >& Source(){
 		return this->src;
 	}
 	
-	const ting::Ref<const aumiks::Source<T_Sample, num_channels> >& Source()const{
+	const ting::Ref<const aumiks::ChanSource<num_channels> >& Source()const{
 		return this->src;
 	}
 };

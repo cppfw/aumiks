@@ -37,11 +37,11 @@ THE SOFTWARE. */
 namespace aumiks{
 
 //TODO: doxygen
-template <class T_Sample, ting::u8 num_channels> class Mixer : public Source<T_Sample, num_channels>{
+template <class T_Sample, ting::u8 num_channels> class Mixer : public ChanSource<T_Sample, num_channels>{
 	Mixer(const Mixer&);
 	Mixer& operator=(const Mixer&);
 	
-	typedef std::list<ting::Ref<Source<T_Sample, num_channels> > > T_List;
+	typedef std::list<ting::Ref<ChanSource<T_Sample, num_channels> > > T_List;
 	typedef T_List::iterator T_Iter;
 	
 	atomic::SpinLock addSpinLock;
@@ -131,7 +131,7 @@ public:
 		return !this->isPersistent && (this->sources.size() == 0);
 	}
 	
-	void AddSource(const ting::Ref<Source<T_Sample, num_channels> >& src){
+	void AddSource(const ting::Ref<ChanSource<T_Sample, num_channels> >& src){
 		atomic::SpinLock::GuardYield guard(this->addSpinLock);
 		this->sourcesPendingAddition->push_back(src);
 	}

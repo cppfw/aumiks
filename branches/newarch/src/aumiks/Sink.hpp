@@ -35,33 +35,33 @@ THE SOFTWARE. */
 namespace aumiks{
 
 //TODO: doxygen
-template <class T_Sample> class AbstractSink{
+class Sink{
 	ting::u8 numChannels;
 	
 protected:
-	AbstractSink(ting::u8 numChannles) :
+	Sink(ting::u8 numChannles) :
 			numChannles(numChannles)
 	{}
 public:
 	
-	virtual ~AbstractSink()throw(){}
+	virtual ~Sink()throw(){}
 	
 	virtual void Start() = 0;
 	
 	virtual void Stop(){
-		throw aumiks::Exc("AbstractSink::Stop(): unsupported");
+		throw aumiks::Exc("Sink::Stop(): unsupported");
 	}
 };
 
 
 
-template <class T_Sample, ting::u8 num_channels> class Sink : public AbstractSink<T_Sample>{
+template <ting::u8 num_channels> class ChanSink : public Sink{
 protected:
-	Sink() :
-			AbstractSink(num_channels)
+	ChanSink() :
+			Sink(num_channels)
 	{}
 public:
-	aumiks::Input<T_Sample, num_channels> input;
+	aumiks::Input<num_channels> input;
 };
 
 }

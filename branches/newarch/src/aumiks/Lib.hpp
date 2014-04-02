@@ -124,7 +124,7 @@ public:
 	
 	
 	
-	template <class T_Sample, ting::u8 num_channels> void PlaySource(ting::Ref<Source<T_Sample, num_channels> >& s){
+	template <class T_Sample, ting::u8 num_channels> void PlaySource(ting::Ref<ChanSource<T_Sample, num_channels> >& s){
 		//TODO:
 	}
 	
