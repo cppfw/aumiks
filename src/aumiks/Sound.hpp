@@ -30,6 +30,7 @@ THE SOFTWARE. */
 
 
 #include "Channel.hpp"
+#include "Source.hpp"
 
 
 
@@ -40,7 +41,7 @@ namespace aumiks{
 /**
  * @brief Base class for sounds.
  * A sound object is an object which holds all the initial data required to play a particular sound.
- * Sound object is normally used to create an instances of a channel to play that sound.
+ * Sound object is normally used to create instances of a source to play that sound.
  */
 class Sound : virtual public ting::RefCounted{
 protected:
@@ -49,12 +50,7 @@ public:
 	
 	virtual ~Sound()throw(){}
 
-	/**
-	 * @brief Channel factory method.
-	 * Creates an instance of the channel which can later be used to play that sound.
-	 * @return a newly created instance of the channel for this sound.
-	 */
-	virtual ting::Ref<aumiks::Channel> CreateChannel()const = 0;
+	virtual ting::Ref<aumiks::Source> CreateSource()const = 0;
 };
 
 }//~namespace

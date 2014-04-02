@@ -34,7 +34,7 @@ THE SOFTWARE. */
 
 namespace aumiks{
 
-template <ting::u8 num_channels> class SpeakersSink : public aumiks::Sink<ting::s32, num_channels>, private audout::PlayerListener{
+template <ting::u8 num_channels> class SpeakersSink : public aumiks::ChanSink<ting::s32, num_channels>, private audout::PlayerListener{
 
 	SpeakersSink(const SpeakersSink&);
 
