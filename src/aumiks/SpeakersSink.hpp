@@ -34,7 +34,10 @@ THE SOFTWARE. */
 
 namespace aumiks{
 
-template <ting::u8 num_channels> class SpeakersSink : public aumiks::ChanSink<ting::s32, num_channels>, private audout::PlayerListener{
+template <audout::AudioFormat::Frame::Type frame_type> class SpeakersSink :
+		public aumiks::ChanSink<audout::AudioFormat::Frame::Traits<frame_type>::NUM_CHANNELS>,
+		private audout::PlayerListener
+{
 
 	SpeakersSink(const SpeakersSink&);
 
@@ -48,13 +51,31 @@ template <ting::u8 num_channels> class SpeakersSink : public aumiks::ChanSink<ti
 
 protected:
 
-	SpeakersSink(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis = 100);
-
+	SpeakersSink(audout::AudioFormat::SamplingRate::Type samplingRate, ting::u16 bufferSizeMillis = 100);
+	
+public:
+	static ting::Ref<SpeakersSink<frame_type> > New(
+			audout::AudioFormat::SamplingRate::Type samplingRate,
+			ting::u16 bufferSizeMillis = 100
+		)
+	{
+		return ting::Ref<SpeakersSink<frame_type> >(
+				new SpeakersSink<frame_type>(samplingRate, bufferSizeMillis)
+			);
+	}
+	
 	//override
 	void Start();
 
 	//override
 	void Stop();
 };
+
+
+
+typedef SpeakersSink<audout::AudioFormat::Frame::MONO> MonoSink;
+typedef SpeakersSink<audout::AudioFormat::Frame::STEREO> StereoSink;
+
+
 
 }
