@@ -286,7 +286,7 @@ void android_main(struct android_app* state) {
 		ASSERT_ALWAYS(aumiks::Lib::IsCreated())
 
 		ting_android::AssetFile fi(state->activity->assetManager, "ice_break.wav");
-		engine.snd = aumiks::WavSound::LoadWAV(fi);
+		engine.snd = aumiks::WavSound::Load(fi);
 		ASSERT_ALWAYS(engine.snd)
 
 //		TRACE(<< "Playing!" << std::endl)

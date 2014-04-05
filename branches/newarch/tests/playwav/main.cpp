@@ -6,11 +6,11 @@
 
 void Play(const std::string& fileName){
 	TRACE_ALWAYS(<< "Playing " << fileName << std::endl)
-	ting::Ref<aumiks::WavSound> snd = aumiks::WavSound::LoadWAV(fileName);
+	ting::Ref<aumiks::WavSound> snd = aumiks::WavSound::Load(fileName);
 
 	ASSERT(snd)
 	
-	ting::Ref<aumiks::WavSound::Channel> ch = snd->CreateWavChannel();
+	ting::Ref<aumiks::WavSound::Source> ch = snd->CreateWavChannel();
 	ch->Play_ts();
 	
 	while(!ch->IsStopped_ts()){

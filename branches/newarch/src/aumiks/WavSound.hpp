@@ -43,21 +43,48 @@ namespace aumiks{
 
 class WavSound : public aumiks::Sound{
 	
-	unsigned chans;
-	unsigned freq;
+	ting::u8 chans;
+	ting::u32 freq;
 	
 protected:
-	WavSound(unsigned chans, unsigned freq) :
+	WavSound(ting::u8 chans, ting::s32 freq) :
 			chans(chans),
 			freq(freq)
 	{}
-	
+
 public:
-	class Channel : public aumiks::Channel{
+	inline ting::u8 NumChannels()const throw(){
+		return this->chans;
+	}
+	
+	inline ting::u32 SamplingRate()const throw(){
+		return this->freq;
+	}
+
+	//TODO:
+//	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{
+//		Ref<WavSound::Channel> ret = this->CreateWavChannel();
+//		ret->Play(numLoops);
+//		return ret;
+//	}
+
+	static ting::Ref<WavSound> Load(const std::string& fileName);
+	static ting::Ref<WavSound> Load(ting::fs::File& fi);
+};
+
+
+
+template <ting::u8 num_channels> class ChanWavSound : public  WavSound{
+protected:
+	ChanWavSound(ting::u32 freq) :
+			WavSound(num_channels, freq)
+	{}
+public:
+	class Source : public aumiks::ChanSource<num_channels>{
 	protected:
 		ting::Inited<unsigned, 1> numLoops;//0 means loop infinitely
 		
-		ting::Inited<unsigned, 0> curSmp;//current index in samples into sound data buffer
+		ting::Inited<ting::u32, 0> curSmp;//current index in samples into sound data buffer
 		
 	public:
 		/**
@@ -70,32 +97,12 @@ public:
 //			this->aumiks::Channel::Play();
 //		}
 	};
-
-public:
-	inline unsigned NumChannels()const throw(){
-		return this->chans;
-	}
 	
-	inline unsigned SamplingRate()const throw(){
-		return this->freq;
-	}
-	
-	virtual ting::Ref<WavSound::Channel> CreateWavChannel()const = 0;
-
-	//TODO:
-//	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{
-//		Ref<WavSound::Channel> ret = this->CreateWavChannel();
-//		ret->Play(numLoops);
-//		return ret;
-//	}
-
-	static ting::Ref<WavSound> LoadWAV(const std::string& fileName);
-	static ting::Ref<WavSound> LoadWAV(ting::fs::File& fi);
-	
+	virtual ting::Ref<Source> CreateWavSource()const = 0;
 	
 	//override
-	virtual ting::Ref<aumiks::Channel> CreateChannel()const{
-		return this->CreateWavChannel();
+	virtual ting::Ref<aumiks::Source> CreateSource()const{
+		return this->CreateWavSource();
 	}
 };
 
