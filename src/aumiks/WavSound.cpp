@@ -30,7 +30,6 @@ THE SOFTWARE. */
 
 #include "Exc.hpp"
 #include "WavSound.hpp"
-#include "Lib.hpp"
 
 
 
@@ -42,23 +41,23 @@ namespace{
 
 
 
-template <class TSampleType, unsigned channels, ting::u32 frequency, unsigned outputChannels, ting::u32 outputFrequency> class WavSoundImpl : public WavSound{
+template <class TSampleType, ting::u8 num_channels, ting::u32 frequency>
+		class WavSoundImpl : public ChanWavSound<num_channels>
+{
 	ting::Array<TSampleType> data;
 	
 
-	class Channel : public WavSound::Channel{
+	class Source : public ChanWavSound::Source{
 		friend class WavSoundImpl;
 
 		const ting::Ref<const WavSoundImpl> wavSound;
-	protected:
-
 	private:
-		inline Channel(const ting::Ref<const WavSoundImpl>& sound) :
+		inline Source(const ting::Ref<const WavSoundImpl>& sound) :
 				wavSound(ASS(sound))
 		{}
 	public:
-		static inline ting::Ref<Channel> New(const ting::Ref<const WavSoundImpl>& sound){
-			return ting::Ref<Channel>(new Channel(sound));
+		static inline ting::Ref<Source> New(const ting::Ref<const WavSoundImpl>& sound){
+			return ting::Ref<Source>(new Source(sound));
 		}
 
 	private:
@@ -66,12 +65,12 @@ template <class TSampleType, unsigned channels, ting::u32 frequency, unsigned ou
 		virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf){
 			ASSERT(buf.Size() % aumiks::Lib::Inst().OutputFormat().frame.NumChannels() == 0)
 			
-			ASSERT(this->wavSound->data.Size() % channels == 0)
-			ASSERT(this->curSmp % channels == 0)
+			ASSERT(this->wavSound->data.Size() % num_channels == 0)
+			ASSERT(this->curSmp % num_channels == 0)
 			
-			size_t framesInBuf = buf.Size() / outputChannels;
+			size_t framesInBuf = buf.Size() / num_channels;
 			
-			size_t framesToCopy = (this->wavSound->data.Size() - this->curSmp) / channels;
+			size_t framesToCopy = (this->wavSound->data.Size() - this->curSmp) / num_channels;
 			ting::util::ClampTop(framesToCopy, framesInBuf);
 
 			ASSERT(framesToCopy <= framesInBuf)
@@ -84,88 +83,31 @@ template <class TSampleType, unsigned channels, ting::u32 frequency, unsigned ou
 			ASSERT(this->curSmp <= this->wavSound->data.Size())			
 			const TSampleType *startSmp = &this->wavSound->data[this->curSmp];
 			
-			this->curSmp += framesToCopy * channels;
+			this->curSmp += framesToCopy * num_channels;
 			
-			if(channels == outputChannels){
-				if(frequency == outputFrequency){
-					ting::s32 *dst = buf.Begin();
-					for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * outputChannels; ++dst, ++src){
-						*dst = ting::s32(*src);
-					}
-					
-					//fill the rest with zeroes
-					for(; dst != buf.End(); ++dst){
-						*dst = 0;
-					}
-					return false;
-				}else{
-					//TODO: resample
-					return true;
-				}
-			}else if(channels < outputChannels){
-				if(frequency == outputFrequency){
-					ting::s32 *dst = buf.Begin();
-					for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * outputChannels;){
-						unsigned c = 0;
-						ting::s32 avg = 0;
-						for(; c != channels; ++c, ++dst, ++src){
-							*dst = ting::s32(*src);
-							avg += *dst;
-						}
-						for(; c != outputChannels; ++c, ++dst){
-							*dst = avg;
-						}
-					}
-					
-					for(; dst != buf.End(); ++dst){
-						*dst = 0;
-					}
-					return false;
-				}else{
-					//TODO: resample
-					return true;
-				}
-			}else{
-				// channels > chans
-				
-				//TODO:
-				if(this->wavSound->SamplingRate() == outputFrequency){
-					ting::s32 *dst = buf.Begin();
-					for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * outputChannels;){						
-						ting::s32 avg = 0;
-						for(unsigned c = outputChannels; c != this->wavSound->NumChannels(); ++c){
-							avg += ting::s32(src[c]);
-						}
-						
-						for(unsigned c = 0; c != outputChannels; ++c, ++dst, ++src){
-							*dst = ting::s32(*src);//(ting::s32(*src) + avg) / ting::s32(this->wavSound->NumChannels() - chans + 1);
-						}
-					}
-					
-					for(; dst != buf.End(); ++dst){
-						*dst = 0;
-					}
-					return false;
-				}else{
-					//TODO: resample
-					return true;
-				}
+			ting::s32 *dst = buf.Begin();
+			for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * num_channels; ++dst, ++src){
+				*dst = ting::s32(*src);
 			}
 
-			return true;
+			//fill the rest with zeroes
+			for(; dst != buf.End(); ++dst){
+				*dst = 0;
+			}
+			return false;
 		}
 	};//~class Channel
 
 private:
 	//override
-	virtual ting::Ref<WavSound::Channel> CreateWavChannel()const{
-		return Channel::New(ting::Ref<const WavSoundImpl>(this));
+	virtual ting::Ref<ChanWavSound::Source> CreateWavSource()const{
+		return Source::New(ting::Ref<const WavSoundImpl>(this));
 	}
 	
 private:
 	//NOTE: assume that data in d is little-endian
 	WavSoundImpl(const ting::Buffer<ting::u8>& d) :
-			WavSound(channels, frequency)
+			WavSound(num_channels, frequency)
 	{
 		ASSERT(d.Size() % (this->NumChannels() * sizeof(TSampleType)) == 0)
 
@@ -197,14 +139,14 @@ public:
 
 
 
-ting::Ref<WavSound> WavSound::LoadWAV(const std::string& fileName){
+ting::Ref<WavSound> WavSound::Load(const std::string& fileName){
 	ting::fs::FSFile fi(fileName);
-	return WavSound::LoadWAV(fi);
+	return WavSound::Load(fi);
 }
 
 
 
-ting::Ref<WavSound> WavSound::LoadWAV(ting::fs::File& fi){
+ting::Ref<WavSound> WavSound::Load(ting::fs::File& fi){
 	ting::fs::File::Guard fileGuard(fi, ting::fs::File::READ);//make sure we close the file even in case of exception is thrown
 
 	//Start reading Wav-file header
@@ -312,7 +254,7 @@ ting::Ref<WavSound> WavSound::LoadWAV(ting::fs::File& fi){
 			case 1://mono
 				switch(frequency){
 					case 11025:
-						ret = WavSoundImpl<ting::s16, 1, 11025, >::New(data);
+						ret = WavSoundImpl<ting::s16, 1, 11025>::New(data);
 						break;
 					case 22050:
 						ret = WavSoundImpl<ting::s16, 1, 22050>::New(data);

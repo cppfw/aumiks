@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2012-2013 Ivan Gagis
+Copyright (c) 2012-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ THE SOFTWARE. */
 #pragma once
 
 
-#include "Channel.hpp"
 #include "Source.hpp"
 
 
@@ -50,6 +49,7 @@ public:
 	
 	virtual ~Sound()throw(){}
 
+	//TODO: doxygen
 	virtual ting::Ref<aumiks::Source> CreateSource()const = 0;
 };
 
