@@ -74,38 +74,4 @@ public:
 
 
 
-template <ting::u8 num_channels> class ChanWavSound : public  WavSound{
-protected:
-	ChanWavSound(ting::u32 freq) :
-			WavSound(num_channels, freq)
-	{}
-public:
-	class Source : public aumiks::ChanSource<num_channels>{
-	protected:
-		ting::Inited<unsigned, 1> numLoops;//0 means loop infinitely
-		
-		ting::Inited<ting::u32, 0> curSmp;//current index in samples into sound data buffer
-		
-	public:
-		/**
-		 * @brief play channel
-         * @param numLoops - number of time the sound should be repeated. 0 means repeat infinitely.
-         */
-		//TODO:
-//		inline void Play(unsigned numLoops = 1){
-//			this->numLoops = numLoops;//not protected by mutex, but should not cause any serious problems
-//			this->aumiks::Channel::Play();
-//		}
-	};
-	
-	virtual ting::Ref<Source> CreateWavSource()const = 0;
-	
-	//override
-	virtual ting::Ref<aumiks::Source> CreateSource()const{
-		return this->CreateWavSource();
-	}
-};
-
-
-
 }

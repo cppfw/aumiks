@@ -39,6 +39,7 @@ namespace aumiks{
 //TODO: doxygen
 class Source : virtual public ting::RefCounted{
 	template <ting::u8> friend class Input;
+	template <ting::u8 num_channels> friend class ChanSource;
 	
 	Source(const Source&);
 	Source& operator=(const Source&);

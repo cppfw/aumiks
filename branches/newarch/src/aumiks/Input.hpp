@@ -28,6 +28,7 @@ THE SOFTWARE. */
 
 #pragma once
 
+#include "Exc.hpp"
 #include "Source.hpp"
 
 namespace aumiks{

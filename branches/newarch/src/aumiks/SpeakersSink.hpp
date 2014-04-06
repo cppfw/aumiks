@@ -51,7 +51,15 @@ template <audout::AudioFormat::Frame::Type frame_type> class SpeakersSink :
 
 protected:
 
-	SpeakersSink(audout::AudioFormat::SamplingRate::Type samplingRate, ting::u16 bufferSizeMillis = 100);
+	SpeakersSink(audout::AudioFormat::SamplingRate::Type samplingRate, ting::u16 bufferSizeMillis = 100) :
+			smpBuf((audout::AudioFormat::SamplingRate(samplingRate).Frequency() * bufferSizeMillis / 1000) * this->NumChannels())
+	{
+		this->player = audout::Player::CreatePlayer(
+				audout::AudioFormat(frame_type, samplingRate),
+				smpBuf.Size() / this->NumChannels(),
+				this
+			);
+	}
 	
 public:
 	static ting::Ref<SpeakersSink<frame_type> > New(
@@ -65,10 +73,14 @@ public:
 	}
 	
 	//override
-	void Start();
+	void SpeakersSink::Start(){
+		this->player->SetPaused(false);
+	}
 
 	//override
-	void Stop();
+	void SpeakersSink::Stop(){
+		this->player->SetPaused(true);
+	}
 };
 
 
