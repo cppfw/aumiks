@@ -40,7 +40,7 @@ class Sink{
 	
 protected:
 	Sink(ting::u8 numChannles) :
-			numChannles(numChannles)
+			numChannels(numChannles)
 	{}
 public:
 	

@@ -41,13 +41,47 @@ namespace{
 
 
 
+template <ting::u8 num_channels> class ChanWavSound : public  WavSound{
+protected:
+	ChanWavSound(ting::u32 freq) :
+			WavSound(num_channels, freq)
+	{}
+public:
+	class Source : public aumiks::ChanSource<num_channels>{
+	protected:
+		ting::Inited<unsigned, 1> numLoops;//0 means loop infinitely
+		
+		ting::Inited<ting::u32, 0> curSmp;//current index in samples into sound data buffer
+		
+	public:
+		/**
+		 * @brief play channel
+         * @param numLoops - number of time the sound should be repeated. 0 means repeat infinitely.
+         */
+		//TODO:
+//		inline void Play(unsigned numLoops = 1){
+//			this->numLoops = numLoops;//not protected by mutex, but should not cause any serious problems
+//			this->aumiks::Channel::Play();
+//		}
+	};
+	
+	virtual ting::Ref<Source> CreateWavSource()const = 0;
+	
+	//override
+	virtual ting::Ref<aumiks::Source> CreateSource()const{
+		return this->CreateWavSource();
+	}
+};
+
+
+
 template <class TSampleType, ting::u8 num_channels, ting::u32 frequency>
 		class WavSoundImpl : public ChanWavSound<num_channels>
 {
 	ting::Array<TSampleType> data;
 	
 
-	class Source : public ChanWavSound::Source{
+	class Source : public ChanWavSound<num_channels>::Source{
 		friend class WavSoundImpl;
 
 		const ting::Ref<const WavSoundImpl> wavSound;
@@ -62,8 +96,8 @@ template <class TSampleType, ting::u8 num_channels, ting::u32 frequency>
 
 	private:
 		//override
-		virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf){
-			ASSERT(buf.Size() % aumiks::Lib::Inst().OutputFormat().frame.NumChannels() == 0)
+		virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw(){
+			ASSERT(buf.Size() % num_channels == 0)
 			
 			ASSERT(this->wavSound->data.Size() % num_channels == 0)
 			ASSERT(this->curSmp % num_channels == 0)
@@ -100,14 +134,14 @@ template <class TSampleType, ting::u8 num_channels, ting::u32 frequency>
 
 private:
 	//override
-	virtual ting::Ref<ChanWavSound::Source> CreateWavSource()const{
+	virtual ting::Ref<typename ChanWavSound<num_channels>::Source> CreateWavSource()const{
 		return Source::New(ting::Ref<const WavSoundImpl>(this));
 	}
 	
 private:
 	//NOTE: assume that data in d is little-endian
 	WavSoundImpl(const ting::Buffer<ting::u8>& d) :
-			WavSound(num_channels, frequency)
+			ChanWavSound<num_channels>(frequency)
 	{
 		ASSERT(d.Size() % (this->NumChannels() * sizeof(TSampleType)) == 0)
 

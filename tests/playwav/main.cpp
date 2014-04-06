@@ -1,4 +1,3 @@
-#include "../../src/aumiks/Lib.hpp"
 #include "../../src/aumiks/WavSound.hpp"
 
 #include <ting/fs/FSFile.hpp>
@@ -10,7 +9,7 @@ void Play(const std::string& fileName){
 
 	ASSERT(snd)
 	
-	ting::Ref<aumiks::WavSound::Source> ch = snd->CreateWavChannel();
+	ting::Ref<aumiks::Source> ch = snd->CreateSource();
 	ch->Play_ts();
 	
 	while(!ch->IsStopped_ts()){
