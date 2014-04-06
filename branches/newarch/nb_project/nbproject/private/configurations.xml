@@ -107,8 +107,6 @@
         <in>Channel.hpp</in>
         <in>Effect.cpp</in>
         <in>Effect.hpp</in>
-        <in>Element.cpp</in>
-        <in>Element.hpp</in>
         <in>Exc.hpp</in>
         <in>Input.hpp</in>
         <in>Lib.cpp</in>
