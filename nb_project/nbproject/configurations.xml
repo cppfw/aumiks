@@ -51,7 +51,6 @@
         </df>
         <in>Channel.cpp</in>
         <in>Effect.cpp</in>
-        <in>Element.cpp</in>
         <in>Lib.cpp</in>
         <in>MixChannel.cpp</in>
         <in>WavSound.cpp</in>
@@ -240,10 +239,6 @@
         </ccTool>
       </item>
       <item path="../src/aumiks/Effect.cpp" ex="false" tool="1" flavor2="4">
-        <ccTool>
-        </ccTool>
-      </item>
-      <item path="../src/aumiks/Element.cpp" ex="false" tool="1" flavor2="4">
         <ccTool>
         </ccTool>
       </item>
