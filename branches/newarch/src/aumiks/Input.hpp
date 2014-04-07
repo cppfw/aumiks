@@ -38,39 +38,53 @@ template <ting::u8 num_channels> class Input{
 	
 	ting::Ref<aumiks::ChanSource<num_channels> > srcInUse;
 	
+	ting::atomic::SpinLock spinLock;
 public:
+	//thread safe
 	bool IsConnected()const{
 		return this->src.IsValid();
 	}
 	
-	void Connect(const ting::Ref<aumiks::ChanSource<num_channels> >& src){
-		ASSERT(src.IsValid())
+	void Connect(const ting::Ref<aumiks::ChanSource<num_channels> >& source){
+		ASSERT(source.IsValid())
 		
 		if(this->IsConnected()){
 			throw aumiks::Exc("Input already connected");
 		}
 		
-		if(src->IsConnected()){
+		if(source->IsConnected()){
 			throw aumiks::Exc("Source is already connected");
 		}
 		
-		src->isConnected = true;
-		this->src = src;
+		{
+			ting::atomic::SpinLock::Guard guard(this->spinLock);
+			source->isConnected = true;
+			this->src = source;
+		}
 	}
 	
 	void Disconnect()throw(){
-		ASSERT(this->src.IsValid())
+		//To minimize the time with locked spinlock need to avoid object destruction
+		//within the locked spinlock period. To achieve that use temporary strong reference.
+		ting::Ref<aumiks::ChanSource<num_channels> > tmp;
 		
-		this->src->isConnected = false;
-		this->src.Reset();
+		if(this->src.IsValid()){
+			ting::atomic::SpinLock::Guard guard(this->spinLock);
+			tmp = this->src;
+			tmp->isConnected = false;
+			this->src.Reset();
+		}
 	}
 	
-	const ting::Ref<aumiks::ChanSource<num_channels> >& Source(){
-		return this->src;
-	}
-	
-	const ting::Ref<const aumiks::ChanSource<num_channels> >& Source()const{
-		return this->src;
+	bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw(){
+		if(this->src != this->srcInUse){
+			ting::atomic::SpinLock::Guard guard(this->spinLock);
+			this->srcInUse = this->src;
+		}
+		if(this->srcInUse.IsNotValid()){
+			return false;
+		}
+		return this->srcInUse->FillSampleBuffer(buf);
 	}
 };
 

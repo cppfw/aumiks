@@ -18,7 +18,7 @@ ifeq ($(platform),darwin)
     remove := rm -rf
 endif
 ifeq ($(platform),linux)
-    libs := ../../src/libaumiks.so -lting
+    libs := ../../src/libaumiks.so -lting -laudout
     includes :=
     remove := rm -rf
 endif
