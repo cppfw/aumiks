@@ -47,10 +47,28 @@ template <audout::AudioFormat::Frame::Type frame_type> class SpeakersSink :
 
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	//override
-	void FillPlayBuf(ting::Buffer<ting::s16>& playBuf);
+	void FillPlayBuf(const ting::Buffer<ting::s16>& playBuf)throw(){
+		ASSERT(this->smpBuf.Size() == playBuf.Size())
 
-protected:
+		if(this->input.FillSampleBuffer(this->smpBuf)){
+			this->input.Disconnect();
+		}
+		
+		const ting::s32 *src = this->smpBuf.Begin();
+		ting::s16* dst = playBuf.Begin();
+		for(; src != this->smpBuf.End(); ++src, ++dst){
+			ting::s32 tmp = *src;
+			ting::util::ClampTop(tmp, 0x7fff);
+			ting::util::ClampBottom(tmp, -0x7fff);
 
+			ASSERT(playBuf.Overlaps(dst))
+			
+			*dst = ting::s16(tmp);
+		}
+		ASSERT(dst == playBuf.End())
+	}
+	
+public:
 	SpeakersSink(audout::AudioFormat::SamplingRate::Type samplingRate, ting::u16 bufferSizeMillis = 100) :
 			smpBuf((audout::AudioFormat::SamplingRate(samplingRate).Frequency() * bufferSizeMillis / 1000) * this->NumChannels())
 	{
@@ -61,24 +79,13 @@ protected:
 			);
 	}
 	
-public:
-	static ting::Ref<SpeakersSink<frame_type> > New(
-			audout::AudioFormat::SamplingRate::Type samplingRate,
-			ting::u16 bufferSizeMillis = 100
-		)
-	{
-		return ting::Ref<SpeakersSink<frame_type> >(
-				new SpeakersSink<frame_type>(samplingRate, bufferSizeMillis)
-			);
-	}
-	
 	//override
-	void SpeakersSink::Start(){
+	void Start(){
 		this->player->SetPaused(false);
 	}
 
 	//override
-	void SpeakersSink::Stop(){
+	void Stop(){
 		this->player->SetPaused(true);
 	}
 };

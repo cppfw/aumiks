@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009-2012 Ivan Gagis
+Copyright (c) 2009-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ THE SOFTWARE. */
 #pragma once
 
 
+#include <string>
 
 #include <ting/Exc.hpp>
 
@@ -38,16 +39,9 @@ namespace aumiks{
 
 class Exc : public ting::Exc{
 public:
-	inline Exc(const char* msg) :
-			ting::Exc(msg),
-			errorCode(UNKNOWN)
+	inline Exc(const std::string&  msg) :
+			ting::Exc(msg)
 	{}
-
-	enum E_Error{
-		UNKNOWN
-	};
-
-	E_Error errorCode;
 };
 
 }//~namespace
