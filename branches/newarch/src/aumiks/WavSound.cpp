@@ -75,7 +75,7 @@ public:
 
 
 
-template <class TSampleType, ting::u8 num_channels, ting::u32 frequency>
+template <class TSampleType, ting::u8 num_channels>
 		class WavSoundImpl : public ChanWavSound<num_channels>
 {
 	ting::Array<TSampleType> data;
@@ -140,7 +140,7 @@ private:
 	
 private:
 	//NOTE: assume that data in d is little-endian
-	WavSoundImpl(const ting::Buffer<ting::u8>& d) :
+	WavSoundImpl(const ting::Buffer<ting::u8>& d, ting::u32 frequency) :
 			ChanWavSound<num_channels>(frequency)
 	{
 		ASSERT(d.Size() % (this->NumChannels() * sizeof(TSampleType)) == 0)
@@ -162,8 +162,8 @@ private:
 	}
 
 public:
-	static inline ting::Ref<WavSoundImpl> New(const ting::Buffer<ting::u8>& d){
-		return ting::Ref<WavSoundImpl>(new WavSoundImpl(d));
+	static inline ting::Ref<WavSoundImpl> New(const ting::Buffer<ting::u8>& d, ting::u32 frequency){
+		return ting::Ref<WavSoundImpl>(new WavSoundImpl(d, frequency));
 	}
 };
 
@@ -286,34 +286,10 @@ ting::Ref<WavSound> WavSound::Load(ting::fs::File& fi){
 		//set the format
 		switch(chans){
 			case 1://mono
-				switch(frequency){
-					case 11025:
-						ret = WavSoundImpl<ting::s16, 1, 11025>::New(data);
-						break;
-					case 22050:
-						ret = WavSoundImpl<ting::s16, 1, 22050>::New(data);
-						break;
-					case 44100:
-						ret = WavSoundImpl<ting::s16, 1, 44100>::New(data);
-						break;
-					default:
-						throw Exc("WavSound::LoadWAV(): unsupported sampling rate");
-				}
+				ret = WavSoundImpl<ting::s16, 1>::New(data, frequency);
 				break;
 			case 2://stereo
-				switch(frequency){
-					case 11025:
-						ret = WavSoundImpl<ting::s16, 2, 11025>::New(data);
-						break;
-					case 22050:
-						ret = WavSoundImpl<ting::s16, 2, 22050>::New(data);
-						break;
-					case 44100:
-						ret = WavSoundImpl<ting::s16, 2, 44100>::New(data);
-						break;
-					default:
-						throw Exc("WavSound::LoadWAV(): unsupported sampling rate");
-				}
+				ret = WavSoundImpl<ting::s16, 2>::New(data, frequency);
 				break;
 			default:
 				throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");
