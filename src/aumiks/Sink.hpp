@@ -37,15 +37,21 @@ namespace aumiks{
 //TODO: doxygen
 class Sink{
 	ting::u8 numChannels;
+	ting::u32 frequency;
 	
 protected:
-	Sink(ting::u8 numChannles) :
-			numChannels(numChannles)
+	Sink(ting::u8 numChannles, ting::u32 frequency) :
+			numChannels(numChannles),
+			frequency(frequency)
 	{}
 public:
 	
-	ting::u8 NumChannels()throw(){
+	ting::u8 NumChannels()const throw(){
 		return this->numChannels;
+	}
+	
+	ting::u32 Frequency()const throw(){
+		return this->frequency;
 	}
 	
 	virtual ~Sink()throw(){}
@@ -61,11 +67,11 @@ public:
 
 template <ting::u8 num_channels> class ChanSink : public Sink{
 protected:
-	ChanSink() :
-			Sink(num_channels)
+	ChanSink(ting::u32 frequency) :
+			Sink(num_channels, frequency)
 	{}
 public:
-	aumiks::Input<num_channels> input;
+	aumiks::ChanInput<num_channels> input;
 };
 
 }
