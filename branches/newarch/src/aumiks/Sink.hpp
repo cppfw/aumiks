@@ -36,10 +36,11 @@ namespace aumiks{
 
 //TODO: doxygen
 class Sink{
+	template <ting::u8> friend class ChanSink;
+	
 	ting::u8 numChannels;
 	ting::u32 frequency;
 	
-protected:
 	Sink(ting::u8 numChannles, ting::u32 frequency) :
 			numChannels(numChannles),
 			frequency(frequency)
