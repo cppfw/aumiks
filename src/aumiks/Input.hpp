@@ -105,7 +105,7 @@ public:
 	bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw(){
 		if(this->src != this->srcInUse){
 			ting::atomic::SpinLock::Guard guard(this->spinLock);
-			ASSERT(this->src->NumChannels() == num_channels)
+//			ASSERT(this->src.IsNotValid() || this->src->NumChannels() == num_channels)
 			typedef aumiks::ChanSource<num_channels> T_ChanneledSource;
 			this->srcInUse = this->src.template StaticCast<T_ChanneledSource>();
 		}
