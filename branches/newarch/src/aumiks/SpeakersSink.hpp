@@ -70,7 +70,10 @@ template <audout::AudioFormat::Frame::Type frame_type> class SpeakersSink :
 	
 public:
 	SpeakersSink(audout::AudioFormat::SamplingRate::Type samplingRate, ting::u16 bufferSizeMillis = 100) :
-			smpBuf((audout::AudioFormat::SamplingRate(samplingRate).Frequency() * bufferSizeMillis / 1000) * this->NumChannels())
+			aumiks::ChanSink<audout::AudioFormat::Frame::Traits<frame_type>::NUM_CHANNELS>(
+					audout::AudioFormat::SamplingRate(samplingRate).Frequency()
+				),
+			smpBuf((this->Frequency() * bufferSizeMillis / 1000) * this->NumChannels())
 	{
 		this->player = audout::Player::CreatePlayer(
 				audout::AudioFormat(frame_type, samplingRate),

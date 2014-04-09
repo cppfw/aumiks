@@ -33,20 +33,45 @@ THE SOFTWARE. */
 
 namespace aumiks{
 
-template <ting::u8 num_channels> class Input{
-	ting::Ref<aumiks::ChanSource<num_channels> > src;
+
+
+class Input{
+	template <ting::u8 num_channels> friend class ChanInput;
 	
-	ting::Ref<aumiks::ChanSource<num_channels> > srcInUse;
+	ting::u8 numChannels;
+	
+	Input(ting::u8 numChannels) :
+			numChannels(numChannels)
+	{}
+	
+	ting::Ref<aumiks::Source> src;
+	
+	ting::Ref<aumiks::Source> srcInUse;
 	
 	ting::atomic::SpinLock spinLock;
 public:
-	//thread safe
-	bool IsConnected()const{
-		return this->src.IsValid();
+	virtual ~Input()throw(){}
+	
+	ting::u8 NumChannels()const throw(){
+		return this->numChannels;
 	}
 	
-	void Connect(const ting::Ref<aumiks::ChanSource<num_channels> >& source){
+	void Disconnect()throw(){
+		//To minimize the time with locked spinlock need to avoid object destruction
+		//within the locked spinlock period. To achieve that use temporary strong reference.
+		ting::Ref<aumiks::Source> tmp;
+		
+		if(this->src.IsValid()){
+			ting::atomic::SpinLock::Guard guard(this->spinLock);
+			tmp = this->src;
+			tmp->isConnected = false;
+			this->src.Reset();
+		}
+	}
+	
+	void Connect(const ting::Ref<aumiks::Source>& source){
 		ASSERT(source.IsValid())
+		ASSERT(this->NumChannels() == source->NumChannels())
 		
 		if(this->IsConnected()){
 			throw aumiks::Exc("Input already connected");
@@ -63,18 +88,21 @@ public:
 		}
 	}
 	
-	void Disconnect()throw(){
-		//To minimize the time with locked spinlock need to avoid object destruction
-		//within the locked spinlock period. To achieve that use temporary strong reference.
-		ting::Ref<aumiks::ChanSource<num_channels> > tmp;
-		
-		if(this->src.IsValid()){
-			ting::atomic::SpinLock::Guard guard(this->spinLock);
-			tmp = this->src;
-			tmp->isConnected = false;
-			this->src.Reset();
-		}
+	//thread safe
+	bool IsConnected()const{
+		return this->src.IsValid();
 	}
+};
+
+
+
+template <ting::u8 num_channels> class ChanInput : public Input{
+	
+public:
+	
+	ChanInput() :
+			Input(num_channels)
+	{}
 	
 	bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw(){
 		if(this->src != this->srcInUse){
@@ -84,7 +112,7 @@ public:
 		if(this->srcInUse.IsNotValid()){
 			return false;
 		}
-		return this->srcInUse->FillSampleBuffer(buf);
+		return static_cast<aumiks::ChanSource<num_channels>*>(this->srcInUse.operator->())->FillSampleBuffer(buf);
 	}
 };
 

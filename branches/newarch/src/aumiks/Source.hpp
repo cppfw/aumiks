@@ -38,7 +38,7 @@ namespace aumiks{
 
 //TODO: doxygen
 class Source : virtual public ting::RefCounted{
-	template <ting::u8> friend class Input;
+	friend class Input;
 	template <ting::u8 num_channels> friend class ChanSource;
 	
 	Source(const Source&);
@@ -54,10 +54,12 @@ class Source : virtual public ting::RefCounted{
 public:
 	virtual ~Source()throw(){}
 	
-	virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw() = 0;
-	
 	bool IsConnected()throw(){
 		return this->isConnected;
+	}
+	
+	ting::u8 NumChannels()const throw(){
+		return this->numChannels;
 	}
 private:
 
@@ -66,6 +68,8 @@ private:
 
 
 template <ting::u8 num_channels> class ChanSource : public Source{
+	template <ting::u8> friend class ChanInput;
+	
 	ChanSource(const ChanSource&);
 	ChanSource& operator=(const ChanSource&);
 	
@@ -73,6 +77,8 @@ protected:
 	ChanSource() :
 			Source(num_channels)
 	{}
+	
+	virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw() = 0;
 };
 
 
