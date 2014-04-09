@@ -38,7 +38,6 @@ template <audout::AudioFormat::Frame::Type frame_type> class SpeakersSink :
 		public aumiks::ChanSink<audout::AudioFormat::Frame::Traits<frame_type>::NUM_CHANNELS>,
 		private audout::PlayerListener
 {
-
 	SpeakersSink(const SpeakersSink&);
 
 	ting::Ptr<audout::Player> player;
