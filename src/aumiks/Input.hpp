@@ -46,8 +46,6 @@ class Input{
 	
 	ting::Ref<aumiks::Source> src;
 	
-	ting::Ref<aumiks::Source> srcInUse;
-	
 	ting::atomic::SpinLock spinLock;
 public:
 	virtual ~Input()throw(){}
@@ -97,7 +95,7 @@ public:
 
 
 template <ting::u8 num_channels> class ChanInput : public Input{
-	
+	ting::Ref<aumiks::ChanSource<num_channels> > srcInUse;
 public:
 	
 	ChanInput() :
@@ -107,12 +105,14 @@ public:
 	bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw(){
 		if(this->src != this->srcInUse){
 			ting::atomic::SpinLock::Guard guard(this->spinLock);
-			this->srcInUse = this->src;
+			ASSERT(this->src->NumChannels() == num_channels)
+			typedef aumiks::ChanSource<num_channels> T_ChanneledSource;
+			this->srcInUse = this->src.template StaticCast<T_ChanneledSource>();
 		}
 		if(this->srcInUse.IsNotValid()){
 			return false;
 		}
-		return static_cast<aumiks::ChanSource<num_channels>*>(this->srcInUse.operator->())->FillSampleBuffer(buf);
+		return this->srcInUse->FillSampleBuffer(buf);
 	}
 };
 
