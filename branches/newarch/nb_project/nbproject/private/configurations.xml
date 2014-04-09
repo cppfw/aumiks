@@ -186,11 +186,11 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
           <runcommandpicklistitem>tests</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>tests</runcommand>
-        <rundir>../tests/playwav</rundir>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>/home/ivan/prj/aumiks/nb_project/../tests/playwav</rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
