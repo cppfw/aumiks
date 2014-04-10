@@ -56,28 +56,12 @@ public:
 	virtual ~Source()throw(){}
 	
 	//thread safe
-	bool IsConnected()throw(){
+	bool IsConnected()const throw(){
 		return this->isConnected;
 	}
 private:
 
 };
-
-
-
-//template <ting::u8 num_channels> class ChanSource : public Source{
-//	template <ting::u8> friend class ChanInput;
-//	
-//	ChanSource(const ChanSource&);
-//	ChanSource& operator=(const ChanSource&);
-//	
-//protected:
-//	ChanSource() :
-//			Source(num_channels)
-//	{}
-//	
-//	virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw() = 0;
-//};
 
 
 
