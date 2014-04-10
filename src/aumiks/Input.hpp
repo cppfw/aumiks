@@ -69,7 +69,7 @@ public:
 	
 	void Connect(const ting::Ref<aumiks::Source>& source){
 		ASSERT(source.IsValid())
-		ASSERT(this->NumChannels() == source->NumChannels())
+		ASSERT(this->NumChannels() == source->output.NumChannels())
 		
 		if(this->IsConnected()){
 			throw aumiks::Exc("Input already connected");
@@ -95,7 +95,8 @@ public:
 
 
 template <ting::u8 num_channels> class ChanInput : public Input{
-	ting::Ref<aumiks::ChanSource<num_channels> > srcInUse;
+	ting::Ref<aumiks::Source> srcInUse;
+
 public:
 	
 	ChanInput() :
@@ -105,14 +106,14 @@ public:
 	bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw(){
 		if(this->src != this->srcInUse){
 			ting::atomic::SpinLock::Guard guard(this->spinLock);
-			ASSERT(this->src.IsNotValid() || this->src->NumChannels() == num_channels)
-			typedef aumiks::ChanSource<num_channels> T_ChanneledSource;
-			this->srcInUse = this->src.template StaticCast<T_ChanneledSource>();
+			ASSERT(this->src.IsNotValid() || this->src->output.NumChannels() == num_channels)
+			this->srcInUse = this->src;//this->src.template StaticCast<T_ChanneledSource>();
 		}
 		if(this->srcInUse.IsNotValid()){
 			return false;
 		}
-		return this->srcInUse->FillSampleBuffer(buf);
+		typedef aumiks::ChanOutput<num_channels> T_ChanneledOutput;
+		return static_cast<T_ChanneledOutput&>(this->srcInUse->output).FillSampleBuffer(buf);
 	}
 };
 
