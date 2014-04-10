@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009-2014 Ivan Gagis
+Copyright (c) 2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,71 +26,51 @@ THE SOFTWARE. */
  * @author Ivan Gagis <igagis@gmail.com>
  */
 
-
 #pragma once
 
+#include <ting/types.hpp>
 
-#include <ting/Array.hpp>
-#include <ting/fs/File.hpp>
-
-#include "Sound.hpp"
-
+#include "Exc.hpp"
 
 
 namespace aumiks{
 
 
 
-class WavSound : public aumiks::Sound{
+class Output{
+	template <ting::u8> friend class ChanOutput;
 	
-	ting::u8 chans;
-	ting::u32 freq;
+	ting::u8 numChannels;
 	
-protected:
-	WavSound(ting::u8 chans, ting::s32 freq) :
-			chans(chans),
-			freq(freq)
+	Output(const Output&);
+	Output& operator=(const Output&);
+	
+	Output(ting::u8 numChannels) :
+			numChannels(numChannels)
 	{}
-
+	
 public:
-	inline ting::u8 NumChannels()const throw(){
-		return this->chans;
+	virtual ~Output()throw(){}
+	
+	ting::u8 NumChannels()const throw(){
+		return this->numChannels;
 	}
-	
-	inline ting::u32 SamplingRate()const throw(){
-		return this->freq;
-	}
-
-	class Source : public aumiks::Source{
-		Source(const Source&);
-		Source& operator=(const Source&);
-	protected:
-		Source(aumiks::Output& output) :
-				aumiks::Source(output)
-		{}
-	public:
-		
-		//TODO:
-	};
-	
-	virtual ting::Ref<Source> CreateWavSource()const = 0;
-	
-	//override
-	ting::Ref<aumiks::Source> CreateSource()const{
-		return this->CreateWavSource();
-	}
-	
-	//TODO:
-//	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{
-//		Ref<WavSound::Channel> ret = this->CreateWavChannel();
-//		ret->Play(numLoops);
-//		return ret;
-//	}
-
-	static ting::Ref<WavSound> Load(const std::string& fileName);
-	static ting::Ref<WavSound> Load(ting::fs::File& fi);
 };
 
+
+
+template <ting::u8 num_channels> class ChanOutput : public Output{
+	ChanOutput(const ChanOutput&);
+	ChanOutput& operator=(const ChanOutput&);
+	
+public:
+	
+	ChanOutput() :
+			Output(num_channels)
+	{}
+	
+	virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw() = 0;
+};
 
 
 }

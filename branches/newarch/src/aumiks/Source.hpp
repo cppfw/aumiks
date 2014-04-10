@@ -32,6 +32,7 @@ THE SOFTWARE. */
 #include <ting/Buffer.hpp>
 #include <ting/Ref.hpp>
 
+#include "Output.hpp"
 
 namespace aumiks{
 
@@ -39,27 +40,24 @@ namespace aumiks{
 //TODO: doxygen
 class Source : virtual public ting::RefCounted{
 	friend class Input;
-	template <ting::u8> friend class ChanSource;
 	
 	Source(const Source&);
 	Source& operator=(const Source&);
 	
 	ting::Inited<bool, false> isConnected;
 	
-	ting::u8 numChannels;
-	
-	Source(ting::u8 numChannels) :
-			numChannels(numChannels)
+protected:
+	Source(aumiks::Output& output) :
+			output(output)
 	{}
 public:
+	aumiks::Output& output;
+	
 	virtual ~Source()throw(){}
 	
+	//thread safe
 	bool IsConnected()throw(){
 		return this->isConnected;
-	}
-	
-	ting::u8 NumChannels()const throw(){
-		return this->numChannels;
 	}
 private:
 
@@ -67,19 +65,19 @@ private:
 
 
 
-template <ting::u8 num_channels> class ChanSource : public Source{
-	template <ting::u8> friend class ChanInput;
-	
-	ChanSource(const ChanSource&);
-	ChanSource& operator=(const ChanSource&);
-	
-protected:
-	ChanSource() :
-			Source(num_channels)
-	{}
-	
-	virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw() = 0;
-};
+//template <ting::u8 num_channels> class ChanSource : public Source{
+//	template <ting::u8> friend class ChanInput;
+//	
+//	ChanSource(const ChanSource&);
+//	ChanSource& operator=(const ChanSource&);
+//	
+//protected:
+//	ChanSource() :
+//			Source(num_channels)
+//	{}
+//	
+//	virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw() = 0;
+//};
 
 
 

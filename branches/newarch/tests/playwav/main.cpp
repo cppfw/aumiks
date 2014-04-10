@@ -29,7 +29,7 @@ int main(int argc, char *argv[]){
 		
 		ASSERT_ALWAYS(snd->NumChannels() == 1)
 		
-		sink.input.Connect(snd->CreateSource().StaticCast<aumiks::ChanSource<1> >());
+		sink.input.Connect(snd->CreateSource());
 		sink.Start();
 		
 		while(sink.input.IsConnected()){
