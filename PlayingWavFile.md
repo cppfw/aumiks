@@ -1,0 +1,32 @@
+# How to play a wav file #
+
+A minimal example of using the **aumiks** library to play a WAV file.
+
+```
+#include <ting/Thread.hpp> //for ting::Thread::Sleep()
+#include <aumiks/WavSound.hpp>
+
+int main(int argc, char *argv[]){
+	//open audio device by creatig a singleton object.
+	//We request stereo 44100KHz format and 100ms playing buffer.
+	aumiks::Lib aumiksLibrary(100, aumiks::STEREO_16_44100);
+	
+	//load sound from WAV file
+	ting::Ref<aumiks::WavSound> snd = aumiks::WavSound::LoadWAV("sample.wav");
+	
+	//In order to play the sound it is necessary to create a playing channel
+	//for this sound using CreateChannel() method, and then start playback of
+	//the created channel. The number of channels existing simultaneously is
+	//not limited.
+	//Some sound classes, like WavSound, provide convenience method Play() which
+	//creates a channel and starts playing it.
+	ting::Ref<aumiks::Channel> ch = snd->Play();
+	
+	//check if sound has finished playing every 50ms.
+	while(ch->IsPlaying()){
+		ting::Thread::Sleep(50);
+	}
+	
+	return 0;
+}
+```
