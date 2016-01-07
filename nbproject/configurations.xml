@@ -54,8 +54,7 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <flagsDictionary>
-        <element flagsID="0"
-                 commonFlags="-mtune=generic -march=x86-64 -std=c++11 -funsigned-char -fPIC"/>
+        <element flagsID="0" commonFlags="-funsigned-char -std=c++11 -fPIC"/>
         <element flagsID="1" commonFlags="-std=c++11"/>
       </flagsDictionary>
       <codeAssistance>
@@ -109,11 +108,11 @@
       <item path="src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>/usr/include/utki</pElem>
-            <pElem>/usr/include/papki</pElem>
-            <pElem>src/aumiks</pElem>
             <pElem>.</pElem>
           </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="tests/effects/main.cpp" ex="false" tool="1" flavor2="8">

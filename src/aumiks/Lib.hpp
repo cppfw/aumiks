@@ -84,6 +84,7 @@ public:
 	 * @brief Create sound library singleton instance.
 	 * Creates singleton instance of sound library object and
 	 * opens sound device.
+	 * @param outputFormat - desired audio output format.
 	 * @param bufferSizeMillis - size of desired playing buffer in milliseconds. Use smaller buffers for higher latency.
 	 *                           Note, that very small buffer may result in bigger overhead and lags. The same applies to very big buffer sizes.
 	 */

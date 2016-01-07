@@ -54,8 +54,6 @@ protected:
 	 * possible if there are any effects added to this channel which keeps playing, for example
 	 * an echo effect.
 	 * @param buf - the sample buffer to fill with the data to play.
-	 * @param freq - sampling rate in Hertz.
-	 * @param chans - number of channels (1 = mono, 2 = stereo, etc.).
 	 * @return true if sound playing has finished. Returning true will result in that the channel will be removed
 	 *         from the pool of playing channels and the contents of the 'buf' after this call will not be played.
 	 * @return false otherwise.
