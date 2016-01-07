@@ -1,6 +1,6 @@
 include prorab.mk
 
-this_name := audout
+this_name := aumiks
 
 this_soname := $(shell cat $(prorab_this_dir)/soname.txt)
 

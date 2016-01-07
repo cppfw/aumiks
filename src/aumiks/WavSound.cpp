@@ -1,33 +1,4 @@
-/* The MIT License:
-
-Copyright (c) 2009-2014 Ivan Gagis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. */
-
-// Home page: http://aumiks.googlecode.com
-
-
-
-#include <ting/Buffer.hpp>
-#include <ting/fs/FSFile.hpp>
-#include <ting/util.hpp>
-#include <ting/Array.hpp>
+#include <papki/FSFile.hpp>
 
 #include "Exc.hpp"
 #include "WavSound.hpp"
@@ -42,40 +13,36 @@ namespace{
 
 
 
-template <class TSampleType, ting::u8 num_channels>
+template <class TSampleType, std::uint8_t num_channels>
 		class WavSoundImpl : public WavSound
 {
-	ting::Array<TSampleType> data;
+	std::vector<TSampleType> data;
 	
 
 	class Source : public WavSound::Source, private aumiks::ChanOutput<num_channels>{
 //		friend class WavSoundImpl;
 
-		const ting::Ref<const WavSoundImpl> wavSound;
+		const std::shared_ptr<const WavSoundImpl> wavSound;
 		
-		ting::Inited<ting::u32, 0> curSmp;
+		std::uint32_t curSmp = 0;
 	
-		Source(const ting::Ref<const WavSoundImpl>& sound) :
+	public:
+		Source(const std::shared_ptr<const WavSoundImpl>& sound) :
 				WavSound::Source(static_cast<aumiks::ChanOutput<num_channels>&>(*this)),
 				wavSound(ASS(sound))
 		{}
-	public:
-		static inline ting::Ref<Source> New(const ting::Ref<const WavSoundImpl>& sound){
-			return ting::Ref<Source>(new WavSoundImpl::Source(sound));
-		}
 
 	private:
-		//override
-		virtual bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw(){
-			ASSERT(buf.Size() % num_channels == 0)
+		virtual bool FillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept override{
+			ASSERT(buf.size() % num_channels == 0)
 			
-			ASSERT(this->wavSound->data.Size() % num_channels == 0)
+			ASSERT(this->wavSound->data.size() % num_channels == 0)
 			ASSERT(this->curSmp % num_channels == 0)
 			
-			size_t framesInBuf = buf.Size() / num_channels;
+			size_t framesInBuf = buf.size() / num_channels;
 			
-			size_t framesToCopy = (this->wavSound->data.Size() - this->curSmp) / num_channels;
-			ting::util::ClampTop(framesToCopy, framesInBuf);
+			size_t framesToCopy = (this->wavSound->data.size() - this->curSmp) / num_channels;
+			utki::clampTop(framesToCopy, framesInBuf);
 
 			ASSERT(framesToCopy <= framesInBuf)
 			
@@ -84,18 +51,18 @@ template <class TSampleType, ting::u8 num_channels>
 				return true;
 			}
 
-			ASSERT(this->curSmp <= this->wavSound->data.Size())			
+			ASSERT(this->curSmp <= this->wavSound->data.size())			
 			const TSampleType *startSmp = &this->wavSound->data[this->curSmp];
 			
 			this->curSmp += framesToCopy * num_channels;
 			
-			ting::s32 *dst = buf.Begin();
-			for(const TSampleType *src = startSmp; dst != buf.Begin() + framesToCopy * num_channels; ++dst, ++src){
-				*dst = ting::s32(*src);
+			auto dst = buf.begin();
+			for(const TSampleType *src = startSmp; dst != buf.begin() + framesToCopy * num_channels; ++dst, ++src){
+				*dst = std::int32_t(*src);
 			}
 
 			//fill the rest with zeroes
-			for(; dst != buf.End(); ++dst){
+			for(; dst != buf.end(); ++dst){
 				*dst = 0;
 			}
 			return false;
@@ -103,37 +70,31 @@ template <class TSampleType, ting::u8 num_channels>
 	};//~class Source
 
 private:
-	//override
-	virtual ting::Ref<WavSound::Source> CreateWavSource()const{
-		return Source::New(ting::Ref<const WavSoundImpl>(this));
+	virtual std::shared_ptr<WavSound::Source> CreateWavSource()const override{
+		return utki::makeShared<Source>(this->sharedFromThis(this));
 	}
 	
-private:
+public:
 	//NOTE: assume that data in d is little-endian
-	WavSoundImpl(const ting::Buffer<ting::u8>& d, ting::u32 frequency) :
+	WavSoundImpl(const utki::Buf<std::uint8_t> d, std::uint32_t frequency) :
 			WavSound(num_channels, frequency)
 	{
-		ASSERT(d.Size() % (this->NumChannels() * sizeof(TSampleType)) == 0)
+		ASSERT(d.size() % (this->NumChannels() * sizeof(TSampleType)) == 0)
 
-		this->data.Init(d.Size() / sizeof(TSampleType));
+		this->data.resize(d.size() / sizeof(TSampleType));
 
-		const ting::u8* src = d.Begin();
-		TSampleType* dst = this->data.Begin();
-		for(; src != d.End(); ++dst){
+		const std::uint8_t* src = d.begin();
+		auto dst = this->data.begin();
+		for(; src != d.end(); ++dst){
 			TSampleType tmp = 0;
 			for(unsigned i = 0; i != sizeof(TSampleType); ++i){
-				ASSERT(d.Begin() <= src && src < d.End())
+				ASSERT(d.begin() <= src && src < d.end())
 				tmp |= ((TSampleType(*src)) << (8 * i));
 				++src;
 			}
-			ASSERT(this->data.Begin() <= dst && dst < this->data.End())
+			ASSERT(this->data.begin() <= dst && dst < this->data.end())
 			*dst = tmp;
 		}
-	}
-
-public:
-	static inline ting::Ref<WavSoundImpl> New(const ting::Buffer<ting::u8>& d, ting::u32 frequency){
-		return ting::Ref<WavSoundImpl>(new WavSoundImpl(d, frequency));
 	}
 };
 
@@ -143,50 +104,50 @@ public:
 
 
 
-ting::Ref<WavSound> WavSound::Load(const std::string& fileName){
-	ting::fs::FSFile fi(fileName);
+std::shared_ptr<WavSound> WavSound::Load(const std::string& fileName){
+	papki::FSFile fi(fileName);
 	return WavSound::Load(fi);
 }
 
 
 
-ting::Ref<WavSound> WavSound::Load(ting::fs::File& fi){
-	ting::fs::File::Guard fileGuard(fi, ting::fs::File::READ);//make sure we close the file even in case of exception is thrown
+std::shared_ptr<WavSound> WavSound::Load(papki::File& fi){
+	papki::File::Guard fileGuard(fi, papki::File::E_Mode::READ);//make sure we close the file even in case of exception is thrown
 
 	//Start reading Wav-file header
 	{
-		ting::StaticBuffer<ting::u8, 4> riff;
-		fi.Read(riff);//Read 'RIFF' signature
-		if(std::string(reinterpret_cast<char*>(riff.Begin()), riff.Size()) != "RIFF"){
+		std::array<std::uint8_t, 4> riff;
+		fi.read(utki::wrapBuf(riff));//Read 'RIFF' signature
+		if(std::string(reinterpret_cast<char*>(riff.begin()), riff.size()) != "RIFF"){
 			throw Exc("WavSound::LoadWAV(): 'RIFF' signature not found");
 		}
 	}
 
-	fi.SeekForward(4);//Skip "Wav-file size minus 7". We are not interested in this information
+	fi.seekForward(4);//Skip "Wav-file size minus 7". We are not interested in this information
 
 	{
-		ting::StaticBuffer<ting::u8, 4> wave;
-		fi.Read(wave);//Read 'WAVE' signature
-		if(std::string(reinterpret_cast<char*>(wave.Begin()), wave.Size()) != "WAVE"){
+		std::array<std::uint8_t, 4> wave;
+		fi.read(utki::wrapBuf(wave));//Read 'WAVE' signature
+		if(std::string(reinterpret_cast<char*>(wave.begin()), wave.size()) != "WAVE"){
 			throw Exc("WavSound::LoadWAV(): 'WAVE' signature not found");
 		}
 	}
 
 	{
-		ting::StaticBuffer<ting::u8, 4> fmt;
-		fi.Read(fmt);//Read 'fmt ' signature
-		if(std::string(reinterpret_cast<char*>(fmt.Begin()), fmt.Size()) != "fmt "){
+		std::array<std::uint8_t, 4> fmt;
+		fi.read(utki::wrapBuf(fmt));//Read 'fmt ' signature
+		if(std::string(reinterpret_cast<char*>(fmt.begin()), fmt.size()) != "fmt "){
 			throw Exc("WavSound::LoadWAV(): 'fmt ' signature not found");
 		}
 	}
 
-	fi.SeekForward(4);//Skip 4 bytes. Their purpose is unknown to me.
+	fi.seekForward(4);//Skip 4 bytes. Their purpose is unknown to me.
 
 	unsigned chans;
 	{
-		ting::StaticBuffer<ting::u8, 4> pcmBuf;
-		fi.Read(pcmBuf);
-		ting::u32 pcm = ting::util::Deserialize32LE(pcmBuf.Begin());
+		std::array<std::uint8_t, 4> pcmBuf;
+		fi.read(utki::wrapBuf(pcmBuf));
+		std::uint32_t pcm = utki::deserialize32LE(&*pcmBuf.begin());
 		if((pcm & 0x0000ffff) != 1){//Low word indicates whether the file is in PCM format
 			throw Exc("C_PCM_NonStreamedSound::LoadWAV(): not a PCM format, only PCM format is supported");
 		}
@@ -199,42 +160,42 @@ ting::Ref<WavSound> WavSound::Load(ting::fs::File& fi){
 	}
 
 	//Read in the sound quantization frequency
-	ting::u32 frequency;
+	std::uint32_t frequency;
 	{
-		ting::StaticBuffer<ting::u8, 4> buf;
-		fi.Read(buf);
-		frequency = ting::util::Deserialize32LE(buf.Begin());
+		std::array<std::uint8_t, 4> buf;
+		fi.read(utki::wrapBuf(buf));
+		frequency = utki::deserialize32LE(&*buf.begin());
 	}
 
-	fi.SeekForward(4);//Playback speed (freq * PCMSampleSize). We don't need this info.
+	fi.seekForward(4);//Playback speed (freq * PCMSampleSize). We don't need this info.
 
-	ting::u32 bitDepth;
+	std::uint32_t bitDepth;
 	{
-		ting::StaticBuffer<ting::u8, 4> buf;
-		fi.Read(buf);
-		bitDepth = ting::util::Deserialize32LE(buf.Begin());
+		std::array<std::uint8_t, 4> buf;
+		fi.read(utki::wrapBuf(buf));
+		bitDepth = utki::deserialize32LE(&*buf.begin());
 		bitDepth >>= 16;//High word contains the sound bit depth
 	}
 
 	{
-		ting::StaticBuffer<ting::u8, 4> data;
-		fi.Read(data);//Read 'data' signature
-		if(std::string(reinterpret_cast<char*>(data.Begin()), data.Size()) != "data"){
+		std::array<std::uint8_t, 4> data;
+		fi.read(utki::wrapBuf(data));//Read 'data' signature
+		if(std::string(reinterpret_cast<char*>(&*data.begin()), data.size()) != "data"){
 			throw Exc("WavSound::LoadWAV(): 'data' signature not found");
 		}
 	}
 
-	ting::u32 dataSize;
+	std::uint32_t dataSize;
 	{
-		ting::StaticBuffer<ting::u8, 4> buf;
-		fi.Read(buf);//read the size of the sound data
-		dataSize = ting::util::Deserialize32LE(buf.Begin());
+		std::array<std::uint8_t, 4> buf;
+		fi.read(utki::wrapBuf(buf));//read the size of the sound data
+		dataSize = utki::deserialize32LE(&*buf.begin());
 	}
 	
 	//read in the sound data
-	ting::Array<ting::u8> data(dataSize);
+	std::vector<std::uint8_t> data(dataSize);
 	{
-		unsigned bytesRead = fi.Read(data);//Load Sound data
+		unsigned bytesRead = fi.read(utki::wrapBuf(data));//Load Sound data
 
 		if(bytesRead != dataSize){
 			throw Exc("WavSound::LoadWAV(): sound data size is incorrect");
@@ -242,11 +203,11 @@ ting::Ref<WavSound> WavSound::Load(ting::fs::File& fi){
 	}
 	
 	//Now we have Wav-file info
-	ting::Ref<WavSound> ret;
+	std::shared_ptr<WavSound> ret;
 	if(bitDepth == 8){
 //		C_Ref<C_PCM_ParticularNonStreamedSound<s8> > r = new C_PCM_ParticularNonStreamedSound<s8>(chans, igagis::uint(frequency), dataSize);
 //		ret = static_cast<C_PCM_NonStreamedSound*>(r.operator->());
-//		bytesRead = fi.Read(r->buf.Buf(), r->buf.SizeOfArray());//Load Sound data
+//		bytesRead = fi.read(r->buf.Buf(), r->buf.SizeOfArray());//Load Sound data
 //		//convert data to signed format
 //		for(s8* ptr=r->buf.Buf(); ptr<(r->buf.Buf()+r->buf.SizeOfArray()); ++ptr)
 //			*ptr=s8(int(*ptr)-0x80);
@@ -256,10 +217,10 @@ ting::Ref<WavSound> WavSound::Load(ting::fs::File& fi){
 		//set the format
 		switch(chans){
 			case 1://mono
-				ret = WavSoundImpl<ting::s16, 1>::New(data, frequency);
+				ret = utki::makeShared<WavSoundImpl<std::int16_t, 1>>(utki::wrapBuf(data), frequency);
 				break;
 			case 2://stereo
-				ret = WavSoundImpl<ting::s16, 2>::New(data, frequency);
+				ret = utki::makeShared<WavSoundImpl<std::int16_t, 2>>(utki::wrapBuf(data), frequency);
 				break;
 			default:
 				throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");

@@ -1,27 +1,3 @@
-/* The MIT License:
-
-Copyright (c) 2012-2014 Ivan Gagis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. */
-
-// Home page: http://aumiks.googlecode.com
-
 /**
  * @author Ivan Gagis <igagis@gmail.com>
  */
@@ -29,15 +5,12 @@ THE SOFTWARE. */
 #pragma once
 
 
-#include <ting/debug.hpp>
-#include <ting/Singleton.hpp>
-#include <ting/atomic.hpp>
-#include <ting/Ptr.hpp>
+#include <utki/Singleton.hpp>
 
 #include "MixChannel.hpp"
 
 #include <audout/AudioFormat.hpp>
-#include <audout/PlayerListener.hpp>
+#include <audout/Listener.hpp>
 #include <audout/Player.hpp>
 
 #include "Mixer.hpp"
@@ -81,7 +54,7 @@ class Lib : public ting::IntrusiveSingleton<Lib>, private audout::PlayerListener
 	
 	ting::atomic::SpinLock actionsSpinLock;
 	
-	typedef std::list<ting::Ptr<Action> > T_ActionsList;
+	typedef std::list<std::unique_ptr<Action> > T_ActionsList;
 	typedef T_ActionsList::iterator T_ActionsIter;
 	
 	T_ActionsList actionsList1, actionsList2;
@@ -89,15 +62,15 @@ class Lib : public ting::IntrusiveSingleton<Lib>, private audout::PlayerListener
 	
 	audout::AudioFormat outputFormat;
 
-	ting::Ref<ting::RefCounted> mixer;
+	std::shared_ptr<utki::Shared> mixer;
 	
-	template <ting::u8 num_channels> aumiks::Mixer<ting::s32, num_channels>& MasterMixer()throw(){
-		return *static_cast<aumiks::Mixer<ting::s32, num_channels>*>(this->mixer.operator->());
+	template <std::uint8_t num_channels> aumiks::Mixer<std::int32_t, num_channels>& MasterMixer()throw(){
+		return *static_cast<aumiks::Mixer<std::int32_t, num_channels>*>(this->mixer.operator->());
 	}
 	
-	ting::Array<ting::s32> smpBuf;
+	ting::Array<std::int32_t> smpBuf;
 	
-	ting::Ptr<audout::Player> player;
+	std::unique_ptr<audout::Player> player;
 
 public:
 	inline const audout::AudioFormat& OutputFormat()throw(){
@@ -113,10 +86,8 @@ public:
 	 * opens sound device.
 	 * @param bufferSizeMillis - size of desired playing buffer in milliseconds. Use smaller buffers for higher latency.
 	 *                           Note, that very small buffer may result in bigger overhead and lags. The same applies to very big buffer sizes.
-	 * @param freq - sampling rate in Hertz.
-	 * @param chans - number of channels. 1 = mono, 2 = stereo, etc.
 	 */
-	Lib(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis = 100);
+	Lib(audout::AudioFormat outputFormat, std::uint16_t bufferSizeMillis = 100);
 	
 	
 	
@@ -124,7 +95,7 @@ public:
 	
 	
 	
-	template <class T_Sample, ting::u8 num_channels> void PlaySource(ting::Ref<ChanSource<T_Sample, num_channels> >& s){
+	template <class T_Sample, std::uint8_t num_channels> void PlaySource(std::shared_ptr<ChanSource<T_Sample, num_channels> >& s){
 		//TODO:
 	}
 	
@@ -211,14 +182,14 @@ public:
 
 
 private:
-	void CopySmpBufToPlayBuf(ting::Buffer<ting::s16>& playBuf);
+	void CopySmpBufToPlayBuf(utki::Buf<std::int16_t>& playBuf);
 	
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	//override
-	void FillPlayBuf(ting::Buffer<ting::s16>& playBuf);
+	void FillPlayBuf(utki::Buf<std::int16_t>& playBuf);
 	
 	
-	inline void PushAction_ts(ting::Ptr<Action> action){
+	inline void PushAction_ts(std::unique_ptr<Action> action){
 		ting::atomic::SpinLock::Guard mutexGuard(this->actionsSpinLock);
 		this->addList->push_back(action);
 	}
@@ -231,7 +202,7 @@ public:
 //	 * final mixing buffer after all the playing channels are mixed.
 //	 * @param effect - effect to add.
 //	 */
-//	inline void AddEffect_ts(const ting::Ref<Effect>& effect){
+//	inline void AddEffect_ts(const std::shared_ptr<Effect>& effect){
 //		ASSERT(effect.IsValid())
 //		
 //		//TODO:
@@ -243,7 +214,7 @@ public:
 //	 * final mixing buffer after all the playing channels are mixed.
 //	 * @param effect - effect to remove.
 //	 */
-//	inline void RemoveEffect_ts(const ting::Ref<Effect>& effect){
+//	inline void RemoveEffect_ts(const std::shared_ptr<Effect>& effect){
 //		ASSERT(effect.IsValid())
 //
 //		//TODO:

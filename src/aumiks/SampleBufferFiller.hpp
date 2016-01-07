@@ -1,26 +1,3 @@
-/* The MIT License:
-
-Copyright (c) 2012-2014 Ivan Gagis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. */
-
-// Home page: http://aumiks.googlecode.com
 
 /**
  * @author Ivan Gagis <igagis@gmail.com>
@@ -29,6 +6,9 @@ THE SOFTWARE. */
 
 #pragma once
 
+#include <cstring>
+
+#include <utki/Buf.hpp>
 
 namespace aumiks{
 
@@ -47,11 +27,11 @@ class SampleBufferFiller{
 	
 	//pointer to the next buffer filler in the chain.
 	//If 0 then this is the last one in the chain.
-	ting::Inited<SampleBufferFiller*, 0> next;
+	SampleBufferFiller* next = 0;
 	
-	ting::Inited<volatile bool, false> isOff;
+	volatile bool isOff = false;
 	
-	inline bool FillSmpBufInternal(ting::Buffer<ting::s32>& buf){
+	bool FillSmpBufInternal(utki::Buf<std::int32_t> buf){
 		if(this->isOff){
 //			TRACE(<< "SampleBufferFiller::FillSmpBufInternal(): isOff is true: this->isOff = " << this->isOff << std::endl)
 			return this->FillSmpBufFromNextByChain(buf);
@@ -80,14 +60,14 @@ protected:
 	 *         from the pool of playing channels and the contents of the 'buf' after this call will not be played.
 	 * @return false otherwise.
 	 */
-	virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf) = 0;
+	virtual bool FillSmpBuf(utki::Buf<std::int32_t> buf) = 0;
 	
 	//TODO: doxygen
 	//NOTE: the size of the supplied buf should contain integer number of frames!
-	inline bool FillSmpBufFromNextByChain(ting::Buffer<ting::s32>& buf){
+	inline bool FillSmpBufFromNextByChain(utki::Buf<std::int32_t>& buf){
 //		TRACE(<< "SampleBufferFiller::FillSmpBufFromNextByChain(): this->next = " << this->next << std::endl)
 		if(!this->next){
-			memset(buf.Begin(), 0, buf.SizeInBytes());
+			memset(&*buf.begin(), 0, buf.sizeInBytes());
 			return false;
 		}
 		return this->next->FillSmpBufInternal(buf);

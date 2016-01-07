@@ -33,10 +33,10 @@ using namespace aumiks;
 
 
 
-void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
+void Channel::AddEffect_ts(const std::shared_ptr<aumiks::Effect>& effect){
 	class AddEffectAction : public aumiks::Lib::Action{
-		ting::Ref<aumiks::Channel> channel;
-		ting::Ref<aumiks::Effect> effect;
+		std::shared_ptr<aumiks::Channel> channel;
+		std::shared_ptr<aumiks::Effect> effect;
 		
 		//override
 		virtual void Perform(){
@@ -54,17 +54,17 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 		
 	public:
 		AddEffectAction(
-				const ting::Ref<aumiks::Channel>& channel,
-				const ting::Ref<aumiks::Effect>& effect
+				const std::shared_ptr<aumiks::Channel>& channel,
+				const std::shared_ptr<aumiks::Effect>& effect
 			) :
 				channel(channel),
 				effect(effect)
 		{}
 	};
 	
-	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+	aumiks::Lib::Inst().PushAction_ts(std::unique_ptr<aumiks::Lib::Action>(
 			new AddEffectAction(
-					ting::Ref<Channel>(this),
+					std::shared_ptr<Channel>(this),
 					effect
 				)
 		));
@@ -72,10 +72,10 @@ void Channel::AddEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 
 
 
-void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
+void Channel::RemoveEffect_ts(const std::shared_ptr<aumiks::Effect>& effect){
 	class RemoveEffectAction : public aumiks::Lib::Action{
-		ting::Ref<aumiks::Channel> channel;
-		ting::Ref<aumiks::Effect> effect;
+		std::shared_ptr<aumiks::Channel> channel;
+		std::shared_ptr<aumiks::Effect> effect;
 		
 		//override
 		virtual void Perform(){
@@ -99,17 +99,17 @@ void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 		
 	public:
 		RemoveEffectAction(
-				const ting::Ref<aumiks::Channel>& channel,
-				const ting::Ref<aumiks::Effect>& effect
+				const std::shared_ptr<aumiks::Channel>& channel,
+				const std::shared_ptr<aumiks::Effect>& effect
 			) :
 				channel(channel),
 				effect(effect)
 		{}
 	};
 	
-	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+	aumiks::Lib::Inst().PushAction_ts(std::unique_ptr<aumiks::Lib::Action>(
 			new RemoveEffectAction(
-					ting::Ref<Channel>(this),
+					std::shared_ptr<Channel>(this),
 					effect
 				)
 		));
@@ -119,7 +119,7 @@ void Channel::RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect){
 
 void Channel::RemoveAllEffects_ts(){
 	class RemoveAllEffectsAction : public aumiks::Lib::Action{
-		ting::Ref<aumiks::Channel> channel;
+		std::shared_ptr<aumiks::Channel> channel;
 		
 		//override
 		virtual void Perform(){
@@ -129,15 +129,15 @@ void Channel::RemoveAllEffects_ts(){
 		
 	public:
 		RemoveAllEffectsAction(
-				const ting::Ref<aumiks::Channel>& channel
+				const std::shared_ptr<aumiks::Channel>& channel
 			) :
 				channel(channel)
 		{}
 	};
 	
-	aumiks::Lib::Inst().PushAction_ts(ting::Ptr<aumiks::Lib::Action>(
+	aumiks::Lib::Inst().PushAction_ts(std::unique_ptr<aumiks::Lib::Action>(
 			new RemoveAllEffectsAction(
-					ting::Ref<Channel>(this)
+					std::shared_ptr<Channel>(this)
 				)
 		));
 }
@@ -145,5 +145,5 @@ void Channel::RemoveAllEffects_ts(){
 
 
 void Channel::Play_ts(){
-	aumiks::Lib::Inst().PlayChannel_ts(ting::Ref<aumiks::Channel>(this));
+	aumiks::Lib::Inst().PlayChannel_ts(std::shared_ptr<aumiks::Channel>(this));
 }

@@ -36,39 +36,39 @@ namespace aumiks{
 
 
 class Input{
-	template <ting::u8> friend class ChanInput;
+	template <std::uint8_t> friend class ChanInput;
 	
-	ting::u8 numChannels;
+	std::uint8_t numChannels;
 	
-	Input(ting::u8 numChannels) :
+	Input(std::uint8_t numChannels) :
 			numChannels(numChannels)
 	{}
 	
-	ting::Ref<aumiks::Source> src;
+	std::shared_ptr<aumiks::Source> src;
 	
-	ting::atomic::SpinLock spinLock;
+	utki::SpinLock spinLock;
 public:
 	virtual ~Input()throw(){}
 	
-	ting::u8 NumChannels()const throw(){
+	std::uint8_t NumChannels()const throw(){
 		return this->numChannels;
 	}
 	
 	void Disconnect()throw(){
 		//To minimize the time with locked spinlock need to avoid object destruction
 		//within the locked spinlock period. To achieve that use temporary strong reference.
-		ting::Ref<aumiks::Source> tmp;
+		std::shared_ptr<aumiks::Source> tmp;
 		
-		if(this->src.IsValid()){
-			ting::atomic::SpinLock::Guard guard(this->spinLock);
+		if(this->src){
+			std::lock_guard<utki::SpinLock> guard(this->spinLock);
 			tmp = this->src;
 			tmp->isConnected = false;
-			this->src.Reset();
+			this->src.reset();
 		}
 	}
 	
-	void Connect(const ting::Ref<aumiks::Source>& source){
-		ASSERT(source.IsValid())
+	void Connect(const std::shared_ptr<aumiks::Source>& source){
+		ASSERT(source)
 		ASSERT(this->NumChannels() == source->output.NumChannels())
 		
 		if(this->IsConnected()){
@@ -80,7 +80,7 @@ public:
 		}
 		
 		{
-			ting::atomic::SpinLock::Guard guard(this->spinLock);
+			std::lock_guard<utki::SpinLock> guard(this->spinLock);
 			source->isConnected = true;
 			this->src = source;
 		}
@@ -88,14 +88,14 @@ public:
 	
 	//thread safe
 	bool IsConnected()const{
-		return this->src.IsValid();
+		return this->src.operator bool();
 	}
 };
 
 
 
-template <ting::u8 num_channels> class ChanInput : public Input{
-	ting::Ref<aumiks::Source> srcInUse;
+template <std::uint8_t num_channels> class ChanInput : public Input{
+	std::shared_ptr<aumiks::Source> srcInUse;
 
 public:
 	
@@ -103,13 +103,13 @@ public:
 			Input(num_channels)
 	{}
 	
-	bool FillSampleBuffer(const ting::Buffer<ting::s32>& buf)throw(){
+	bool FillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept{
 		if(this->src != this->srcInUse){
-			ting::atomic::SpinLock::Guard guard(this->spinLock);
-			ASSERT(this->src.IsNotValid() || this->src->output.NumChannels() == num_channels)
+			std::lock_guard<utki::SpinLock> guard(this->spinLock);
+			ASSERT(!this->src || this->src->output.NumChannels() == num_channels)
 			this->srcInUse = this->src;//this->src.template StaticCast<T_ChanneledSource>();
 		}
-		if(this->srcInUse.IsNotValid()){
+		if(!this->srcInUse){
 			return false;
 		}
 		typedef aumiks::ChanOutput<num_channels> T_ChanneledOutput;

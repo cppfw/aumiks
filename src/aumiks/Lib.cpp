@@ -37,7 +37,7 @@ ting::IntrusiveSingleton<Lib>::T_Instance Lib::instance;
 
 
 
-Lib::Lib(audout::AudioFormat outputFormat, ting::u16 bufferSizeMillis) :
+Lib::Lib(audout::AudioFormat outputFormat, std::uint16_t bufferSizeMillis) :
 		addList(&actionsList1),
 		handleList(&actionsList2),
 		outputFormat(outputFormat),
@@ -58,7 +58,7 @@ Lib::~Lib()throw(){
 
 
 
-void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::s16>& playBuf){
+void aumiks::Lib::FillPlayBuf(utki::Buf<std::int16_t>& playBuf){
 	ASSERT(playBuf.Size() == this->smpBuf.Size())
 	
 	//handle actions if any
@@ -86,18 +86,18 @@ void aumiks::Lib::FillPlayBuf(ting::Buffer<ting::s16>& playBuf){
 
 
 
-void aumiks::Lib::CopySmpBufToPlayBuf(ting::Buffer<ting::s16>& playBuf){
+void aumiks::Lib::CopySmpBufToPlayBuf(utki::Buf<std::int16_t>& playBuf){
 	ASSERT((this->smpBuf.Size()) == playBuf.Size())
 
-	const ting::s32 *src = this->smpBuf.Begin();
-	ting::s16* dst = playBuf.Begin();
+	const std::int32_t *src = this->smpBuf.Begin();
+	std::int16_t* dst = playBuf.Begin();
 	for(; src != this->smpBuf.End(); ++src, ++dst){
-		ting::s32 tmp = *src;
-		ting::util::ClampTop(tmp, 0x7fff);
-		ting::util::ClampBottom(tmp, -0x7fff);
+		std::int32_t tmp = *src;
+		utki::ClampTop(tmp, 0x7fff);
+		utki::ClampBottom(tmp, -0x7fff);
 
 		ASSERT(playBuf.Begin() <= dst && dst <= playBuf.End() - 1)
-		*dst = ting::s16(tmp);
+		*dst = std::int16_t(tmp);
 	}
 	ASSERT(dst == playBuf.End())
 }

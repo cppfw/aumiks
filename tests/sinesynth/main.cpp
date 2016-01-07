@@ -1,5 +1,3 @@
-#include <ting/math.hpp>
-
 #include "../../src/aumiks/Lib.hpp"
 #include "../../src/aumiks/Sound.hpp"
 #include "../../src/aumiks/Channel.hpp"
@@ -12,7 +10,7 @@ class SineSound : public aumiks::Sound{
 		ting::Inited<float, 0> time;
 		
 		//override
-		bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+		bool FillSmpBuf(utki::Buf<std::int32_t>& buf, unsigned freq, unsigned chans){
 //			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
 			
 			if(this->time > 1){//play sound for 1 second
@@ -20,8 +18,8 @@ class SineSound : public aumiks::Sound{
 				return true;
 			}
 			
-			for(ting::s32* dst = buf.Begin(); dst != buf.End();){
-				ting::s32 v = float(0x7fff) * ting::math::Sin<float>(this->time * ting::math::D2Pi<float>() * 440.0f);
+			for(std::int32_t* dst = buf.Begin(); dst != buf.End();){
+				std::int32_t v = float(0x7fff) * ting::math::Sin<float>(this->time * ting::math::D2Pi<float>() * 440.0f);
 				this->time += 1 / float(freq);
 				for(unsigned i = 0; i != chans; ++i){
 					ASSERT(buf.Overlaps(dst))
@@ -37,29 +35,29 @@ class SineSound : public aumiks::Sound{
 		}
 		
 	public:
-		inline static ting::Ref<Channel> New(){
-			return ting::Ref<Channel>(new Channel());
+		inline static std::shared_ptr<Channel> New(){
+			return std::shared_ptr<Channel>(new Channel());
 		}
 	};
 	
 public:
 	
 	//override
-	virtual ting::Ref<aumiks::Channel> CreateChannel()const{
+	virtual std::shared_ptr<aumiks::Channel> CreateChannel()const{
 		return Channel::New();
 	}
 	
-	inline static ting::Ref<SineSound> New(){
-		return ting::Ref<SineSound>(new SineSound());
+	inline static std::shared_ptr<SineSound> New(){
+		return std::shared_ptr<SineSound>(new SineSound());
 	}
 };
 
 
 
 void Play(){
-	ting::Ref<SineSound> snd = SineSound::New();
+	std::shared_ptr<SineSound> snd = SineSound::New();
 	
-	ting::Ref<aumiks::Channel> ch = snd->CreateChannel();
+	std::shared_ptr<aumiks::Channel> ch = snd->CreateChannel();
 	ch->Play_ts();
 
 	while(!ch->IsStopped_ts()){

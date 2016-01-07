@@ -1,27 +1,3 @@
-/* The MIT License:
-
-Copyright (c) 2012-2013 Ivan Gagis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. */
-
-// Home page: http://aumiks.googlecode.com
-
 /**
  * @author Ivan Gagis <igagis@gmail.com>
  */
@@ -30,7 +6,6 @@ THE SOFTWARE. */
 
 #pragma once
 
-#include <ting/Ref.hpp>
 
 #include "Effect.hpp"
 
@@ -49,18 +24,18 @@ class MixChannel;
  * @brief Base class of a channel for playing the sound.
  * Usually, channels are created by Sound class implementations using CreateChannel() method.
  */
-class Channel : public SampleBufferFiller, public virtual ting::RefCounted{
+class Channel : public SampleBufferFiller, public virtual utki::Shared{
 	friend class aumiks::Lib;
 	friend class aumiks::MixChannel;
 	
-	ting::Inited<volatile bool, false> stoppedFlag;
+	volatile bool stoppedFlag = false;
 	
 	aumiks::SampleBufferFiller* lastFillerInChain;
 	
 private:
 	Effect::T_EffectsList effects;
 
-	inline bool FillSmpBufAndApplyEffects(ting::Buffer<ting::s32>& buf){
+	bool FillSmpBufAndApplyEffects(utki::Buf<std::int32_t>& buf){
 		if(this->stoppedFlag){
 			return true;
 		}
@@ -72,7 +47,7 @@ private:
 	
 protected:
 	//TODO: doxygen
-	ting::Inited<volatile bool, false> stopFlag;
+	volatile bool stopFlag = false;
 	
 	Channel() :
 			lastFillerInChain(this)
@@ -133,7 +108,7 @@ public:
 	 * Effect instance to more than one channel will result in undefined behavior.
 	 * @param effect - the effect to add.
 	 */
-	void AddEffect_ts(const ting::Ref<aumiks::Effect>& effect);
+	void AddEffect_ts(const std::shared_ptr<aumiks::Effect>& effect);
 
 	/**
 	 * @brief Remove effect from the channel.
@@ -143,7 +118,7 @@ public:
 	 * effect is removed immediately.
 	 * @param effect - effect to remove.
 	 */
-	void RemoveEffect_ts(const ting::Ref<aumiks::Effect>& effect);
+	void RemoveEffect_ts(const std::shared_ptr<aumiks::Effect>& effect);
 
 	/**
 	 * @brief Remove all effects from channel.

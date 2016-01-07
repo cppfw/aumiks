@@ -1,17 +1,17 @@
 #include "../../src/aumiks/WavSound.hpp"
 #include "../../src/aumiks/SpeakersSink.hpp"
 
-#include <ting/fs/FSFile.hpp>
-#include <ting/mt/Thread.hpp>
+#include <papki/FSFile.hpp>
+#include <nitki/Thread.hpp>
 
 
 //void Play(const std::string& fileName){
 //	TRACE_ALWAYS(<< "Playing " << fileName << std::endl)
-//	ting::Ref<aumiks::WavSound> snd = aumiks::WavSound::Load(fileName);
+//	std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::Load(fileName);
 //
 //	ASSERT(snd)
 //	
-//	ting::Ref<aumiks::Source> ch = snd->CreateSource();
+//	std::shared_ptr<aumiks::Source> ch = snd->CreateSource();
 //	ch->Play_ts();
 //	
 //	while(!ch->IsStopped_ts()){
@@ -23,9 +23,9 @@
 
 int main(int argc, char *argv[]){
 	{
-		aumiks::MonoSink sink(audout::AudioFormat::SamplingRate::HZ_11025);
+		aumiks::MonoSink sink(audout::AudioFormat::ESamplingRate::HZ_11025);
 		
-		ting::Ref<aumiks::WavSound> snd = aumiks::WavSound::Load("../samples/sample11025mono16.wav");
+		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::Load("../samples/sample11025mono16.wav");
 		
 		ASSERT_ALWAYS(snd->NumChannels() == 1)
 		
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
 		sink.Start();
 		
 		while(sink.input.IsConnected()){
-			ting::mt::Thread::Sleep(333);
+			nitki::Thread::sleep(333);
 		}
 	}
 	

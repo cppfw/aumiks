@@ -1,8 +1,8 @@
 #include "../../src/aumiks/Lib.hpp"
 #include "../../src/aumiks/WavSound.hpp"
 
-#include <ting/fs/FSFile.hpp>
-#include <ting/util.hpp>
+#include <papki/FSFile.hpp>
+#include <utki/util.hpp>
 
 
 
@@ -12,7 +12,7 @@ class SineSound : public aumiks::Sound{
 		ting::Inited<float, 0> time;
 		
 		//override
-		bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+		bool FillSmpBuf(utki::Buf<std::int32_t>& buf, unsigned freq, unsigned chans){
 //			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
 			
 			if(this->time > 5){//play sound for 5 seconds
@@ -20,8 +20,8 @@ class SineSound : public aumiks::Sound{
 				return true;
 			}
 			
-			for(ting::s32* dst = buf.Begin(); dst != buf.End();){
-				ting::s32 v = float(0x7fff) * ting::math::Sin<float>(this->time * ting::math::D2Pi<float>() * 440.0f);
+			for(std::int32_t* dst = buf.Begin(); dst != buf.End();){
+				std::int32_t v = float(0x7fff) * ting::math::Sin<float>(this->time * ting::math::D2Pi<float>() * 440.0f);
 				this->time += 1 / float(freq);
 				for(unsigned i = 0; i != chans; ++i){
 					ASSERT(buf.Overlaps(dst))
@@ -37,20 +37,20 @@ class SineSound : public aumiks::Sound{
 		}
 		
 	public:
-		inline static ting::Ref<Channel> New(){
-			return ting::Ref<Channel>(new Channel());
+		inline static std::shared_ptr<Channel> New(){
+			return std::shared_ptr<Channel>(new Channel());
 		}
 	};
 	
 public:
 	
 	//override
-	virtual ting::Ref<aumiks::Channel> CreateChannel()const{
+	virtual std::shared_ptr<aumiks::Channel> CreateChannel()const{
 		return Channel::New();
 	}
 	
-	inline static ting::Ref<SineSound> New(){
-		return ting::Ref<SineSound>(new SineSound());
+	inline static std::shared_ptr<SineSound> New(){
+		return std::shared_ptr<SineSound>(new SineSound());
 	}
 };
 
@@ -59,14 +59,14 @@ public:
 namespace TestNonTimeDomainEffect{
 
 class VolumeEffect : public aumiks::Effect{
-	ting::Inited<volatile ting::u8, ting::u8(-1)> vol;
+	ting::Inited<volatile std::uint8_t, std::uint8_t(-1)> vol;
 public:
-	inline void SetVolume(ting::u8 vol){
+	inline void SetVolume(std::uint8_t vol){
 		this->vol = vol;
 	}
 	
 	//override
-	virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+	virtual bool FillSmpBuf(utki::Buf<std::int32_t>& buf, unsigned freq, unsigned chans){
 //		TRACE_ALWAYS(<< "effect FillSmpBuf(): enter" << std::endl)
 		
 		if(this->FillSmpBufFromNextByChain(buf, freq, chans)){
@@ -74,21 +74,21 @@ public:
 			return true;
 		}
 		
-		ting::u8 vol = this->vol; //save volatile value
-		if(vol == ting::u8(-1)){
+		std::uint8_t vol = this->vol; //save volatile value
+		if(vol == std::uint8_t(-1)){
 			//do nothing
 			return false;
 		}
 		
-		for(ting::s32* i = buf.Begin(); i != buf.End(); ++i){
-			*i = (*i) * vol / ting::u8(-1);
+		for(std::int32_t* i = buf.Begin(); i != buf.End(); ++i){
+			*i = (*i) * vol / std::uint8_t(-1);
 		}
 		
 		return false;
 	}
 	
-	static inline ting::Ref<VolumeEffect> New(){
-		return ting::Ref<VolumeEffect>(new VolumeEffect());
+	static inline std::shared_ptr<VolumeEffect> New(){
+		return std::shared_ptr<VolumeEffect>(new VolumeEffect());
 	}
 };
 
@@ -96,14 +96,14 @@ void Run(){
 	TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
 	aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::STEREO, audout::AudioFormat::SamplingRate::HZ_44100), 100);
 	
-	ting::Ref<aumiks::Sound> snd = SineSound::New();
+	std::shared_ptr<aumiks::Sound> snd = SineSound::New();
 
 	ASSERT(snd)
 	
-	ting::Ref<aumiks::Channel> ch = snd->CreateChannel();
+	std::shared_ptr<aumiks::Channel> ch = snd->CreateChannel();
 //	TRACE_ALWAYS(<< "ch = " << static_cast<aumiks::SampleBufferFiller*>(ch.operator->()) << std::endl)
 	
-	ting::Ref<VolumeEffect> eff = VolumeEffect::New();
+	std::shared_ptr<VolumeEffect> eff = VolumeEffect::New();
 	
 	ch->AddEffect_ts(eff);
 	
@@ -111,7 +111,7 @@ void Run(){
 	
 	ting::s8 d = -1;
 	ting::s8 step = 20;
-	ting::u8 vol = 0xff;
+	std::uint8_t vol = 0xff;
 	for(unsigned i = 0; i != 100; ++i){
 //		TRACE(<< "Loop" << std::endl)
 		ting::mt::Thread::Sleep(100);
@@ -136,7 +136,7 @@ namespace TestResamplerEffect{
 class ResampleEffect : public aumiks::Effect{
 	
 	//override
-	virtual bool FillSmpBuf(ting::Buffer<ting::s32>& buf, unsigned freq, unsigned chans){
+	virtual bool FillSmpBuf(utki::Buf<std::int32_t>& buf, unsigned freq, unsigned chans){
 		if(this->FillSmpBufFromNextByChain(buf, freq, chans)){
 //			TRACE_ALWAYS(<< "effect FillSmpBuf(): true from next by chain" << std::endl)
 			return true;
@@ -147,8 +147,8 @@ class ResampleEffect : public aumiks::Effect{
 	}
 	
 public:
-	static inline ting::Ref<ResampleEffect> New(){
-		return ting::Ref<ResampleEffect>(
+	static inline std::shared_ptr<ResampleEffect> New(){
+		return std::shared_ptr<ResampleEffect>(
 				new ResampleEffect()
 			);
 	}
@@ -159,14 +159,14 @@ void Run(){
 	TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
 	aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::STEREO, audout::AudioFormat::SamplingRate::HZ_44100), 100);
 	
-	ting::Ref<aumiks::Sound> snd = SineSound::New();
+	std::shared_ptr<aumiks::Sound> snd = SineSound::New();
 
 	ASSERT(snd)
 	
-	ting::Ref<aumiks::Channel> ch = snd->CreateChannel();
+	std::shared_ptr<aumiks::Channel> ch = snd->CreateChannel();
 //	TRACE_ALWAYS(<< "ch = " << static_cast<aumiks::SampleBufferFiller*>(ch.operator->()) << std::endl)
 	
-	ting::Ref<ResampleEffect> eff = ResampleEffect::New();
+	std::shared_ptr<ResampleEffect> eff = ResampleEffect::New();
 	
 	ch->AddEffect_ts(eff);
 	
