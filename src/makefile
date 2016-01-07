@@ -1,218 +1,69 @@
-# Author: Ivan Gagis <igagis@gmail.com>
+include prorab.mk
 
-#==============================================================================
-#==============================================================================
-#==============================================================================
-#                        Project configuration part
-#             change these strings to configure project building
+this_name := audout
 
-#default platform. It may be overriden by specifying platform=xxx in command line when running make
-#Known platforms are:
-#    linux
-#    windows
-platform := linux
+this_soname := $(shell cat $(prorab_this_dir)/soname.txt)
 
-#build configuration:
-#    debug
-#    release
-build_config := debug
 
-name := libaumiks
-
-so_name := 0
-
-ifeq ($(platform), linux)
-    name := $(name).so
-endif
-ifeq ($(platform), windows)
-    name := $(name).a
-endif
+#this_srcs += aumiks/Channel.cpp
+#this_srcs += aumiks/Effect.cpp
+#this_srcs += aumiks/Lib.cpp
+#this_srcs += aumiks/MixChannel.cpp
+#this_srcs += aumiks/util.cpp
+this_srcs += aumiks/WavSound.cpp
 
 
 
-#Sources
-srcs :=
-#srcs += aumiks/Channel.cpp
-#srcs += aumiks/Effect.cpp
-#srcs += aumiks/Lib.cpp
-#srcs += aumiks/MixChannel.cpp
-#srcs += aumiks/util.cpp
-srcs += aumiks/WavSound.cpp
-
-
-
-defines :=
-
-ifeq ($(build_config), debug)
-    defines += -DDEBUG
-endif
-
-ifeq ($(platform), maemo_linux)
-    defines += -DM_MAEMO
-endif
-
-
-
-compiler_flags := -Wall #enable all warnings
-compiler_flags += -Wno-comment #no warnings on nested comments
-compiler_flags += -funsigned-char #the 'char' type is unsigned
-compiler_flags += -Wnon-virtual-dtor #warn if base class has non-virtual destructor
-compiler_flags += -fno-operator-names #do not treat 'and', 'bitand','bitor','compl','not','or','xor' as keywords
-compiler_flags += -Werror #treat warnings as errors
-compiler_flags += -Wfatal-errors # stop on first error encountered
-compiler_flags += -Wno-div-by-zero #disable integer division by zero warning as it is sometimes useful when working with templates
-compiler_flags += -fstrict-aliasing #strict aliasing (in order to comply with the c++ standard more strictly)
-compiler_flags += -g #include debugging symbols
+this_cflags += -Wall #enable all warnings
+this_cflags += -Wno-comment #no warnings on nested comments
+this_cflags += -funsigned-char #the 'char' type is unsigned
+this_cflags += -Wnon-virtual-dtor #warn if base class has non-virtual destructor
+this_cflags += -fno-operator-names #do not treat 'and', 'bitand','bitor','compl','not','or','xor' as keywords
+this_cflags += -Werror #treat warnings as errors
+this_cflags += -Wfatal-errors # stop on first error encountered
+this_cflags += -fstrict-aliasing #strict aliasing (in order to comply with the c++ standard more strictly)
+this_cflags += -g #include debugging symbols
                 #-P -E #-Wreorder
                 #-O3 -funroll-loops -fomit-frame-pointer
-#compiler_flags += -std=c++0x
+this_cflags += -std=c++11
 
 
-
-ifeq ($(platform), linux)
-    compiler_flags += -fPIC # Since we are building shared library, we need Position-Independend Code
-endif
-ifeq ($(platform), maemo_linux)
-    compiler_flags += -fPIC # Since we are building shared library, we need Position-Independend Code
+ifeq ($(debug),true)
+    this_cflags += -DDEBUG
+#    this_cflags += -DM_MORDA_RENDER_WIDGET_BORDERS
+    this_objcflags += -DDEBUG
 endif
 
 
-linker_flags := -shared
+ifeq ($(prorab_os), linux)
+    this_cflags += -fPIC
+    this_ldlibs += -lpthread
+else ifeq ($(prorab_os), windows)
+    this_cflags += -Wno-format #due to bugs in some g++ versions it warns about format when not needed, so disable format warnings
+    this_cflags += -I/usr/include -I/usr/local/include/
+    this_ldflags += -L/usr/local/lib -L/usr/lib
 
-ifeq ($(platform), linux)
-    linker_flags += -Wl,-soname,$(name).$(so_name)
-endif
-ifeq ($(platform), windows)
-    linker_flags +=
-endif
+    #NOTE: order matters in MinGW, libs referenced by other libs should go after those libs which reference them.
+    this_ldlibs += #-lfreetype -lstob -ljpeg -lpng -lz -lopengl32 -lglew32 -lgdi32
 
+    #WORKAROUND for MinGW bug:
+    #this_cflags += -D__STDC_FORMAT_MACROS
+else ifeq ($(prorab_os), macosx)
+    this_cflags += -stdlib=libc++ #this is needed to be able to use c++11 std lib
+    this_ldlibs += -lc++
+    #this_ldlibs += -framework Cocoa -framework OpenGL -lpng -lfreetype -ljpeg -lstob -lGLEW
+    
+    #this_mm_obj := $(prorab_this_dir)$(prorab_obj_dir)morda/glue/macosx/main.o
 
-
-#=======================
-#  Include directories
-#=======================
-ifeq ($(platform), maemo_linux)
-    include_dirs :=
-endif
-ifeq ($(platform), linux)
-    include_dirs :=
-endif
-ifeq ($(platform), windows)
-    include_dirs := -I../../ting/src
-endif
-
-
-
-#============================
-#  Libs and lib directories
-#============================
-ifeq ($(platform), maemo_linux)
-    libs := -lting
-endif
-ifeq ($(platform), linux)
-    libs := -lting
-    libs += -laudout
-#    libs += `pkg-config alsa --libs`
-endif
-ifeq ($(platform), windows)
-    libs := 
+    #define this_rules
+    #    $(this_mm_obj): $(prorab_this_dir)morda/glue/macosx/main.mm
+#		@echo Compiling $$<...
+#		$(prorab_echo)mkdir -p $$(dir $$@)
+#		$(prorab_echo)$(CC) -ObjC++ -std=c++11 -c -o "$$@" $(this_objcflags) $$<
+#    endef
+#    $(eval $(this_rules))
 endif
 
+this_ldlibs += 
 
-
-remove_on_clean:=
-
-
-
-#                     __
-#                    /  \__/  end of configuration part
-#==============================================================================
-
-#remove program
-ifeq ($(platform),windows)
-    remove := del /Q /F
-else
-    remove := rm -f
-endif
-
-obj_dir := obj/1/2
-compiler := g++
-
-
-#==============================================================================
-#=============================TARGETS==========================================
-#==============================================================================
-
-#==========================
-#=project default target=
-default: create-obj-dir $(name)
-
-create-obj-dir:
-ifeq ($(platform), windows)
-	@if not exist $(obj_dir) mkdir $(subst /,\,$(obj_dir))
-else
-	@mkdir -p $(obj_dir)
-endif
-
-
-
-#find all .cpp files and get an .o file name for it to get dependancies for this target
-$(name): $(addprefix $(obj_dir)/,$(patsubst %.cpp,%.o,$(srcs)))
-	@echo Linking $@...
-ifeq ($(platform), windows)
-	@ar cr $@ $^
-else
-	@ar cr $(patsubst %.so,%.a,$@) $^
-	@$(compiler) $^ -o "$@".$(so_name) $(libs) $(linker_flags)
-	@ln -f -s $@.$(so_name) $@
-endif
-
-
-#======================
-#=compile .cpp sources=
-$(obj_dir)/%.o:%.cpp
-	@echo Compiling $<...
-ifeq ($(platform), windows)
-	@if not exist $(dir $@) mkdir $(subst /,\,$(dir $@))
-else
-	@mkdir -p $(dir $@)
-endif
-# -MF option specifies dependency output file name
-	@$(compiler) -c -MF "$(patsubst %.o,%.d,$@)" -MD -o "$@" $(compiler_flags) $(defines) $(include_dirs) $<
-#workaround for gcc 4.2 compiler (it behaves differently than gcc 4.1 for some reason)
-#ifeq ($(platform), linux)
-#	@echo -n $(obj_dir)/ > $(patsubst %.o,%.d_,$@)
-#	@cat $(patsubst %.o,%.d,$@) >> $(patsubst %.o,%.d_,$@)
-#	@mv $(patsubst %.o,%.d_,$@) $(patsubst %.o,%.d,$@)
-#endif
-
-include $(wildcard $(addsuffix /*.d,$(dir $(addprefix $(obj_dir)/,$(srcs)))))
-
-
-
-#==================
-#=build all target=
-all: clean proj
-
-
-test:
-
-#==============
-#=clean target=
-#delete all objects and executables
-
-#it is an abstract target (not a file), declare as .PHONY
-.PHONY: clean
-clean:
-ifeq ($(platform),windows)
-	@$(remove) $(name)
-	@rmdir /S /Q obj
-else
-	@$(remove) $(name)
-	@$(remove) $(patsubst %.so,%.a,$(name))
-	@$(remove) $(name).$(so_name)
-	@$(remove) -rf $(dir $(obj_dir))
-	@$(remove) -rf $(remove_on_clean)
-endif
-
-include ../targets.mk
+$(eval $(prorab-build-lib))

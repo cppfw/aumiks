@@ -1,17 +1,8 @@
-subdirs :=
-subdirs += src
-subdirs += tests
-subdirs += docs
+include prorab.mk
 
+$(eval $(prorab-build-subdirs))
 
+this_soname_dependency := $(prorab_this_dir)src/soname.txt
+this_soname := $(shell cat $(this_soname_dependency))
 
-include ./targets.mk
-
-$(possible_targets_list):
-	@$(MAKE) $(subdirs) target=$@
-
-.PHONY: $(subdirs)
-$(subdirs):
-	@$(MAKE) -C $@ $(target)
-
-
+$(eval $(prorab-build-deb))
