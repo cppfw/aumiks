@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009-2014 Ivan Gagis
+Copyright (c) 2012 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,26 +22,9 @@ THE SOFTWARE. */
 
 // Home page: http://aumiks.googlecode.com
 
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
 
-#pragma once
-
-
-#include <string>
-
-#include <ting/Exc.hpp>
+#include "Effect.hpp"
 
 
 
-namespace aumiks{
 
-class Exc : public ting::Exc{
-public:
-	inline Exc(const std::string&  msg) :
-			ting::Exc(msg)
-	{}
-};
-
-}//~namespace

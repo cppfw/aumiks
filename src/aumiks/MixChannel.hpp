@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2012 Ivan Gagis
+Copyright (c) 2012-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,35 +34,70 @@ THE SOFTWARE. */
 #include <list>
 
 #include <ting/Array.hpp>
+#include <ting/Ref.hpp>
 
-#include "aumiks.hpp"
+#include "Channel.hpp"
 
 
 
 namespace aumiks{
 
+
+
 class MixChannel : public aumiks::Channel{
+	friend class aumiks::Channel;
 	
-	std::list<ting::Ref<aumiks::Channel> > channels;
+	typedef std::list<ting::Ref<aumiks::Channel> > T_ChannelList;
+	typedef T_ChannelList::iterator T_ChannelIter;
+	T_ChannelList channels;//should be accessed from audio thread only
 	
-	ting::Array<ting::s32> smpbuf;
+	ting::Array<ting::s32> smpBuf;
 	
-	MixChannel() :
-			smpbuf(aumiks::Lib::Inst().BufSizeInSamples())
+	bool isPersistent;
+	
+	MixChannel(bool isPersistent = false) :
+			isPersistent(isPersistent)
 	{}
 	
+	
+	//override
+	bool FillSmpBuf(ting::Buffer<ting::s32>& buf);
+	
+	
+	void MixSmpBufTo(ting::Buffer<ting::s32>& buf);
+	
+	
+	
+	void RemoveChannel(const ting::Ref<Channel>& channel){
+		for(T_ChannelIter i = this->channels.begin(); i != this->channels.end(); ++i){
+			if((*i) == channel){
+				this->channels.erase(i);
+				return;
+			}
+		}
+	}
+	
+	
 public:
+	virtual ~MixChannel()throw(){}
 	
-	void Play(const ting::Ref<aumiks::Channel> >& channel);
+	//TODO: doxygen
+	//playing same channel second time results in undefined behavior!
+	void PlayChannel_ts(const ting::Ref<aumiks::Channel>& channel);
 	
-	//TODO:
-	
-	static inline ting::Ref<aumiks::MixChannel> New(){
+	/**
+	 * @brief Create a new MixChannel object.
+     * @param isPersistent - true = the channel will continue to be in the playing state even
+	 *                       after all the child channels have finished playing.
+	 *                       flase = the channel will stop as fast as all the child channels has finished playing.
+     * @return a reference to a newly creted object.
+     */
+	static inline ting::Ref<aumiks::MixChannel> New(bool isPersistent = false){
 		return ting::Ref<aumiks::MixChannel>(
-				new aumiks::MixChannel()
+				new aumiks::MixChannel(isPersistent)
 			);
 	}
 };
 
 
-} //~namespace
+}//~namespace

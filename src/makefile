@@ -9,15 +9,13 @@
 #default platform. It may be overriden by specifying platform=xxx in command line when running make
 #Known platforms are:
 #    linux
-#    maemo_linux
-#    win32
-#    win32cross
+#    windows
 platform := linux
 
 #build configuration:
 #    debug
 #    release
-build_config := release
+build_config := debug
 
 name := libaumiks
 
@@ -26,10 +24,7 @@ so_name := 0
 ifeq ($(platform), linux)
     name := $(name).so
 endif
-ifeq ($(platform), win32)
-    name := $(name).a
-endif
-ifeq ($(platform), win32cross)
+ifeq ($(platform), windows)
     name := $(name).a
 endif
 
@@ -37,7 +32,11 @@ endif
 
 #Sources
 srcs :=
-srcs += aumiks/aumiks.cpp
+#srcs += aumiks/Channel.cpp
+#srcs += aumiks/Effect.cpp
+#srcs += aumiks/Lib.cpp
+#srcs += aumiks/MixChannel.cpp
+#srcs += aumiks/util.cpp
 srcs += aumiks/WavSound.cpp
 
 
@@ -83,10 +82,7 @@ linker_flags := -shared
 ifeq ($(platform), linux)
     linker_flags += -Wl,-soname,$(name).$(so_name)
 endif
-ifeq ($(platform), win32)
-    linker_flags +=
-endif
-ifeq ($(platform), win32cross)
+ifeq ($(platform), windows)
     linker_flags +=
 endif
 
@@ -101,11 +97,8 @@ endif
 ifeq ($(platform), linux)
     include_dirs :=
 endif
-ifeq ($(platform), win32)
+ifeq ($(platform), windows)
     include_dirs := -I../../ting/src
-endif
-ifeq ($(platform), win32cross)
-    include_dirs :=
 endif
 
 
@@ -118,14 +111,11 @@ ifeq ($(platform), maemo_linux)
 endif
 ifeq ($(platform), linux)
     libs := -lting
-    libs += `pkg-config libpulse-simple --libs`
+    libs += -laudout
 #    libs += `pkg-config alsa --libs`
 endif
-ifeq ($(platform), win32)
+ifeq ($(platform), windows)
     libs := 
-endif
-ifeq ($(platform), win32cross)
-    libs :=
 endif
 
 
@@ -139,7 +129,7 @@ remove_on_clean:=
 #==============================================================================
 
 #remove program
-ifeq ($(platform),win32)
+ifeq ($(platform),windows)
     remove := del /Q /F
 else
     remove := rm -f
@@ -158,7 +148,7 @@ compiler := g++
 default: create-obj-dir $(name)
 
 create-obj-dir:
-ifeq ($(platform), win32)
+ifeq ($(platform), windows)
 	@if not exist $(obj_dir) mkdir $(subst /,\,$(obj_dir))
 else
 	@mkdir -p $(obj_dir)
@@ -169,7 +159,7 @@ endif
 #find all .cpp files and get an .o file name for it to get dependancies for this target
 $(name): $(addprefix $(obj_dir)/,$(patsubst %.cpp,%.o,$(srcs)))
 	@echo Linking $@...
-ifeq ($(platform), win32)
+ifeq ($(platform), windows)
 	@ar cr $@ $^
 else
 	@ar cr $(patsubst %.so,%.a,$@) $^
@@ -182,7 +172,7 @@ endif
 #=compile .cpp sources=
 $(obj_dir)/%.o:%.cpp
 	@echo Compiling $<...
-ifeq ($(platform), win32)
+ifeq ($(platform), windows)
 	@if not exist $(dir $@) mkdir $(subst /,\,$(dir $@))
 else
 	@mkdir -p $(dir $@)
@@ -214,7 +204,7 @@ test:
 #it is an abstract target (not a file), declare as .PHONY
 .PHONY: clean
 clean:
-ifeq ($(platform),win32)
+ifeq ($(platform),windows)
 	@$(remove) $(name)
 	@rmdir /S /Q obj
 else

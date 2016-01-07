@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2009-2014 Ivan Gagis
+Copyright (c) 2012-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +26,7 @@ THE SOFTWARE. */
  * @author Ivan Gagis <igagis@gmail.com>
  */
 
-
 #pragma once
-
-
-#include <ting/Array.hpp>
-#include <ting/fs/File.hpp>
-
-#include "Sound.hpp"
 
 
 
@@ -41,56 +34,22 @@ namespace aumiks{
 
 
 
-class WavSound : public aumiks::Sound{
-	
-	ting::u8 chans;
-	ting::u32 freq;
-	
-protected:
-	WavSound(ting::u8 chans, ting::s32 freq) :
-			chans(chans),
-			freq(freq)
-	{}
-
-public:
-	inline ting::u8 NumChannels()const throw(){
-		return this->chans;
-	}
-	
-	inline ting::u32 SamplingRate()const throw(){
-		return this->freq;
-	}
-
-	class Source : public aumiks::Source{
-		Source(const Source&);
-		Source& operator=(const Source&);
-	protected:
-		Source(aumiks::Output& output) :
-				aumiks::Source(output)
-		{}
-	public:
-		
-		//TODO:
-	};
-	
-	virtual ting::Ref<Source> CreateWavSource()const = 0;
-	
-	//override
-	ting::Ref<aumiks::Source> CreateSource()const{
-		return this->CreateWavSource();
-	}
-	
-	//TODO:
-//	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{
-//		Ref<WavSound::Channel> ret = this->CreateWavChannel();
-//		ret->Play(numLoops);
-//		return ret;
-//	}
-
-	static ting::Ref<WavSound> Load(const std::string& fileName);
-	static ting::Ref<WavSound> Load(ting::fs::File& fi);
-};
-
-
-
+/**
+ * @brief Returns frame size for given sound output format.
+ * Returns number of bytes per frame for given sound output format.
+ * The sound frame is the sound data for a single sampling rate tick.
+ * Each frame consists of number of channels samples (e.g. mono: 1 frame = 1 sample, stereo: 1 frame = 2 samples).
+ * @param chans - number of channels. 1 = mono, 2 = stereo, etc.
+ * @return the size of the frame in bytes.
+ */
+inline unsigned BytesPerOutputFrame(unsigned chans){
+	return 2 * chans; //we only support 16 bits per sample
 }
+
+
+
+//TODO:
+
+
+
+}//~namespace

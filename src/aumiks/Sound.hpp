@@ -1,6 +1,6 @@
 /* The MIT License:
 
-Copyright (c) 2011-2012 Ivan Gagis
+Copyright (c) 2012-2014 Ivan Gagis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,55 +28,29 @@ THE SOFTWARE. */
 
 #pragma once
 
-#include <ting/Thread.hpp>
-#include <ting/Array.hpp>
 
-
-#include "../aumiks.hpp"
-#include "../Exc.hpp"
+#include "Source.hpp"
 
 
 
-namespace{
+namespace aumiks{
 
-class WriteBasedBackend : public aumiks::AudioBackend, public ting::MsgThread{
-	ting::Array<ting::u8> playBuf;
+
+
+/**
+ * @brief Base class for sounds.
+ * A sound object is an object which holds all the initial data required to play a particular sound.
+ * Sound object is normally used to create instances of a source to play that sound.
+ */
+class Sound : virtual public ting::RefCounted{
 protected:
-	WriteBasedBackend(size_t playBufSizeInBytes) :
-			playBuf(playBufSizeInBytes)
-	{}
-	
-	inline void StopThread()throw(){
-		this->PushPreallocatedQuitMessage();
-		this->Join();
-	}
-	
-	virtual void Write(const ting::Buffer<ting::u8>& buf) = 0;
-	
+	Sound(){}
 public:
-	virtual ~WriteBasedBackend()throw(){}
 	
-private:
-	
-	//override
-	void Run(){
-		while(!this->quitFlag){
-//			TRACE(<< "Backend loop" << std::endl)
-			while(ting::Ptr<ting::Message> m = this->queue.PeekMsg()){
-				m->Handle();
-			}
+	virtual ~Sound()throw(){}
 
-			this->FillPlayBuf(this->playBuf);
-			
-			//call virtual Write() function
-			try{
-				this->Write(this->playBuf);
-			}catch(aumiks::Exc& e){
-				ASSERT_INFO(false, e.What())
-				return;//exit thread
-			}
-		}//~while
-	}
+	//TODO: doxygen
+	virtual ting::Ref<aumiks::Source> CreateSource()const = 0;
 };
 
 }//~namespace

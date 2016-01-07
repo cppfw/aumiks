@@ -13,7 +13,7 @@ ifeq ($(platform),win32)
     remove := del /Q /F
 endif
 ifeq ($(platform),darwin)
-    libs :=
+    libs := 
     includes :=
     remove := rm -rf
 endif
