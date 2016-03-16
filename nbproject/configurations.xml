@@ -3,20 +3,9 @@
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="src" name="0">
       <df name="aumiks">
-        <df name="rechanneler">
-          <in>MonoToStereo.cpp</in>
-          <in>StereoToMono.cpp</in>
-        </df>
-        <df name="resampler">
-          <in>SlowdownResampler.cpp</in>
-          <in>SpeedupResampler.cpp</in>
-        </df>
         <in>Channel.cpp</in>
         <in>Effect.cpp</in>
-        <in>Lib.cpp</in>
-        <in>MixChannel.cpp</in>
         <in>WavSound.cpp</in>
-        <in>util.cpp</in>
       </df>
     </df>
     <df root="tests" name="1">
@@ -54,7 +43,8 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <flagsDictionary>
-        <element flagsID="0" commonFlags="-funsigned-char -std=c++11 -fPIC"/>
+        <element flagsID="0"
+                 commonFlags="-mtune=generic -march=x86-64 -std=c++11 -funsigned-char -fPIC -fstack-protector-strong"/>
         <element flagsID="1" commonFlags="-std=c++11"/>
       </flagsDictionary>
       <codeAssistance>
@@ -62,7 +52,7 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE} debug=true</buildCommand>
+          <buildCommand>${MAKE} debug=true CXX=g++-4.9</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
           <executablePath>tests/playwav/tests</executablePath>
           <ccTool>
@@ -108,11 +98,18 @@
       <item path="src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
+            <pElem>/usr/include/c++/4.9</pElem>
+            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9/bits</pElem>
+            <pElem>/usr/include/c++/4.9/ext</pElem>
+            <pElem>/usr/include/c++/4.9/bits</pElem>
+            <pElem>/usr/include/utki</pElem>
+            <pElem>/usr/include/papki</pElem>
+            <pElem>src/aumiks</pElem>
+            <pElem>/usr/lib/gcc/x86_64-linux-gnu/4.9/include</pElem>
+            <pElem>/usr/include/c++/4.9/debug</pElem>
+            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>DEBUG</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="tests/effects/main.cpp" ex="false" tool="1" flavor2="8">
@@ -146,7 +143,7 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE} -f makefile</buildCommand>
+          <buildCommand>${MAKE} CXX=g++-4.9</buildCommand>
           <cleanCommand>${MAKE} -f makefile clean</cleanCommand>
           <executablePath></executablePath>
           <ccTool>
