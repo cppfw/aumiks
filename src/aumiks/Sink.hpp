@@ -36,7 +36,7 @@ namespace aumiks{
 
 //TODO: doxygen
 class Sink{
-	template <std::uint8_t> friend class ChanSink;
+	template <std::uint8_t> friend class ChanneledSink;
 	
 	std::uint8_t numChannels;
 	std::uint32_t frequency;
@@ -47,15 +47,15 @@ class Sink{
 	{}
 public:
 	
-	std::uint8_t NumChannels()const throw(){
+	std::uint8_t NumChannels()const noexcept{
 		return this->numChannels;
 	}
 	
-	std::uint32_t Frequency()const throw(){
+	std::uint32_t Frequency()const noexcept{
 		return this->frequency;
 	}
 	
-	virtual ~Sink()throw(){}
+	virtual ~Sink()noexcept{}
 	
 	virtual void Start() = 0;
 	
@@ -66,13 +66,13 @@ public:
 
 
 
-template <std::uint8_t num_channels> class ChanSink : public Sink{
+template <std::uint8_t num_channels> class ChanneledSink : public Sink{
 protected:
-	ChanSink(std::uint32_t frequency) :
+	ChanneledSink(std::uint32_t frequency) :
 			Sink(num_channels, frequency)
 	{}
 public:
-	aumiks::ChanInput<num_channels> input;
+	aumiks::ChanneledInput<num_channels> input;
 };
 
 }

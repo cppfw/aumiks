@@ -27,7 +27,7 @@ protected:
 public:
 	aumiks::Output& output;
 	
-	virtual ~Source()throw(){}
+	virtual ~Source()noexcept{}
 	
 	//thread safe
 	bool IsConnected()const noexcept{

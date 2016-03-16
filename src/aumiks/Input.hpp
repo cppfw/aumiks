@@ -36,7 +36,7 @@ namespace aumiks{
 
 
 class Input{
-	template <std::uint8_t> friend class ChanInput;
+	template <std::uint8_t> friend class ChanneledInput;
 	
 	std::uint8_t numChannels;
 	
@@ -94,12 +94,12 @@ public:
 
 
 
-template <std::uint8_t num_channels> class ChanInput : public Input{
+template <std::uint8_t num_channels> class ChanneledInput : public Input{
 	std::shared_ptr<aumiks::Source> srcInUse;
 
 public:
 	
-	ChanInput() :
+	ChanneledInput() :
 			Input(num_channels)
 	{}
 	
