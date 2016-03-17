@@ -25,8 +25,8 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 	void fillPlayBuf(utki::Buf<std::int16_t> playBuf)noexcept override{
 		ASSERT(this->smpBuf.size() == playBuf.size())
 
-		if(this->input.FillSampleBuffer(utki::wrapBuf(this->smpBuf))){
-			this->input.Disconnect();
+		if(this->input_var.FillSampleBuffer(utki::wrapBuf(this->smpBuf))){
+			this->input_var.Disconnect();
 		}
 		
 		auto src = this->smpBuf.cbegin();

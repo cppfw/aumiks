@@ -40,6 +40,8 @@ public:
 	virtual void Stop(){
 		throw aumiks::Exc("Sink::Stop(): unsupported");
 	}
+	
+	virtual aumiks::Input& input()noexcept = 0;
 };
 
 
@@ -49,8 +51,14 @@ protected:
 	ChanneledSink(std::uint32_t frequency) :
 			Sink(num_channels, frequency)
 	{}
+	
+protected:
+	aumiks::ChanneledInput<num_channels> input_var;
 public:
-	aumiks::ChanneledInput<num_channels> input;
+	aumiks::Input& input()noexcept override{
+		return this->input_var;
+	}
+
 };
 
 }

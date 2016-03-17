@@ -29,10 +29,10 @@ int main(int argc, char *argv[]){
 		
 		ASSERT_ALWAYS(snd->NumChannels() == 1)
 		
-		sink.input.Connect(snd->CreateSource());
+		sink.input().Connect(snd->CreateSource());
 		sink.Start();
 		
-		while(sink.input.IsConnected()){
+		while(sink.input().IsConnected()){
 			nitki::Thread::sleep(333);
 		}
 	}
