@@ -5,11 +5,6 @@ this_name := aumiks
 this_soname := $(shell cat $(prorab_this_dir)/soname.txt)
 
 
-#this_srcs += aumiks/Channel.cpp
-#this_srcs += aumiks/Effect.cpp
-#this_srcs += aumiks/Lib.cpp
-#this_srcs += aumiks/MixChannel.cpp
-#this_srcs += aumiks/util.cpp
 this_srcs += aumiks/WavSound.cpp
 this_srcs += aumiks/Input.cpp
 
@@ -24,14 +19,12 @@ this_cxxflags += -Werror #treat warnings as errors
 this_cxxflags += -Wfatal-errors # stop on first error encountered
 this_cxxflags += -fstrict-aliasing #strict aliasing (in order to comply with the c++ standard more strictly)
 this_cxxflags += -g #include debugging symbols
-                #-P -E #-Wreorder
-                #-O3 -funroll-loops -fomit-frame-pointer
+this_cxxflags += -O3
 this_cxxflags += -std=c++11
 
 
 ifeq ($(debug),true)
     this_cxxflags += -DDEBUG
-#    this_cxxflags += -DM_MORDA_RENDER_WIDGET_BORDERS
     this_objcflags += -DDEBUG
 endif
 
@@ -53,16 +46,6 @@ else ifeq ($(prorab_os), macosx)
     this_cxxflags += -stdlib=libc++ #this is needed to be able to use c++11 std lib
     this_ldlibs += -lc++
     #this_ldlibs += -framework Cocoa -framework OpenGL -lpng -lfreetype -ljpeg -lstob -lGLEW
-    
-    #this_mm_obj := $(prorab_this_dir)$(prorab_obj_dir)morda/glue/macosx/main.o
-
-    #define this_rules
-    #    $(this_mm_obj): $(prorab_this_dir)morda/glue/macosx/main.mm
-#		@echo Compiling $$<...
-#		$(prorab_echo)mkdir -p $$(dir $$@)
-#		$(prorab_echo)$(CC) -ObjC++ -std=c++11 -c -o "$$@" $(this_objcflags) $$<
-#    endef
-#    $(eval $(this_rules))
 endif
 
 this_ldlibs += 
