@@ -69,7 +69,7 @@ public:
 	
 	void Connect(const std::shared_ptr<aumiks::Source>& source){
 		ASSERT(source)
-		ASSERT(this->NumChannels() == source->output.NumChannels())
+		ASSERT(this->NumChannels() == source->NumChannels())
 		
 		if(this->IsConnected()){
 			throw aumiks::Exc("Input already connected");
@@ -106,14 +106,14 @@ public:
 	bool FillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept{
 		if(this->src != this->srcInUse){
 			std::lock_guard<utki::SpinLock> guard(this->spinLock);
-			ASSERT(!this->src || this->src->output.NumChannels() == num_channels)
+			ASSERT(!this->src || this->src->NumChannels() == num_channels)
 			this->srcInUse = this->src;//this->src.template StaticCast<T_ChanneledSource>();
 		}
 		if(!this->srcInUse){
 			return false;
 		}
-		typedef aumiks::ChanOutput<num_channels> T_ChanneledOutput;
-		return static_cast<T_ChanneledOutput&>(this->srcInUse->output).FillSampleBuffer(buf);
+		typedef aumiks::ChanneledSource<num_channels> T_ChanneledOutput;
+		return static_cast<T_ChanneledOutput&>(*this->srcInUse).fillSampleBuffer(buf);
 	}
 };
 

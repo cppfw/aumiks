@@ -28,31 +28,19 @@ protected:
 	{}
 
 public:
-	inline std::uint8_t NumChannels()const throw(){
+	std::uint8_t NumChannels()const throw(){
 		return this->chans;
 	}
 	
-	inline std::uint32_t SamplingRate()const throw(){
+	std::uint32_t SamplingRate()const throw(){
 		return this->freq;
 	}
-
-	class Source : public aumiks::Source{
-		Source(const Source&);
-		Source& operator=(const Source&);
-	protected:
-		Source(aumiks::Output& output) :
-				aumiks::Source(output)
-		{}
-	public:
-		
-		//TODO:
-	};
 	
-	virtual std::shared_ptr<Source> CreateWavSource()const = 0;
-	
-	std::shared_ptr<aumiks::Source> CreateSource()const override{
-		return this->CreateWavSource();
-	}
+//	virtual std::shared_ptr<Source> CreateWavSource()const = 0;
+//	
+//	std::shared_ptr<aumiks::Source> CreateSource()const override{
+//		return this->CreateWavSource();
+//	}
 	
 	//TODO:
 //	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{

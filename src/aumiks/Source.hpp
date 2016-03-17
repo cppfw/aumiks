@@ -6,7 +6,6 @@
 
 #include <utki/Shared.hpp>
 
-#include "Output.hpp"
 
 namespace aumiks{
 
@@ -15,19 +14,24 @@ namespace aumiks{
 class Source : virtual public utki::Shared{
 	friend class Input;
 	
-	Source(const Source&);
-	Source& operator=(const Source&);
-	
 	bool isConnected = false;
 	
+	std::uint8_t numChannels;
+	
 protected:
-	Source(aumiks::Output& output) :
-			output(output)
+	Source(const Source&) = delete;
+	Source& operator=(const Source&) = delete;
+	
+	Source(decltype(numChannels) numChannels) :
+			numChannels(numChannels)
 	{}
 public:
-	aumiks::Output& output;
 	
 	virtual ~Source()noexcept{}
+	
+	decltype(numChannels) NumChannels()const noexcept{
+		return this->numChannels;
+	}
 	
 	//thread safe
 	bool IsConnected()const noexcept{
@@ -37,6 +41,18 @@ private:
 
 };
 
+
+template <std::uint8_t num_channels> class ChanneledSource : public Source{
+public:
+	ChanneledSource(const ChanneledSource&) = delete;
+	ChanneledSource& operator=(const ChanneledSource&) = delete;
+	
+	ChanneledSource() :
+			Source(num_channels)
+	{}
+	
+	virtual bool fillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept = 0;
+};
 
 
 }

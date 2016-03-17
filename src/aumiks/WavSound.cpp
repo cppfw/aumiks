@@ -19,7 +19,7 @@ template <class TSampleType, std::uint8_t num_channels>
 	std::vector<TSampleType> data;
 	
 
-	class Source : public WavSound::Source, private aumiks::ChanOutput<num_channels>{
+	class Source : public aumiks::ChanneledSource<num_channels>{
 //		friend class WavSoundImpl;
 
 		const std::shared_ptr<const WavSoundImpl> wavSound;
@@ -28,12 +28,11 @@ template <class TSampleType, std::uint8_t num_channels>
 	
 	public:
 		Source(const std::shared_ptr<const WavSoundImpl>& sound) :
-				WavSound::Source(static_cast<aumiks::ChanOutput<num_channels>&>(*this)),
 				wavSound(ASS(sound))
 		{}
 
 	private:
-		virtual bool FillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept override{
+		bool fillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept override{
 			ASSERT(buf.size() % num_channels == 0)
 			
 			ASSERT(this->wavSound->data.size() % num_channels == 0)
@@ -70,7 +69,7 @@ template <class TSampleType, std::uint8_t num_channels>
 	};//~class Source
 
 private:
-	virtual std::shared_ptr<WavSound::Source> CreateWavSource()const override{
+	std::shared_ptr<aumiks::Source> CreateSource()const override{
 		return utki::makeShared<Source>(this->sharedFromThis(this));
 	}
 	
