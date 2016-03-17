@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <utki/SpinLock.hpp>
+#include <mutex>
+
 #include "Exc.hpp"
 #include "Source.hpp"
 
@@ -12,55 +15,26 @@ namespace aumiks{
 
 
 class Input{
-	template <std::uint8_t> friend class ChanneledInput;
+	audout::AudioFormat::EFrame frameType_var;
 	
-	std::uint8_t numChannels;
-	
-	Input(std::uint8_t numChannels) :
-			numChannels(numChannels)
-	{}
-	
+protected:
 	std::shared_ptr<aumiks::Source> src;
 	
 	utki::SpinLock spinLock;
+	
+	Input(decltype(frameType_var) frameType) :
+			frameType_var(frameType)
+	{}
 public:
 	virtual ~Input()noexcept{}
 	
-	std::uint8_t NumChannels()const noexcept{
-		return this->numChannels;
+	decltype(frameType_var) frameType()const noexcept{
+		return this->frameType_var;
 	}
 	
-	void Disconnect()noexcept{
-		//To minimize the time with locked spinlock need to avoid object destruction
-		//within the locked spinlock period. To achieve that use temporary strong reference.
-		std::shared_ptr<aumiks::Source> tmp;
-		
-		if(this->src){
-			std::lock_guard<utki::SpinLock> guard(this->spinLock);
-			tmp = this->src;
-			tmp->isConnected = false;
-			this->src.reset();
-		}
-	}
+	void Disconnect()noexcept;
 	
-	void Connect(const std::shared_ptr<aumiks::Source>& source){
-		ASSERT(source)
-		ASSERT(this->NumChannels() == source->NumChannels())
-		
-		if(this->IsConnected()){
-			throw aumiks::Exc("Input already connected");
-		}
-		
-		if(source->IsConnected()){
-			throw aumiks::Exc("Source is already connected");
-		}
-		
-		{
-			std::lock_guard<utki::SpinLock> guard(this->spinLock);
-			source->isConnected = true;
-			this->src = source;
-		}
-	}
+	void Connect(const std::shared_ptr<aumiks::Source>& source);
 	
 	//thread safe
 	bool IsConnected()const{
@@ -70,25 +44,25 @@ public:
 
 
 
-template <std::uint8_t num_channels> class ChanneledInput : public Input{
+template <audout::AudioFormat::EFrame frame_type> class ChanneledInput : public Input{
 	std::shared_ptr<aumiks::Source> srcInUse;
 
 public:
 	
 	ChanneledInput() :
-			Input(num_channels)
+			Input(frame_type)
 	{}
 	
 	bool FillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept{
 		if(this->src != this->srcInUse){
 			std::lock_guard<utki::SpinLock> guard(this->spinLock);
-			ASSERT(!this->src || this->src->NumChannels() == num_channels)
+			ASSERT(!this->src || this->src->NumChannels() == audout::AudioFormat::numChannels(frame_type))
 			this->srcInUse = this->src;//this->src.template StaticCast<T_ChanneledSource>();
 		}
 		if(!this->srcInUse){
 			return false;
 		}
-		typedef aumiks::ChanneledSource<num_channels> T_ChanneledOutput;
+		typedef aumiks::ChanneledSource<frame_type> T_ChanneledOutput;
 		return static_cast<T_ChanneledOutput&>(*this->srcInUse).fillSampleBuffer(buf);
 	}
 };

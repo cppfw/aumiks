@@ -5,6 +5,9 @@
 #pragma once
 
 #include <utki/Shared.hpp>
+#include <utki/Buf.hpp>
+
+#include <audout/AudioFormat.hpp>
 
 
 namespace aumiks{
@@ -16,21 +19,21 @@ class Source : virtual public utki::Shared{
 	
 	bool isConnected = false;
 	
-	std::uint8_t numChannels;
+	audout::AudioFormat::EFrame frameType_var;
 	
 protected:
 	Source(const Source&) = delete;
 	Source& operator=(const Source&) = delete;
 	
-	Source(decltype(numChannels) numChannels) :
-			numChannels(numChannels)
+	Source(decltype(frameType_var) frameType) :
+			frameType_var(frameType)
 	{}
 public:
 	
 	virtual ~Source()noexcept{}
 	
-	decltype(numChannels) NumChannels()const noexcept{
-		return this->numChannels;
+	unsigned NumChannels()const noexcept{
+		return audout::AudioFormat::numChannels(this->frameType_var);
 	}
 	
 	//thread safe
@@ -42,13 +45,13 @@ private:
 };
 
 
-template <std::uint8_t num_channels> class ChanneledSource : public Source{
+template <audout::AudioFormat::EFrame frame_type> class ChanneledSource : public Source{
 public:
 	ChanneledSource(const ChanneledSource&) = delete;
 	ChanneledSource& operator=(const ChanneledSource&) = delete;
 	
 	ChanneledSource() :
-			Source(num_channels)
+			Source(frame_type)
 	{}
 	
 	virtual bool fillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept = 0;

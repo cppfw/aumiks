@@ -13,13 +13,13 @@ namespace{
 
 
 
-template <class TSampleType, std::uint8_t num_channels>
+template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 		class WavSoundImpl : public WavSound
 {
 	std::vector<TSampleType> data;
 	
 
-	class Source : public aumiks::ChanneledSource<num_channels>{
+	class Source : public aumiks::ChanneledSource<frame_type>{
 //		friend class WavSoundImpl;
 
 		const std::shared_ptr<const WavSoundImpl> wavSound;
@@ -33,14 +33,14 @@ template <class TSampleType, std::uint8_t num_channels>
 
 	private:
 		bool fillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept override{
-			ASSERT(buf.size() % num_channels == 0)
+			ASSERT(buf.size() % audout::AudioFormat::numChannels(frame_type) == 0)
 			
-			ASSERT(this->wavSound->data.size() % num_channels == 0)
-			ASSERT(this->curSmp % num_channels == 0)
+			ASSERT(this->wavSound->data.size() % audout::AudioFormat::numChannels(frame_type) == 0)
+			ASSERT(this->curSmp % audout::AudioFormat::numChannels(frame_type) == 0)
 			
-			size_t framesInBuf = buf.size() / num_channels;
+			size_t framesInBuf = buf.size() / audout::AudioFormat::numChannels(frame_type);
 			
-			size_t framesToCopy = (this->wavSound->data.size() - this->curSmp) / num_channels;
+			size_t framesToCopy = (this->wavSound->data.size() - this->curSmp) / audout::AudioFormat::numChannels(frame_type);
 			utki::clampTop(framesToCopy, framesInBuf);
 
 			ASSERT(framesToCopy <= framesInBuf)
@@ -53,10 +53,10 @@ template <class TSampleType, std::uint8_t num_channels>
 			ASSERT(this->curSmp <= this->wavSound->data.size())			
 			const TSampleType *startSmp = &this->wavSound->data[this->curSmp];
 			
-			this->curSmp += framesToCopy * num_channels;
+			this->curSmp += framesToCopy * audout::AudioFormat::numChannels(frame_type);
 			
 			auto dst = buf.begin();
-			for(const TSampleType *src = startSmp; dst != buf.begin() + framesToCopy * num_channels; ++dst, ++src){
+			for(const TSampleType *src = startSmp; dst != buf.begin() + framesToCopy * audout::AudioFormat::numChannels(frame_type); ++dst, ++src){
 				*dst = std::int32_t(*src);
 			}
 
@@ -76,7 +76,7 @@ private:
 public:
 	//NOTE: assume that data in d is little-endian
 	WavSoundImpl(const utki::Buf<std::uint8_t> d, std::uint32_t frequency) :
-			WavSound(num_channels, frequency)
+			WavSound(audout::AudioFormat::numChannels(frame_type), frequency)
 	{
 		ASSERT(d.size() % (this->NumChannels() * sizeof(TSampleType)) == 0)
 
@@ -216,10 +216,10 @@ std::shared_ptr<WavSound> WavSound::Load(papki::File& fi){
 		//set the format
 		switch(chans){
 			case 1://mono
-				ret = utki::makeShared<WavSoundImpl<std::int16_t, 1>>(utki::wrapBuf(data), frequency);
+				ret = utki::makeShared<WavSoundImpl<std::int16_t, audout::AudioFormat::EFrame::MONO>>(utki::wrapBuf(data), frequency);
 				break;
 			case 2://stereo
-				ret = utki::makeShared<WavSoundImpl<std::int16_t, 2>>(utki::wrapBuf(data), frequency);
+				ret = utki::makeShared<WavSoundImpl<std::int16_t, audout::AudioFormat::EFrame::STEREO>>(utki::wrapBuf(data), frequency);
 				break;
 			default:
 				throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");

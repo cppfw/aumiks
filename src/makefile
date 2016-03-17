@@ -11,6 +11,7 @@ this_soname := $(shell cat $(prorab_this_dir)/soname.txt)
 #this_srcs += aumiks/MixChannel.cpp
 #this_srcs += aumiks/util.cpp
 this_srcs += aumiks/WavSound.cpp
+this_srcs += aumiks/Input.cpp
 
 
 
