@@ -35,20 +35,20 @@ THE SOFTWARE. */
 namespace aumiks{
 
 //TODO: doxygen
-class Sink{
-	template <std::uint8_t> friend class ChanneledSink;
-	
-	std::uint8_t numChannels;
+template <audout::AudioFormat::EFrame frame_type> class Sink{
 	std::uint32_t frequency;
 	
-	Sink(std::uint8_t numChannles, std::uint32_t frequency) :
-			numChannels(numChannles),
+protected:
+	Sink(std::uint32_t frequency) :
 			frequency(frequency)
 	{}
 public:
 	
+	
+	aumiks::ChanneledInput<audout::AudioFormat::numChannels(frame_type)> input;
+	
 	std::uint8_t NumChannels()const noexcept{
-		return this->numChannels;
+		return audout::AudioFormat::numChannels(frame_type);
 	}
 	
 	std::uint32_t Frequency()const noexcept{
@@ -64,15 +64,5 @@ public:
 	}
 };
 
-
-
-template <std::uint8_t num_channels> class ChanneledSink : public Sink{
-protected:
-	ChanneledSink(std::uint32_t frequency) :
-			Sink(num_channels, frequency)
-	{}
-public:
-	aumiks::ChanneledInput<num_channels> input;
-};
 
 }
