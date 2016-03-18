@@ -48,7 +48,8 @@ public:
 template <audout::AudioFormat::EFrame frame_type> class ChanneledSink : public Sink{
 protected:
 	ChanneledSink(std::uint32_t frequency) :
-			Sink(frame_type, frequency)
+			Sink(frame_type, frequency),
+			input_var(frequency)
 	{}
 	
 protected:

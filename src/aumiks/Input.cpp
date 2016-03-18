@@ -7,7 +7,6 @@ using namespace aumiks;
 
 void Input::Connect(const std::shared_ptr<aumiks::Source>& source) {
 	ASSERT(source)
-	ASSERT(audout::AudioFormat::numChannels(this->frameType()) == source->NumChannels())
 
 	if (this->IsConnected()) {
 		throw aumiks::Exc("Input already connected");
@@ -17,6 +16,10 @@ void Input::Connect(const std::shared_ptr<aumiks::Source>& source) {
 		throw aumiks::Exc("Source is already connected");
 	}
 
+	ASSERT(audout::AudioFormat::numChannels(this->frameType()) == source->NumChannels())
+	
+	
+	
 	{
 		std::lock_guard<utki::SpinLock> guard(this->spinLock);
 		source->isConnected = true;
