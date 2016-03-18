@@ -40,7 +40,7 @@ public:
 	
 	void Disconnect()noexcept;
 	
-	void Connect(const std::shared_ptr<aumiks::Source>& source);
+	void Connect(std::shared_ptr<aumiks::Source> source);
 	
 	//thread safe
 	bool IsConnected()const{
