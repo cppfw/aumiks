@@ -36,6 +36,10 @@ public:
 		return this->freq;
 	}
 	
+	decltype(freq) frequency()const noexcept{
+		return this->freq;
+	}
+	
 //	virtual std::shared_ptr<Source> CreateWavSource()const = 0;
 //	
 //	std::shared_ptr<aumiks::Source> CreateSource()const override{
