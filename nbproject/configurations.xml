@@ -3,8 +3,6 @@
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="src" name="0">
       <df name="aumiks">
-        <in>Channel.cpp</in>
-        <in>Effect.cpp</in>
         <in>Input.cpp</in>
         <in>WavSound.cpp</in>
       </df>
@@ -75,27 +73,6 @@
           </preprocessorList>
         </ccTool>
       </folder>
-      <item path="src/aumiks/Channel.cpp" ex="false" tool="1" flavor2="4">
-        <ccTool>
-          <incDir>
-            <pElem>/usr/include/ting</pElem>
-            <pElem>src/aumiks</pElem>
-            <pElem>/usr/include/audout</pElem>
-            <pElem>/usr/include/ting/mt</pElem>
-            <pElem>src</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/aumiks/Effect.cpp" ex="false" tool="1" flavor2="4">
-        <ccTool>
-          <incDir>
-            <pElem>src/aumiks</pElem>
-            <pElem>/usr/include/ting</pElem>
-            <pElem>/usr/include/ting/mt</pElem>
-            <pElem>src</pElem>
-          </incDir>
-        </ccTool>
-      </item>
       <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
@@ -181,27 +158,6 @@
           </incDir>
         </ccTool>
       </folder>
-      <item path="src/aumiks/Channel.cpp" ex="false" tool="1" flavor2="4">
-        <ccTool>
-          <incDir>
-            <pElem>/usr/include/ting</pElem>
-            <pElem>src/aumiks</pElem>
-            <pElem>/usr/include/audout</pElem>
-            <pElem>/usr/include/ting/mt</pElem>
-            <pElem>src</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/aumiks/Effect.cpp" ex="false" tool="1" flavor2="4">
-        <ccTool>
-          <incDir>
-            <pElem>src/aumiks</pElem>
-            <pElem>/usr/include/ting</pElem>
-            <pElem>/usr/include/ting/mt</pElem>
-            <pElem>src</pElem>
-          </incDir>
-        </ccTool>
-      </item>
       <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/playwav/main.cpp" ex="false" tool="1" flavor2="8">

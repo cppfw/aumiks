@@ -23,7 +23,7 @@
 
 int main(int argc, char *argv[]){
 	{
-		aumiks::MonoSink sink(audout::AudioFormat::ESamplingRate::HZ_11025);
+		aumiks::MonoSink sink(audout::AudioFormat::ESamplingRate::HZ_22050);
 		
 		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::Load("../samples/sample11025mono16.wav");
 		
