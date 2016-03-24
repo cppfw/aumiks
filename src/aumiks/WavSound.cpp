@@ -28,7 +28,6 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 	
 	public:
 		Source(const std::shared_ptr<const WavSoundImpl>& sound) :
-				ChanneledSource<frame_type>(ASS(sound)->frequency()),
 				wavSound(ASS(sound))
 		{}
 

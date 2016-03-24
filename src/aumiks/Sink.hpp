@@ -15,21 +15,15 @@ namespace aumiks{
 //TODO: doxygen
 class Sink : utki::Unique{
 	audout::AudioFormat::EFrame frameType_var;
-	std::uint32_t frequency;
 
 protected:	
-	Sink(decltype(frameType_var) frameType, std::uint32_t frequency) :
-			frameType_var(frameType),
-			frequency(frequency)
+	Sink(decltype(frameType_var) frameType) :
+			frameType_var(frameType)
 	{}
 public:
 	
 	std::uint8_t NumChannels()const noexcept{
 		return audout::AudioFormat::numChannels(this->frameType_var);
-	}
-	
-	std::uint32_t Frequency()const noexcept{
-		return this->frequency;
 	}
 	
 	virtual ~Sink()noexcept{}
@@ -47,9 +41,8 @@ public:
 
 template <audout::AudioFormat::EFrame frame_type> class ChanneledSink : public Sink{
 protected:
-	ChanneledSink(std::uint32_t frequency) :
-			Sink(frame_type, frequency),
-			input_var(frequency)
+	ChanneledSink() :
+			Sink(frame_type)
 	{}
 	
 protected:

@@ -21,15 +21,12 @@ class Source : virtual public utki::Shared{
 	
 	audout::AudioFormat::EFrame frameType_var;
 	
-	std::uint32_t frequency_var;
-	
 protected:
 	Source(const Source&) = delete;
 	Source& operator=(const Source&) = delete;
 	
-	Source(decltype(frameType_var) frameType, std::uint32_t frequency) :
-			frameType_var(frameType),
-			frequency_var(frequency)
+	Source(decltype(frameType_var) frameType) :
+			frameType_var(frameType)
 	{}
 public:
 	
@@ -39,9 +36,6 @@ public:
 		return this->frameType_var;
 	}
 	
-	decltype(frequency_var) frequency()const noexcept{
-		return this->frequency_var;
-	}
 	
 	unsigned NumChannels()const noexcept{
 		return audout::AudioFormat::numChannels(this->frameType_var);
@@ -61,8 +55,8 @@ public:
 	ChanneledSource(const ChanneledSource&) = delete;
 	ChanneledSource& operator=(const ChanneledSource&) = delete;
 	
-	ChanneledSource(std::uint32_t frequency) :
-			Source(frame_type, frequency)
+	ChanneledSource() :
+			Source(frame_type)
 	{}
 	
 	virtual bool fillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept = 0;

@@ -40,6 +40,9 @@ public:
 		return this->freq;
 	}
 	
+	
+	std::shared_ptr<Source> createSource(std::uint32_t frequency)const;
+	
 //	virtual std::shared_ptr<Source> CreateWavSource()const = 0;
 //	
 //	std::shared_ptr<aumiks::Source> CreateSource()const override{

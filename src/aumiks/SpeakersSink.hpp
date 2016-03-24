@@ -15,8 +15,6 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 		public aumiks::ChanneledSink<frame_type>,
 		private audout::Listener
 {
-	SpeakersSink(const SpeakersSink&) = delete;
-
 	std::vector<std::int32_t> smpBuf;
 	
 	audout::Player player;
@@ -45,11 +43,12 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 	
 public:
 	SpeakersSink(audout::AudioFormat::ESamplingRate samplingRate, std::uint16_t bufferSizeMillis = 100) :
-			aumiks::ChanneledSink<frame_type>(std::uint32_t(samplingRate)),
-			smpBuf((this->Frequency() * bufferSizeMillis / 1000) * this->NumChannels()),
+			smpBuf((audout::AudioFormat(frame_type, samplingRate).frequency() * bufferSizeMillis / 1000) * this->NumChannels()),
 			player(audout::AudioFormat(frame_type, samplingRate), smpBuf.size() / this->NumChannels(), this)
 	{}
-	
+
+	SpeakersSink(const SpeakersSink&) = delete;
+
 	void Start()override{
 		this->player.setPaused(false);
 	}

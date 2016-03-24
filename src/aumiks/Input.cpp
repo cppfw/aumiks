@@ -17,11 +17,8 @@ void Input::Connect(std::shared_ptr<aumiks::Source> source) {
 	}
 
 	ASSERT(audout::AudioFormat::numChannels(this->frameType()) == source->NumChannels())
-	
-	if(this->frequency() != source->frequency()){
-		//TODO:
-	}
-	
+	//TODO: if channels are not equal
+			
 	{
 		std::lock_guard<utki::SpinLock> guard(this->spinLock);
 		source->isConnected = true;

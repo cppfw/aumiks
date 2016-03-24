@@ -16,26 +16,20 @@ namespace aumiks{
 
 class Input{
 	audout::AudioFormat::EFrame frameType_var;
-	std::uint32_t frequency_var;
 	
 protected:
 	std::shared_ptr<aumiks::Source> src;
 	
 	utki::SpinLock spinLock;
 	
-	Input(decltype(frameType_var) frameType, decltype(frequency_var) frequency) :
-			frameType_var(frameType),
-			frequency_var(frequency)
+	Input(decltype(frameType_var) frameType) :
+			frameType_var(frameType)
 	{}
 public:
 	virtual ~Input()noexcept{}
 	
 	decltype(frameType_var) frameType()const noexcept{
 		return this->frameType_var;
-	}
-	
-	decltype(frequency_var) frequency()const noexcept{
-		return this->frequency_var;
 	}
 	
 	void Disconnect()noexcept;
@@ -55,8 +49,8 @@ template <audout::AudioFormat::EFrame frame_type> class ChanneledInput : public 
 
 public:
 	
-	ChanneledInput(std::uint32_t frequency) :
-			Input(frame_type, frequency)
+	ChanneledInput() :
+			Input(frame_type)
 	{}
 	
 	bool FillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept{
