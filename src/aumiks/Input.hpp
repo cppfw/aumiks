@@ -53,7 +53,7 @@ public:
 			Input(frame_type)
 	{}
 	
-	bool fillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept{
+	bool fillSampleBuffer(utki::Buf<std::int32_t[audout::AudioFormat::numChannels(frame_type)]> buf)noexcept{
 		if(this->src != this->srcInUse){
 			std::lock_guard<utki::SpinLock> guard(this->spinLock);
 			ASSERT(!this->src || this->src->numChannels() == audout::AudioFormat::numChannels(frame_type))

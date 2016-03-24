@@ -32,7 +32,7 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 		{}
 
 	private:
-		bool fillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept override{
+		bool fillSampleBuffer(utki::Buf<std::int32_t[audout::AudioFormat::numChannels(frame_type)]> buf)noexcept override{
 			ASSERT(buf.size() % audout::AudioFormat::numChannels(frame_type) == 0)
 			
 			ASSERT(this->wavSound->data.size() % audout::AudioFormat::numChannels(frame_type) == 0)
@@ -56,13 +56,17 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 			this->curSmp += framesToCopy * audout::AudioFormat::numChannels(frame_type);
 			
 			auto dst = buf.begin();
-			for(const TSampleType *src = startSmp; dst != buf.begin() + framesToCopy * audout::AudioFormat::numChannels(frame_type); ++dst, ++src){
-				*dst = std::int32_t(*src);
+			for(const TSampleType *src = startSmp; dst != buf.begin() + framesToCopy; ++dst){
+				for(auto p = &(*dst)[0]; p != &(*dst)[0] + audout::AudioFormat::numChannels(frame_type); ++p, ++src){
+					*p = std::int32_t(*src);
+				}
 			}
 
 			//fill the rest with zeroes
 			for(; dst != buf.end(); ++dst){
-				*dst = 0;
+				for(unsigned i = 0; i != audout::AudioFormat::numChannels(frame_type); ++i){
+					(*dst)[i] = 0;
+				}
 			}
 			return false;
 		}

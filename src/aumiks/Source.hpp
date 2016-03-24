@@ -59,7 +59,7 @@ public:
 			Source(frame_type)
 	{}
 	
-	virtual bool fillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept = 0;
+	virtual bool fillSampleBuffer(utki::Buf<std::int32_t[audout::AudioFormat::numChannels(frame_type)]> buf)noexcept = 0;
 };
 
 

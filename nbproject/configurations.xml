@@ -4,6 +4,8 @@
     <df root="src" name="0">
       <df name="aumiks">
         <in>Input.cpp</in>
+        <in>Resampler.cpp</in>
+        <in>Resampler.hpp</in>
         <in>WavSound.cpp</in>
       </df>
     </df>
@@ -90,6 +92,10 @@
           </incDir>
         </ccTool>
       </item>
+      <item path="src/aumiks/Resampler.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/aumiks/Resampler.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
@@ -159,6 +165,10 @@
         </ccTool>
       </folder>
       <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/aumiks/Resampler.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/aumiks/Resampler.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tests/playwav/main.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
