@@ -57,8 +57,8 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 			
 			auto dst = buf.begin();
 			for(const TSampleType *src = startSmp; dst != buf.begin() + framesToCopy; ++dst){
-				for(auto p = &(*dst)[0]; p != &(*dst)[0] + audout::AudioFormat::numChannels(frame_type); ++p, ++src){
-					*p = std::int32_t(*src);
+				for(unsigned i = 0; i != audout::AudioFormat::numChannels(frame_type); ++i, ++src){
+					(*dst)[i] = std::int32_t(*src);
 				}
 			}
 
