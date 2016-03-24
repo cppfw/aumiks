@@ -39,9 +39,6 @@ public:
 	decltype(freq) frequency()const noexcept{
 		return this->freq;
 	}
-	
-	
-	std::shared_ptr<Source> createSource(std::uint32_t frequency)const;
 
 	static std::shared_ptr<WavSound> Load(const std::string& fileName);
 	static std::shared_ptr<WavSound> Load(papki::File& fi);

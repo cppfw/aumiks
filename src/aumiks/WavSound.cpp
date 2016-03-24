@@ -69,7 +69,7 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 	};//~class Source
 
 private:
-	std::shared_ptr<aumiks::Source> CreateSource()const override{
+	std::shared_ptr<aumiks::Source> CreateSource(std::uint32_t frequency = 0)const override{
 		return utki::makeShared<Source>(this->sharedFromThis(this));
 	}
 	
