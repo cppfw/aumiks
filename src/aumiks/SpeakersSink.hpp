@@ -18,6 +18,8 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 	std::vector<std::int32_t> smpBuf;
 	
 	audout::Player player;
+	
+	std::uint32_t freq;
 
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	void fillPlayBuf(utki::Buf<std::int16_t> playBuf)noexcept override{
@@ -43,12 +45,18 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 	
 public:
 	SpeakersSink(audout::AudioFormat::ESamplingRate samplingRate, std::uint16_t bufferSizeMillis = 100) :
-			smpBuf((audout::AudioFormat(frame_type, samplingRate).frequency() * bufferSizeMillis / 1000) * this->NumChannels()),
+			freq(audout::AudioFormat(frame_type, samplingRate).frequency()),
+			smpBuf((freq * bufferSizeMillis / 1000) * this->NumChannels()),
 			player(audout::AudioFormat(frame_type, samplingRate), smpBuf.size() / this->NumChannels(), this)
 	{}
 
 	SpeakersSink(const SpeakersSink&) = delete;
+	SpeakersSink& operator=(const SpeakersSink&) = delete;
 
+	decltype(freq) frequency()const noexcept{
+		return this->freq;
+	}
+	
 	void Start()override{
 		this->player.setPaused(false);
 	}
