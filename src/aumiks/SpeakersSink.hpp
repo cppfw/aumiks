@@ -15,11 +15,11 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 		public aumiks::ChanneledSink<frame_type>,
 		private audout::Listener
 {
+	std::uint32_t freq;
+	
 	std::vector<std::int32_t> smpBuf;
 	
 	audout::Player player;
-	
-	std::uint32_t freq;
 
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	void fillPlayBuf(utki::Buf<std::int16_t> playBuf)noexcept override{

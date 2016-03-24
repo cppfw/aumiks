@@ -25,12 +25,14 @@ int main(int argc, char *argv[]){
 	{
 		aumiks::MonoSink sink(audout::AudioFormat::ESamplingRate::HZ_22050);
 		
+		sink.Start();
+		
 		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::Load("../samples/sample11025mono16.wav");
 		
 		ASSERT_ALWAYS(snd->NumChannels() == 1)
 		
 		sink.input().Connect(snd->CreateSource());
-		sink.Start();
+		
 		
 		while(sink.input().IsConnected()){
 			nitki::Thread::sleep(333);

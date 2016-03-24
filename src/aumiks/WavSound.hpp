@@ -42,19 +42,6 @@ public:
 	
 	
 	std::shared_ptr<Source> createSource(std::uint32_t frequency)const;
-	
-//	virtual std::shared_ptr<Source> CreateWavSource()const = 0;
-//	
-//	std::shared_ptr<aumiks::Source> CreateSource()const override{
-//		return this->CreateWavSource();
-//	}
-	
-	//TODO:
-//	inline Ref<WavSound::Channel> Play(unsigned numLoops = 1)const{
-//		Ref<WavSound::Channel> ret = this->CreateWavChannel();
-//		ret->Play(numLoops);
-//		return ret;
-//	}
 
 	static std::shared_ptr<WavSound> Load(const std::string& fileName);
 	static std::shared_ptr<WavSound> Load(papki::File& fi);
