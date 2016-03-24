@@ -7,8 +7,8 @@ int main(int argc, char *argv[]){
 	TRACE_ALWAYS(<< "Opening audio playback device: mono 44100" << std::endl)
 	aumiks::Lib aumiksLibrary(audout::AudioFormat(audout::AudioFormat::Frame::MONO, audout::AudioFormat::SamplingRate::HZ_44100), 100);
 	
-	std::shared_ptr<aumiks::WavSound> snd1 = aumiks::WavSound::Load("../samples/sample44100mono16.wav");
-	std::shared_ptr<aumiks::WavSound> snd2 = aumiks::WavSound::Load("../samples/ice_break.wav");
+	std::shared_ptr<aumiks::WavSound> snd1 = aumiks::WavSound::load("../samples/sample44100mono16.wav");
+	std::shared_ptr<aumiks::WavSound> snd2 = aumiks::WavSound::load("../samples/ice_break.wav");
 
 	ASSERT(snd1)
 	ASSERT(snd2)

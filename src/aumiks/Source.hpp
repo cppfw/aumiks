@@ -17,7 +17,7 @@ namespace aumiks{
 class Source : virtual public utki::Shared{
 	friend class Input;
 	
-	bool isConnected = false;
+	bool isConnected_var = false;
 	
 	audout::AudioFormat::EFrame frameType_var;
 	
@@ -37,13 +37,13 @@ public:
 	}
 	
 	
-	unsigned NumChannels()const noexcept{
+	unsigned numChannels()const noexcept{
 		return audout::AudioFormat::numChannels(this->frameType_var);
 	}
 	
 	//thread safe
-	bool IsConnected()const noexcept{
-		return this->isConnected;
+	bool isConnected()const noexcept{
+		return this->isConnected_var;
 	}
 private:
 

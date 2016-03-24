@@ -47,10 +47,10 @@ protected:
 	Sound(){}
 public:
 	
-	virtual ~Sound()throw(){}
+	virtual ~Sound()noexcept{}
 
 	//TODO: doxygen
-	virtual std::shared_ptr<aumiks::Source> CreateSource(std::uint32_t frequency = 0)const = 0;
+	virtual std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const = 0;
 };
 
 }//~namespace

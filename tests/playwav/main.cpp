@@ -25,16 +25,16 @@ int main(int argc, char *argv[]){
 	{
 		aumiks::MonoSink sink(audout::AudioFormat::ESamplingRate::HZ_22050);
 		
-		sink.Start();
+		sink.start();
 		
-		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::Load("../samples/sample11025mono16.wav");
+		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::load("../samples/sample11025mono16.wav");
 		
-		ASSERT_ALWAYS(snd->NumChannels() == 1)
+		ASSERT_ALWAYS(snd->numChannels() == 1)
 		
-		sink.input().Connect(snd->CreateSource());
+		sink.input().connect(snd->createSource());
 		
 		
-		while(sink.input().IsConnected()){
+		while(sink.input().isConnected()){
 			nitki::Thread::sleep(333);
 		}
 	}

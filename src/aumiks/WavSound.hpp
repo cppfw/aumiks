@@ -28,11 +28,11 @@ protected:
 	{}
 
 public:
-	std::uint8_t NumChannels()const throw(){
+	std::uint8_t numChannels()const throw(){
 		return this->chans;
 	}
 	
-	std::uint32_t SamplingRate()const throw(){
+	std::uint32_t samplingRate()const throw(){
 		return this->freq;
 	}
 	
@@ -40,8 +40,8 @@ public:
 		return this->freq;
 	}
 
-	static std::shared_ptr<WavSound> Load(const std::string& fileName);
-	static std::shared_ptr<WavSound> Load(papki::File& fi);
+	static std::shared_ptr<WavSound> load(const std::string& fileName);
+	static std::shared_ptr<WavSound> load(papki::File& fi);
 };
 
 

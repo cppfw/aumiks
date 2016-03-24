@@ -25,8 +25,8 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 	void fillPlayBuf(utki::Buf<std::int16_t> playBuf)noexcept override{
 		ASSERT(this->smpBuf.size() == playBuf.size())
 
-		if(this->input_var.FillSampleBuffer(utki::wrapBuf(this->smpBuf))){
-			this->input_var.Disconnect();
+		if(this->input_var.fillSampleBuffer(utki::wrapBuf(this->smpBuf))){
+			this->input_var.disconnect();
 		}
 		
 		auto src = this->smpBuf.cbegin();
@@ -46,8 +46,8 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 public:
 	SpeakersSink(audout::AudioFormat::ESamplingRate samplingRate, std::uint16_t bufferSizeMillis = 100) :
 			freq(audout::AudioFormat(frame_type, samplingRate).frequency()),
-			smpBuf((freq * bufferSizeMillis / 1000) * this->NumChannels()),
-			player(audout::AudioFormat(frame_type, samplingRate), smpBuf.size() / this->NumChannels(), this)
+			smpBuf((freq * bufferSizeMillis / 1000) * this->numChannels()),
+			player(audout::AudioFormat(frame_type, samplingRate), smpBuf.size() / this->numChannels(), this)
 	{}
 
 	SpeakersSink(const SpeakersSink&) = delete;
@@ -57,11 +57,11 @@ public:
 		return this->freq;
 	}
 	
-	void Start()override{
+	void start()override{
 		this->player.setPaused(false);
 	}
 
-	void Stop()override{
+	void stop()override{
 		this->player.setPaused(true);
 	}
 };

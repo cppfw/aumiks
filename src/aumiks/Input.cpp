@@ -5,29 +5,29 @@ using namespace aumiks;
 
 
 
-void Input::Connect(std::shared_ptr<aumiks::Source> source) {
+void Input::connect(std::shared_ptr<aumiks::Source> source) {
 	ASSERT(source)
 
-	if (this->IsConnected()) {
+	if (this->isConnected()) {
 		throw aumiks::Exc("Input already connected");
 	}
 
-	if (source->IsConnected()) {
+	if (source->isConnected()) {
 		throw aumiks::Exc("Source is already connected");
 	}
 
-	ASSERT(audout::AudioFormat::numChannels(this->frameType()) == source->NumChannels())
+	ASSERT(audout::AudioFormat::numChannels(this->frameType()) == source->numChannels())
 	//TODO: if channels are not equal
 			
 	{
 		std::lock_guard<utki::SpinLock> guard(this->spinLock);
-		source->isConnected = true;
+		source->isConnected_var = true;
 		this->src = std::move(source);
 	}
 }
 
 
-void Input::Disconnect() noexcept{
+void Input::disconnect() noexcept{
 	//To minimize the time with locked spinlock need to avoid object destruction
 	//within the locked spinlock period. To achieve that use temporary strong reference.
 	std::shared_ptr<aumiks::Source> tmp;
@@ -35,7 +35,7 @@ void Input::Disconnect() noexcept{
 	if (this->src) {
 		std::lock_guard<utki::SpinLock> guard(this->spinLock);
 		tmp = this->src;
-		tmp->isConnected = false;
+		tmp->isConnected_var = false;
 		this->src.reset();
 	}
 }

@@ -32,12 +32,12 @@ public:
 		return this->frameType_var;
 	}
 	
-	void Disconnect()noexcept;
+	void disconnect()noexcept;
 	
-	void Connect(std::shared_ptr<aumiks::Source> source);
+	void connect(std::shared_ptr<aumiks::Source> source);
 	
 	//thread safe
-	bool IsConnected()const{
+	bool isConnected()const{
 		return this->src.operator bool();
 	}
 };
@@ -53,10 +53,10 @@ public:
 			Input(frame_type)
 	{}
 	
-	bool FillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept{
+	bool fillSampleBuffer(utki::Buf<std::int32_t> buf)noexcept{
 		if(this->src != this->srcInUse){
 			std::lock_guard<utki::SpinLock> guard(this->spinLock);
-			ASSERT(!this->src || this->src->NumChannels() == audout::AudioFormat::numChannels(frame_type))
+			ASSERT(!this->src || this->src->numChannels() == audout::AudioFormat::numChannels(frame_type))
 			this->srcInUse = this->src;//this->src.template StaticCast<T_ChanneledSource>();
 		}
 		if(!this->srcInUse){

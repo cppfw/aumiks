@@ -69,7 +69,7 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 	};//~class Source
 
 private:
-	std::shared_ptr<aumiks::Source> CreateSource(std::uint32_t frequency = 0)const override{
+	std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const override{
 		return utki::makeShared<Source>(this->sharedFromThis(this));
 	}
 	
@@ -78,7 +78,7 @@ public:
 	WavSoundImpl(const utki::Buf<std::uint8_t> d, std::uint32_t frequency) :
 			WavSound(audout::AudioFormat::numChannels(frame_type), frequency)
 	{
-		ASSERT(d.size() % (this->NumChannels() * sizeof(TSampleType)) == 0)
+		ASSERT(d.size() % (this->numChannels() * sizeof(TSampleType)) == 0)
 
 		this->data.resize(d.size() / sizeof(TSampleType));
 
@@ -103,14 +103,14 @@ public:
 
 
 
-std::shared_ptr<WavSound> WavSound::Load(const std::string& fileName){
+std::shared_ptr<WavSound> WavSound::load(const std::string& fileName){
 	papki::FSFile fi(fileName);
-	return WavSound::Load(fi);
+	return WavSound::load(fi);
 }
 
 
 
-std::shared_ptr<WavSound> WavSound::Load(papki::File& fi){
+std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 	papki::File::Guard fileGuard(fi, papki::File::E_Mode::READ);//make sure we close the file even in case of exception is thrown
 
 	//Start reading Wav-file header

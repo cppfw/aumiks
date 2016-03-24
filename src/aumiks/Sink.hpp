@@ -22,15 +22,15 @@ protected:
 	{}
 public:
 	
-	std::uint8_t NumChannels()const noexcept{
+	std::uint8_t numChannels()const noexcept{
 		return audout::AudioFormat::numChannels(this->frameType_var);
 	}
 	
 	virtual ~Sink()noexcept{}
 	
-	virtual void Start() = 0;
+	virtual void start() = 0;
 	
-	virtual void Stop(){
+	virtual void stop(){
 		throw aumiks::Exc("Sink::Stop(): unsupported");
 	}
 	
