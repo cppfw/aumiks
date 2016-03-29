@@ -17,7 +17,7 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 {
 	std::uint32_t freq;
 	
-	std::vector<std::int32_t[audout::AudioFormat::numChannels(frame_type)]> smpBuf;
+	std::vector<Frame<frame_type>> smpBuf;
 	
 	audout::Player player;
 
@@ -34,7 +34,7 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 		for(; src != this->smpBuf.cend(); ++src){
 			for(unsigned i = 0; i != audout::AudioFormat::numChannels(frame_type); ++i, ++dst){
 				ASSERT(playBuf.overlaps(dst))
-				*dst = std::int16_t(utki::clampedRange((*src)[i], -0x7fff, 0x7fff));
+				*dst = std::int16_t(utki::clampedRange(src->channel[i], -0x7fff, 0x7fff));
 			}
 		}
 		ASSERT(dst == playBuf.end())

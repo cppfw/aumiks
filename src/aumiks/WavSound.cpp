@@ -1,8 +1,11 @@
 #include <papki/FSFile.hpp>
 
+#include <utki/Shared.hpp>
+
 #include "Exc.hpp"
 #include "WavSound.hpp"
 
+#include "Resampler.hpp"
 
 
 using namespace aumiks;
@@ -32,7 +35,7 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 		{}
 
 	private:
-		bool fillSampleBuffer(utki::Buf<std::int32_t[audout::AudioFormat::numChannels(frame_type)]> buf)noexcept override{
+		bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept override{
 			ASSERT(buf.size() % audout::AudioFormat::numChannels(frame_type) == 0)
 			
 			ASSERT(this->wavSound->data.size() % audout::AudioFormat::numChannels(frame_type) == 0)
@@ -58,14 +61,14 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 			auto dst = buf.begin();
 			for(const TSampleType *src = startSmp; dst != buf.begin() + framesToCopy; ++dst){
 				for(unsigned i = 0; i != audout::AudioFormat::numChannels(frame_type); ++i, ++src){
-					(*dst)[i] = std::int32_t(*src);
+					dst->channel[i] = std::int32_t(*src);
 				}
 			}
 
 			//fill the rest with zeroes
 			for(; dst != buf.end(); ++dst){
 				for(unsigned i = 0; i != audout::AudioFormat::numChannels(frame_type); ++i){
-					(*dst)[i] = 0;
+					dst->channel[i] = 0;
 				}
 			}
 			return false;
@@ -74,7 +77,18 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 
 private:
 	std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const override{
-		return utki::makeShared<Source>(this->sharedFromThis(this));
+		auto src = utki::makeShared<Source>(this->sharedFromThis(this));
+		if(frequency == 0 || frequency == this->frequency()){
+			return src;
+		}
+		
+		auto resampler = utki::makeShared<Resampler<frame_type>>();
+		
+		resampler->input.connect(std::move(src));
+		
+		resampler->setScale(this->frequency(), frequency);
+		
+		return resampler;
 	}
 	
 public:

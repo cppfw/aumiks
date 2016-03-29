@@ -27,11 +27,11 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::load("../samples/sample11025mono16.wav");
+		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::load("../samples/sample44100mono16.wav");
 		
 		ASSERT_ALWAYS(snd->numChannels() == 1)
 		
-		sink.input().connect(snd->createSource());
+		sink.input().connect(snd->createSource(sink.frequency()));
 		
 		
 		while(sink.input().isConnected()){

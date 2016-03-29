@@ -1,20 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+#pragma once
 
-/* 
- * File:   Frame.hpp
- * Author: ivan
- *
- * Created on March 27, 2016, 12:52 AM
- */
+#include <audout/AudioFormat.hpp>
 
-#ifndef FRAME_HPP
-#define FRAME_HPP
+#include <array>
 
+namespace aumiks{
 
+template <audout::AudioFormat::EFrame frame_type> struct Frame{
+	std::array<std::int32_t, audout::AudioFormat::numChannels(frame_type)> channel;
+};
 
-#endif /* FRAME_HPP */
-
+}

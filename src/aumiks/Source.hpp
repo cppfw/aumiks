@@ -9,6 +9,7 @@
 
 #include <audout/AudioFormat.hpp>
 
+#include "Frame.hpp"
 
 namespace aumiks{
 
@@ -59,7 +60,7 @@ public:
 			Source(frame_type)
 	{}
 	
-	virtual bool fillSampleBuffer(utki::Buf<std::int32_t[audout::AudioFormat::numChannels(frame_type)]> buf)noexcept = 0;
+	virtual bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept = 0;
 };
 
 
