@@ -5,6 +5,7 @@
       <df name="aumiks">
         <in>Frame.hpp</in>
         <in>Input.cpp</in>
+        <in>Reframer.hpp</in>
         <in>Resampler.cpp</in>
         <in>Resampler.hpp</in>
         <in>WavSound.cpp</in>
@@ -93,6 +94,8 @@
           </incDir>
         </ccTool>
       </item>
+      <item path="src/aumiks/Reframer.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/aumiks/Resampler.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="1">
         </ccTool>
@@ -168,6 +171,8 @@
       <item path="src/aumiks/Frame.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/aumiks/Reframer.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/aumiks/Resampler.cpp" ex="false" tool="1" flavor2="0">
       </item>

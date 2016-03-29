@@ -27,9 +27,7 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::load("../samples/sample44100mono16.wav");
-		
-		ASSERT_ALWAYS(snd->numChannels() == 1)
+		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::load("../samples/sample44100stereo16.wav");
 		
 		sink.input().connect(snd->createSource(sink.frequency()));
 		
@@ -45,8 +43,6 @@ int main(int argc, char *argv[]){
 		sink.start();
 		
 		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::load("../samples/sample11025stereo16.wav");
-		
-		ASSERT_ALWAYS(snd->numChannels() == 2)
 		
 		sink.input().connect(snd->createSource(sink.frequency()));
 		
