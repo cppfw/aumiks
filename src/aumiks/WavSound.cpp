@@ -39,12 +39,10 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 			ASSERT(this->wavSound->data.size() % audout::AudioFormat::numChannels(frame_type) == 0)
 			ASSERT(this->curSmp % audout::AudioFormat::numChannels(frame_type) == 0)
 			
-			size_t framesInBuf = buf.size() / audout::AudioFormat::numChannels(frame_type);
-			
 			size_t framesToCopy = (this->wavSound->data.size() - this->curSmp) / audout::AudioFormat::numChannels(frame_type);
-			utki::clampTop(framesToCopy, framesInBuf);
+			utki::clampTop(framesToCopy, buf.size());
 
-			ASSERT(framesToCopy <= framesInBuf)
+			ASSERT(framesToCopy <= buf.size())
 			
 			if(framesToCopy == 0){
 				//TODO: check number of replays
@@ -65,8 +63,8 @@ template <class TSampleType, audout::AudioFormat::EFrame frame_type>
 
 			//fill the rest with zeroes
 			for(; dst != buf.end(); ++dst){
-				for(unsigned i = 0; i != audout::AudioFormat::numChannels(frame_type); ++i){
-					dst->channel[i] = 0;
+				for(auto& c : dst->channel){
+					c = 0;
 				}
 			}
 			return false;

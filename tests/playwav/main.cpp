@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::load("../samples/sample22050stereo16.wav");
+		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::load("../samples/sample11025stereo16.wav");
 		
 		ASSERT_ALWAYS(snd->numChannels() == 2)
 		
