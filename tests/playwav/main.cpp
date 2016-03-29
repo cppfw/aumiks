@@ -39,6 +39,23 @@ int main(int argc, char *argv[]){
 		}
 	}
 	
+	{
+		aumiks::StereoSink sink(audout::AudioFormat::ESamplingRate::HZ_22050);
+		
+		sink.start();
+		
+		std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::load("../samples/sample22050stereo16.wav");
+		
+		ASSERT_ALWAYS(snd->numChannels() == 2)
+		
+		sink.input().connect(snd->createSource(sink.frequency()));
+		
+		
+		while(sink.input().isConnected()){
+			nitki::Thread::sleep(333);
+		}
+	}
+	
 	
 //	{
 //		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
