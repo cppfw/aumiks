@@ -78,9 +78,9 @@ private:
 			return src;
 		}
 		
-		auto resampler = utki::makeShared<Resampler<frame_type>>();
+		auto resampler = utki::makeShared<ChanneledResampler<frame_type>>();
 		
-		resampler->input.connect(std::move(src));
+		resampler->input().connect(std::move(src));
 		
 		resampler->setScale(this->frequency(), frequency);
 		

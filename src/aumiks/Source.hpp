@@ -31,7 +31,6 @@ public:
 	
 	virtual audout::Frame_e frameType()const noexcept = 0;
 	
-	
 	//thread safe
 	bool isConnected()const noexcept{
 		return this->isConnected_var;

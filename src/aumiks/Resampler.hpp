@@ -5,22 +5,37 @@
 
 namespace aumiks{
 
-template <audout::Frame_e frame_type> class Resampler : public ChanneledSource<frame_type>{
-	static const std::uint16_t DScale = 32;
+
+class Resampler : virtual public Source{
+protected:
+	Resampler(){}
+public:
+	virtual Input& input() = 0;
+};
+
+
+template <audout::Frame_e frame_type> class ChanneledResampler :
+		public ChanneledSource<frame_type>,
+		public Resampler
+{
+	static const std::uint16_t DScale = 128;
 	
 	std::int32_t scale;
 	
 	std::uint16_t step = DScale;
 	
+	ChanneledInput<frame_type> input_v;
 public:
-	Resampler(const Resampler&) = delete;
-	Resampler& operator=(const Resampler&) = delete;
+	ChanneledResampler(const ChanneledResampler&) = delete;
+	ChanneledResampler& operator=(const ChanneledResampler&) = delete;
 	
-	Resampler(){
+	ChanneledResampler(){
 		this->reset();
 	}
 	
-	ChanneledInput<frame_type> input;
+	Input& input() override{
+		return this->input_v;
+	}
 	
 	void setScale(float scale)noexcept{
 		this->step = decltype(step)(scale * float(DScale));
@@ -56,7 +71,7 @@ private:
 					if(ret){
 						break;
 					}
-					ret = this->input.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
+					ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
 					this->curTmpPos = this->tmpBuf.begin();
 				}
 				if(this->scale <= 0){
@@ -80,7 +95,7 @@ private:
 					if(ret){
 						break;
 					}
-					ret = this->input.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
+					ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
 					this->curTmpPos = this->tmpBuf.begin();
 				}
 				if(this->scale <= 0){
