@@ -58,22 +58,18 @@ private:
 		
 		auto dst = buf.begin();
 		
-		{
+		if(s > DScale){//if up-sampling
 			size_t filledFromPrevCall = 0;
-
-			
-			if(s > DScale){//if up-sampling
-				//something has left from previous call
-				for(; this->scale > 0 && dst != buf.end(); scale -= DScale, ++dst, ++filledFromPrevCall){
-					*dst = this->lastFrameForUpsampling;
-				}
-				if(dst == buf.end()){
-					return false;
-				}
-				this->tmpBuf.resize((buf.size() - filledFromPrevCall) * DScale / s + 1);
-			}else{
-				this->tmpBuf.resize((buf.size()) * DScale / s);
+			//something has left from previous call
+			for(; this->scale > 0 && dst != buf.end(); scale -= DScale, ++dst, ++filledFromPrevCall){
+				*dst = this->lastFrameForUpsampling;
 			}
+			if(dst == buf.end()){
+				return false;
+			}
+			this->tmpBuf.resize((buf.size() - filledFromPrevCall) * DScale / s + 1);
+		}else{
+			this->tmpBuf.resize((buf.size()) * DScale / s);
 		}
 		
 		bool ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
