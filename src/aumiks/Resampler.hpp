@@ -78,17 +78,14 @@ private:
 					}
 				}
 			}
-
-			size_t tmpBufSize = (buf.size() - filledFromPrevCall) * DScale / s;
-			this->tmpBuf.resize(tmpBufSize);
+			
+			this->tmpBuf.resize((buf.size() - filledFromPrevCall) * DScale / s);
 		}
 		
 		bool ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
 		
-		auto src = this->tmpBuf.cbegin();
-		
 		if(s > DScale){//if up-sampling
-			for(; src != this->tmpBuf.end(); ++src){
+			for(auto src = this->tmpBuf.cbegin(); src != this->tmpBuf.end(); ++src){
 				ASSERT(src != this->tmpBuf.end())
 				ASSERT(dst != buf.end())
 				
@@ -110,7 +107,7 @@ private:
 		}else{// if down-sampling
 			ASSERT(s <= DScale)
 			
-			for(; dst != buf.end() && !ret;){
+			for(auto src = this->tmpBuf.cbegin(); dst != buf.end() && !ret;){
 				ASSERT(src != this->tmpBuf.end())
 				if(this->scale <= 0){
 					this->scale += DScale;
