@@ -22,7 +22,7 @@ template <audout::Frame_e frame_type> class ChanneledResampler :
 	
 	std::int32_t scale;
 	
-	std::uint16_t step = DScale;
+	volatile std::uint16_t step = DScale;
 	
 	ChanneledInput<frame_type> input_v;
 public:
@@ -61,11 +61,14 @@ private:
 	bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept override{
 		ASSERT(this->step > 0) //if step is 0 then there will be infinite loop
 		
+		//variable step can be changed from another thread, so copy it here
+		typename std::remove_volatile<decltype(this->step)>::type s = this->step;
+		
 		bool ret = false;
 		
 		auto dst = buf.begin();
 		
-		if(this->step > DScale){//if up-sampling
+		if(s > DScale){//if up-sampling
 			for(; dst != buf.end() && !ret; ++this->curTmpPos){
 				if(this->curTmpPos == this->tmpBuf.end()){
 					if(ret){
@@ -75,7 +78,7 @@ private:
 					this->curTmpPos = this->tmpBuf.begin();
 				}
 				if(this->scale <= 0){
-					this->scale += this->step;
+					this->scale += s;
 				}
 				for(; this->scale > 0;){
 					*dst = *this->curTmpPos;
@@ -88,7 +91,7 @@ private:
 				}
 			}
 		}else{// if down-sampling
-			ASSERT(this->step <= DScale)
+			ASSERT(s <= DScale)
 			
 			for(; dst != buf.end() && !ret;){
 				if(this->curTmpPos == this->tmpBuf.end()){
@@ -103,7 +106,7 @@ private:
 					*dst = *this->curTmpPos;
 					++dst;
 				}
-				for(; this->scale > 0 && this->curTmpPos != this->tmpBuf.end(); ++this->curTmpPos, this->scale -= this->step){
+				for(; this->scale > 0 && this->curTmpPos != this->tmpBuf.end(); ++this->curTmpPos, this->scale -= s){
 				}
 			}
 		}

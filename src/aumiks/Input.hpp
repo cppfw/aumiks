@@ -31,7 +31,6 @@ public:
 	
 	void connect(std::shared_ptr<aumiks::Source> source);
 	
-	//thread safe
 	bool isConnected()const{
 		return this->src.operator bool();
 	}
@@ -43,9 +42,9 @@ template <audout::Frame_e frame_type> class ChanneledInput : public Input{
 	std::shared_ptr<ChanneledSource<frame_type>> srcInUse;
 
 public:
-	
+
 	ChanneledInput(){}
-	
+
 	audout::Frame_e frameType() const noexcept override{
 		return frame_type;
 	}
