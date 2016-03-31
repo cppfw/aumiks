@@ -31,9 +31,6 @@ public:
 	
 	virtual audout::Frame_e frameType()const noexcept = 0;
 	
-	unsigned numChannels()const noexcept{
-		return audout::AudioFormat::numChannels(this->frameType());
-	}
 	
 	//thread safe
 	bool isConnected()const noexcept{

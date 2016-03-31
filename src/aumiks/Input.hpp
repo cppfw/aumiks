@@ -57,7 +57,7 @@ public:
 	bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept{
 		if(this->src != this->srcInUse){
 			std::lock_guard<utki::SpinLock> guard(this->spinLock);
-			ASSERT(!this->src || this->src->numChannels() == audout::AudioFormat::numChannels(frame_type))
+			ASSERT(!this->src || this->src->frameType() == frame_type)
 			this->srcInUse = std::dynamic_pointer_cast<typename decltype(srcInUse)::element_type>(this->src);
 		}
 		if(!this->srcInUse){
