@@ -20,26 +20,19 @@ class Source : virtual public utki::Shared{
 	
 	bool isConnected_var = false;
 	
-	audout::AudioFormat::EFrame frameType_var;
-	
 protected:
 	Source(const Source&) = delete;
 	Source& operator=(const Source&) = delete;
 	
-	Source(decltype(frameType_var) frameType) :
-			frameType_var(frameType)
-	{}
+	Source(){}
 public:
 	
 	virtual ~Source()noexcept{}
 	
-	decltype(frameType_var) frameType()const noexcept{
-		return this->frameType_var;
-	}
-	
+	virtual audout::AudioFormat::EFrame frameType()const noexcept = 0;
 	
 	unsigned numChannels()const noexcept{
-		return audout::AudioFormat::numChannels(this->frameType_var);
+		return audout::AudioFormat::numChannels(this->frameType());
 	}
 	
 	//thread safe
@@ -51,16 +44,18 @@ private:
 };
 
 
-template <audout::AudioFormat::EFrame frame_type> class ChanneledSource : public Source{
+template <audout::AudioFormat::EFrame frame_type> class ChanneledSource : virtual public Source{
 public:
 	ChanneledSource(const ChanneledSource&) = delete;
 	ChanneledSource& operator=(const ChanneledSource&) = delete;
 	
-	ChanneledSource() :
-			Source(frame_type)
-	{}
+	ChanneledSource(){}
 	
 	virtual bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept = 0;
+	
+	audout::AudioFormat::EFrame frameType() const noexcept override{
+		return frame_type;
+	}
 };
 
 

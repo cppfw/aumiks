@@ -35,7 +35,7 @@ public:
 	
 private:
 	static const std::size_t DTmpBufSize = 50 * 48000 / 1000; //for 50ms of sound data at 48kHz
-	std::array<Frame<frame_type>, DTmpBufSize> tmpBuf;
+	std::array<Frame<frame_type>, DTmpBufSize> tmpBuf; //TODO: use vector
 	typename decltype(tmpBuf)::iterator curTmpPos;
 	
 	void reset(){
