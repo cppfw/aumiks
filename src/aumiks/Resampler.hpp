@@ -49,13 +49,11 @@ public:
 	}
 	
 private:
-	static const std::size_t DTmpBufSize = 50 * 48000 / 1000; //for 50ms of sound data at 48kHz
-	std::array<Frame<frame_type>, DTmpBufSize> tmpBuf; //TODO: use vector
-	typename decltype(tmpBuf)::iterator curTmpPos;
+	std::vector<Frame<frame_type>> tmpBuf;
+	Frame<frame_type> lastFrameForUpsampling;
 	
 	void reset(){
 		this->scale = 0;
-		this->curTmpPos = this->tmpBuf.end();
 	}
 	
 	bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept override{
@@ -64,28 +62,47 @@ private:
 		//variable step can be changed from another thread, so copy it here
 		typename std::remove_volatile<decltype(this->step)>::type s = this->step;
 		
-		bool ret = false;
-		
 		auto dst = buf.begin();
 		
-		if(s > DScale){//if up-sampling
-			for(; dst != buf.end() && !ret; ++this->curTmpPos){
-				if(this->curTmpPos == this->tmpBuf.end()){
-					if(ret){
-						break;
+		{
+			size_t filledFromPrevCall = 0;
+
+			if(this->scale > 0){
+				if(s > DScale){//if up-sampling
+					//something has left from previous call
+					for(; this->scale > 0 && dst != buf.end(); scale -= DScale, ++dst, ++filledFromPrevCall){
+						*dst = this->lastFrameForUpsampling;
 					}
-					ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
-					this->curTmpPos = this->tmpBuf.begin();
+					if(dst == buf.end()){
+						return false;
+					}
 				}
-				if(this->scale <= 0){
-					this->scale += s;
-				}
-				for(; this->scale > 0;){
-					*dst = *this->curTmpPos;
+			}
+
+			size_t tmpBufSize = (buf.size() - filledFromPrevCall) * DScale / s;
+			this->tmpBuf.resize(tmpBufSize);
+		}
+		
+		bool ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
+		
+		auto src = this->tmpBuf.cbegin();
+		
+		if(s > DScale){//if up-sampling
+			for(; src != this->tmpBuf.end(); ++src){
+				ASSERT(src != this->tmpBuf.end())
+				ASSERT(dst != buf.end())
+				
+				ASSERT(this->scale <= 0)
+				
+				for(this->scale += s; this->scale > 0;){
+					*dst = *src;
 					
 					this->scale -= DScale;
 					++dst;
 					if(dst == buf.end()){
+						if(this->scale > 0){
+							this->lastFrameForUpsampling = *src;
+						}
 						goto endloop; //to avoid incrementing of this->curTmpPos
 					}
 				}
@@ -94,19 +111,13 @@ private:
 			ASSERT(s <= DScale)
 			
 			for(; dst != buf.end() && !ret;){
-				if(this->curTmpPos == this->tmpBuf.end()){
-					if(ret){
-						break;
-					}
-					ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
-					this->curTmpPos = this->tmpBuf.begin();
-				}
+				ASSERT(src != this->tmpBuf.end())
 				if(this->scale <= 0){
 					this->scale += DScale;
-					*dst = *this->curTmpPos;
+					*dst = *src;
 					++dst;
 				}
-				for(; this->scale > 0 && this->curTmpPos != this->tmpBuf.end(); ++this->curTmpPos, this->scale -= s){
+				for(; this->scale > 0 && src != this->tmpBuf.end(); ++src, this->scale -= s){
 				}
 			}
 		}
