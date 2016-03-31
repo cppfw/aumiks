@@ -70,6 +70,8 @@ private:
 					if(dst == buf.end()){
 						return false;
 					}
+				}else{
+					this->scale = 0;
 				}
 			}
 			
@@ -108,7 +110,7 @@ private:
 			}
 		}
 		//TODO: dst + 1 shouldn be here
-		ASSERT(dst == buf.end() || dst + 1 ==buf.end())
+		ASSERT(dst == buf.end() || dst + 1 == buf.end())
 		
 		return ret;
 	}
