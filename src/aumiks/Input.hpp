@@ -16,22 +16,16 @@ namespace aumiks{
 
 
 class Input{
-	audout::Frame_e frameType_var;
-	
 protected:
 	std::shared_ptr<aumiks::Source> src;
 	
 	utki::SpinLock spinLock;
 	
-	Input(decltype(frameType_var) frameType) :
-			frameType_var(frameType)
-	{}
+	Input(){}
 public:
 	virtual ~Input()noexcept{}
 	
-	decltype(frameType_var) frameType()const noexcept{
-		return this->frameType_var;
-	}
+	virtual audout::Frame_e frameType()const noexcept = 0;
 	
 	void disconnect()noexcept;
 	
@@ -50,10 +44,12 @@ template <audout::Frame_e frame_type> class ChanneledInput : public Input{
 
 public:
 	
-	ChanneledInput() :
-			Input(frame_type)
-	{}
+	ChanneledInput(){}
 	
+	audout::Frame_e frameType() const noexcept override{
+		return frame_type;
+	}
+
 	bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept{
 		if(this->src != this->srcInUse){
 			std::lock_guard<utki::SpinLock> guard(this->spinLock);
