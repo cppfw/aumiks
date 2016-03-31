@@ -5,7 +5,7 @@ using namespace aumiks;
 
 namespace aumiks{
 
-template<> void Reframer<audout::AudioFormat::EFrame::MONO, audout::AudioFormat::EFrame::STEREO>::fillSampleBuffer_i(utki::Buf<Frame<audout::AudioFormat::EFrame::STEREO>> buf)noexcept{
+template<> void Reframer<audout::Frame_e::MONO, audout::Frame_e::STEREO>::fillSampleBuffer_i(utki::Buf<Frame<audout::Frame_e::STEREO>> buf)noexcept{
 	ASSERT(this->tmpBuf.size() == buf.size())
 	
 	auto src = this->tmpBuf.cbegin();
@@ -16,7 +16,7 @@ template<> void Reframer<audout::AudioFormat::EFrame::MONO, audout::AudioFormat:
 	}
 }
 
-template<> void Reframer<audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::EFrame::MONO>::fillSampleBuffer_i(utki::Buf<Frame<audout::AudioFormat::EFrame::MONO>> buf)noexcept{
+template<> void Reframer<audout::Frame_e::STEREO, audout::Frame_e::MONO>::fillSampleBuffer_i(utki::Buf<Frame<audout::Frame_e::MONO>> buf)noexcept{
 	ASSERT(this->tmpBuf.size() == buf.size())
 	
 	auto src = this->tmpBuf.cbegin();

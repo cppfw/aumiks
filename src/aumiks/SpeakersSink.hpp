@@ -11,7 +11,7 @@
 namespace aumiks{
 
 //TODO: make singleton
-template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
+template <audout::Frame_e frame_type> class SpeakersSink :
 		public aumiks::ChanneledSink<frame_type>,
 		private audout::Listener
 {
@@ -41,7 +41,7 @@ template <audout::AudioFormat::EFrame frame_type> class SpeakersSink :
 	}
 	
 public:
-	SpeakersSink(audout::AudioFormat::ESamplingRate samplingRate, std::uint16_t bufferSizeMillis = 100) :
+	SpeakersSink(audout::SamplingRate_e samplingRate, std::uint16_t bufferSizeMillis = 100) :
 			freq(audout::AudioFormat(frame_type, samplingRate).frequency()),
 			smpBuf((freq * bufferSizeMillis / 1000)),
 			player(audout::AudioFormat(frame_type, samplingRate), smpBuf.size(), this)
@@ -65,8 +65,8 @@ public:
 
 
 
-typedef SpeakersSink<audout::AudioFormat::EFrame::MONO> MonoSink;
-typedef SpeakersSink<audout::AudioFormat::EFrame::STEREO> StereoSink;
+typedef SpeakersSink<audout::Frame_e::MONO> MonoSink;
+typedef SpeakersSink<audout::Frame_e::STEREO> StereoSink;
 
 
 

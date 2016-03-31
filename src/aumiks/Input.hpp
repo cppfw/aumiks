@@ -16,7 +16,7 @@ namespace aumiks{
 
 
 class Input{
-	audout::AudioFormat::EFrame frameType_var;
+	audout::Frame_e frameType_var;
 	
 protected:
 	std::shared_ptr<aumiks::Source> src;
@@ -45,7 +45,7 @@ public:
 
 
 
-template <audout::AudioFormat::EFrame frame_type> class ChanneledInput : public Input{
+template <audout::Frame_e frame_type> class ChanneledInput : public Input{
 	std::shared_ptr<ChanneledSource<frame_type>> srcInUse;
 
 public:

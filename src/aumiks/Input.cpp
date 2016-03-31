@@ -18,12 +18,12 @@ void Input::connect(std::shared_ptr<aumiks::Source> source) {
 	}
 
 	if(this->frameType() != source->frameType()){
-		if(source->frameType() == audout::AudioFormat::EFrame::STEREO && this->frameType() == audout::AudioFormat::EFrame::MONO){
-			auto r = utki::makeShared<Reframer<audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::EFrame::MONO>>();
+		if(source->frameType() == audout::Frame_e::STEREO && this->frameType() == audout::Frame_e::MONO){
+			auto r = utki::makeShared<Reframer<audout::Frame_e::STEREO, audout::Frame_e::MONO>>();
 			r->input.connect(source);
 			source = std::move(r);
-		}else if(source->frameType() == audout::AudioFormat::EFrame::MONO && this->frameType() == audout::AudioFormat::EFrame::STEREO){
-			auto r = utki::makeShared<Reframer<audout::AudioFormat::EFrame::MONO, audout::AudioFormat::EFrame::STEREO>>();
+		}else if(source->frameType() == audout::Frame_e::MONO && this->frameType() == audout::Frame_e::STEREO){
+			auto r = utki::makeShared<Reframer<audout::Frame_e::MONO, audout::Frame_e::STEREO>>();
 			r->input.connect(source);
 			source = std::move(r);
 		}else{

@@ -8,7 +8,7 @@
 
 namespace aumiks{
 	
-template <audout::AudioFormat::EFrame from_type, audout::AudioFormat::EFrame to_type> class Reframer : public ChanneledSource<to_type>{
+template <audout::Frame_e from_type, audout::Frame_e to_type> class Reframer : public ChanneledSource<to_type>{
 	
 	void fillSampleBuffer_i(utki::Buf<Frame<to_type>> buf)noexcept;
 	

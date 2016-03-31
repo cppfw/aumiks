@@ -29,7 +29,7 @@ public:
 	
 	virtual ~Source()noexcept{}
 	
-	virtual audout::AudioFormat::EFrame frameType()const noexcept = 0;
+	virtual audout::Frame_e frameType()const noexcept = 0;
 	
 	unsigned numChannels()const noexcept{
 		return audout::AudioFormat::numChannels(this->frameType());
@@ -44,7 +44,7 @@ private:
 };
 
 
-template <audout::AudioFormat::EFrame frame_type> class ChanneledSource : virtual public Source{
+template <audout::Frame_e frame_type> class ChanneledSource : virtual public Source{
 public:
 	ChanneledSource(const ChanneledSource&) = delete;
 	ChanneledSource& operator=(const ChanneledSource&) = delete;
@@ -53,7 +53,7 @@ public:
 	
 	virtual bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept = 0;
 	
-	audout::AudioFormat::EFrame frameType() const noexcept override{
+	audout::Frame_e frameType() const noexcept override{
 		return frame_type;
 	}
 };

@@ -25,7 +25,7 @@ public:
 	
 	virtual ~Sink()noexcept{}
 	
-	virtual audout::AudioFormat::EFrame frameType()const noexcept = 0;
+	virtual audout::Frame_e frameType()const noexcept = 0;
 	
 	virtual void start() = 0;
 	
@@ -38,7 +38,7 @@ public:
 
 
 
-template <audout::AudioFormat::EFrame frame_type> class ChanneledSink : public Sink{
+template <audout::Frame_e frame_type> class ChanneledSink : public Sink{
 protected:
 	ChanneledSink(){}
 	
@@ -49,7 +49,7 @@ public:
 		return this->input_var;
 	}
 
-	audout::AudioFormat::EFrame frameType() const noexcept override{
+	audout::Frame_e frameType() const noexcept override{
 		return frame_type;
 	}
 

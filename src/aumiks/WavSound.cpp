@@ -16,7 +16,7 @@ namespace{
 
 
 
-template <class TSampleType, audout::AudioFormat::EFrame frame_type>
+template <class TSampleType, audout::Frame_e frame_type>
 		class WavSoundImpl : public WavSound
 {
 	std::vector<TSampleType> data;
@@ -230,10 +230,10 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 		//set the format
 		switch(chans){
 			case 1://mono
-				ret = utki::makeShared<WavSoundImpl<std::int16_t, audout::AudioFormat::EFrame::MONO>>(utki::wrapBuf(data), frequency);
+				ret = utki::makeShared<WavSoundImpl<std::int16_t, audout::Frame_e::MONO>>(utki::wrapBuf(data), frequency);
 				break;
 			case 2://stereo
-				ret = utki::makeShared<WavSoundImpl<std::int16_t, audout::AudioFormat::EFrame::STEREO>>(utki::wrapBuf(data), frequency);
+				ret = utki::makeShared<WavSoundImpl<std::int16_t, audout::Frame_e::STEREO>>(utki::wrapBuf(data), frequency);
 				break;
 			default:
 				throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");

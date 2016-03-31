@@ -23,7 +23,7 @@
 
 int main(int argc, char *argv[]){
 	{
-		aumiks::MonoSink sink(audout::AudioFormat::ESamplingRate::HZ_22050);
+		aumiks::MonoSink sink(audout::SamplingRate_e::HZ_22050);
 		
 		sink.start();
 		
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
 	}
 	
 	{
-		aumiks::StereoSink sink(audout::AudioFormat::ESamplingRate::HZ_22050);
+		aumiks::StereoSink sink(audout::SamplingRate_e::HZ_22050);
 		
 		sink.start();
 		

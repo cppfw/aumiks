@@ -5,7 +5,7 @@
 
 namespace aumiks{
 
-template <audout::AudioFormat::EFrame frame_type> class Resampler : public ChanneledSource<frame_type>{
+template <audout::Frame_e frame_type> class Resampler : public ChanneledSource<frame_type>{
 	static const std::uint16_t DScale = 32;
 	
 	std::int32_t scale;
