@@ -61,56 +61,62 @@ private:
 		{
 			size_t filledFromPrevCall = 0;
 
-			if(this->scale > 0){
-				if(s > DScale){//if up-sampling
-					//something has left from previous call
-					for(; this->scale > 0 && dst != buf.end(); scale -= DScale, ++dst, ++filledFromPrevCall){
-						*dst = this->lastFrameForUpsampling;
-					}
-					if(dst == buf.end()){
-						return false;
-					}
-				}else{
-					this->scale = 0;
-				}
-			}
 			
-			this->tmpBuf.resize((buf.size() - filledFromPrevCall) * DScale / s);
+			if(s > DScale){//if up-sampling
+				//something has left from previous call
+				for(; this->scale > 0 && dst != buf.end(); scale -= DScale, ++dst, ++filledFromPrevCall){
+					*dst = this->lastFrameForUpsampling;
+				}
+				if(dst == buf.end()){
+					return false;
+				}
+				this->tmpBuf.resize((buf.size() - filledFromPrevCall) * DScale / s + 1);
+			}else{
+				this->tmpBuf.resize((buf.size()) * DScale / s);
+			}
 		}
 		
 		bool ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
 		
-		if(s > DScale){//if up-sampling
-			for(auto src = this->tmpBuf.cbegin(); src != this->tmpBuf.cend(); ++src){
-				ASSERT(src != this->tmpBuf.cend())
-				ASSERT(dst != buf.end())
-				
-				ASSERT(this->scale <= 0)
-				
-				for(this->scale += s; this->scale > 0 && dst != buf.end(); this->scale -= DScale, ++dst){
-					*dst = *src;
-				}
-				ASSERT((dst != buf.end()) || (src + 1 == this->tmpBuf.cend()))
-			}
-			if(this->scale > 0){
-				this->lastFrameForUpsampling = this->tmpBuf.back();
-			}
-		}else{// if down-sampling
-			ASSERT(s <= DScale)
-
-			for(auto src = this->tmpBuf.cbegin(); dst != buf.end(); ++dst){
-				ASSERT(src != this->tmpBuf.cend())
-				ASSERT(this->scale <= 0)
-				
+		auto src = this->tmpBuf.cbegin();
+		for(; dst != buf.end(); ++src){
+			this->scale += s;
+			for(; this->scale > 0 && dst != buf.end(); this->scale -= DScale, ++dst){
+				ASSERT_INFO(dst != buf.end(),
+						"s = " << s <<
+						" buf.size() = " << buf.size() <<
+						" this->tmpBuf.size() = " << this->tmpBuf.size() <<
+						" this->scale = " << this->scale <<
+						" dst-end = " << (dst - buf.end())
+					)
+				ASSERT_INFO(src != this->tmpBuf.cend(),
+						"s = " << s <<
+						" buf.size() = " << buf.size() <<
+						" this->tmpBuf.size() = " << this->tmpBuf.size() <<
+						" this->scale = " << this->scale <<
+						" dst-end = " << (dst - buf.end())
+					)
 				*dst = *src;
-
-				for(this->scale += DScale; this->scale > 0; ++src, this->scale -= s){
-					ASSERT(src != this->tmpBuf.cend())
-				}
 			}
 		}
-		//TODO: dst + 1 shouldn be here
-		ASSERT(dst == buf.end() || dst + 1 == buf.end())
+		ASSERT(dst == buf.end())
+		
+		if(src != this->tmpBuf.cend()){
+			//one more sample left in source buffer
+			ASSERT_INFO(src + 1 == this->tmpBuf.cend(),
+					"s = " << s <<
+					" buf.size() = " << buf.size() <<
+					" this->tmpBuf.size() = " << this->tmpBuf.size() <<
+					" this->scale = " << this->scale <<
+					" src-end = " << (src - this->tmpBuf.cend())
+				)
+			this->scale += s;
+		}
+		
+		if(this->scale > 0){
+			ASSERT(s > DScale) //was upsampling
+			this->lastFrameForUpsampling = this->tmpBuf.back();
+		}
 		
 		return ret;
 	}
