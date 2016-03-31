@@ -97,6 +97,7 @@ private:
 					this->scale -= DScale;
 					++dst;
 					if(dst == buf.end()){
+						ASSERT(src + 1 == this->tmpBuf.end())
 						if(this->scale > 0){
 							this->lastFrameForUpsampling = *src;
 						}
