@@ -79,8 +79,8 @@ private:
 		bool ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
 		
 		if(s > DScale){//if up-sampling
-			for(auto src = this->tmpBuf.cbegin(); src != this->tmpBuf.end(); ++src){
-				ASSERT(src != this->tmpBuf.end())
+			for(auto src = this->tmpBuf.cbegin(); src != this->tmpBuf.cend(); ++src){
+				ASSERT(src != this->tmpBuf.cend())
 				ASSERT(dst != buf.end())
 				
 				ASSERT(this->scale <= 0)
@@ -88,31 +88,27 @@ private:
 				for(this->scale += s; this->scale > 0 && dst != buf.end(); this->scale -= DScale, ++dst){
 					*dst = *src;
 				}
-				ASSERT((dst != buf.end()) || (src + 1 == this->tmpBuf.end()))
+				ASSERT((dst != buf.end()) || (src + 1 == this->tmpBuf.cend()))
 			}
 			if(this->scale > 0){
 				this->lastFrameForUpsampling = this->tmpBuf.back();
 			}
 		}else{// if down-sampling
 			ASSERT(s <= DScale)
-			
-			for(auto src = this->tmpBuf.cbegin(); dst != buf.end() && !ret;){
-				ASSERT(src != this->tmpBuf.end())
-				if(this->scale <= 0){
-					this->scale += DScale;
-					*dst = *src;
-					++dst;
-				}
-				for(; this->scale > 0 && src != this->tmpBuf.end(); ++src, this->scale -= s){
-				}
-			}
-		}
 
-		for(; dst != buf.end(); ++dst){
-			for(auto& c : dst->channel){
-				c = 0;
+			for(auto src = this->tmpBuf.cbegin(); dst != buf.end(); ++dst){
+				ASSERT(src != this->tmpBuf.cend())
+				ASSERT(this->scale <= 0)
+				
+				*dst = *src;
+
+				for(this->scale += DScale; this->scale > 0; ++src, this->scale -= s){
+					ASSERT(src != this->tmpBuf.cend())
+				}
 			}
 		}
+		//TODO: dst + 1 shouldn be here
+		ASSERT(dst == buf.end() || dst + 1 ==buf.end())
 		
 		return ret;
 	}
