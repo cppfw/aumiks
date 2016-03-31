@@ -20,7 +20,7 @@ template <audout::Frame_e frame_type> class ChanneledResampler :
 {
 	static const std::uint16_t DScale = 128;
 	
-	std::int32_t scale;
+	std::int32_t scale = 0;
 	
 	volatile std::uint16_t step = DScale;
 	
@@ -29,9 +29,7 @@ public:
 	ChanneledResampler(const ChanneledResampler&) = delete;
 	ChanneledResampler& operator=(const ChanneledResampler&) = delete;
 	
-	ChanneledResampler(){
-		this->reset();
-	}
+	ChanneledResampler(){}
 	
 	Input& input() override{
 		return this->input_v;
@@ -51,10 +49,6 @@ public:
 private:
 	std::vector<Frame<frame_type>> tmpBuf;
 	Frame<frame_type> lastFrameForUpsampling;
-	
-	void reset(){
-		this->scale = 0;
-	}
 	
 	bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept override{
 		ASSERT(this->step > 0) //if step is 0 then there will be infinite loop
@@ -91,19 +85,13 @@ private:
 				
 				ASSERT(this->scale <= 0)
 				
-				for(this->scale += s; this->scale > 0;){
+				for(this->scale += s; this->scale > 0 && dst != buf.end(); this->scale -= DScale, ++dst){
 					*dst = *src;
-					
-					this->scale -= DScale;
-					++dst;
-					if(dst == buf.end()){
-						ASSERT(src + 1 == this->tmpBuf.end())
-						if(this->scale > 0){
-							this->lastFrameForUpsampling = *src;
-						}
-						goto endloop; //to avoid incrementing of this->curTmpPos
-					}
 				}
+				ASSERT((dst != buf.end()) || (src + 1 == this->tmpBuf.end()))
+			}
+			if(this->scale > 0){
+				this->lastFrameForUpsampling = this->tmpBuf.back();
 			}
 		}else{// if down-sampling
 			ASSERT(s <= DScale)
@@ -119,14 +107,11 @@ private:
 				}
 			}
 		}
-endloop:
+
 		for(; dst != buf.end(); ++dst){
 			for(auto& c : dst->channel){
 				c = 0;
 			}
-		}
-		if(ret){
-			this->reset();
 		}
 		
 		return ret;
