@@ -45,6 +45,10 @@ protected:
 protected:
 	aumiks::ChanneledInput<frame_type> input_var;
 public:
+	constexpr static audout::Frame_e sinkFrameType() noexcept{
+		return frame_type;
+	}
+	
 	aumiks::Input& input()noexcept override{
 		return this->input_var;
 	}

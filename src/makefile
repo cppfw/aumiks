@@ -8,6 +8,7 @@ this_soname := $(shell cat $(prorab_this_dir)/soname.txt)
 this_srcs += aumiks/WavSound.cpp
 this_srcs += aumiks/Input.cpp
 this_srcs += aumiks/Reframer.cpp
+this_srcs += aumiks/Mixer.cpp
 
 
 
