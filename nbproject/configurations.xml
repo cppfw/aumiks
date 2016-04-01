@@ -7,6 +7,7 @@
         <in>Input.cpp</in>
         <in>Mixer.cpp</in>
         <in>Mixer.hpp</in>
+        <in>NullSource.hpp</in>
         <in>Reframer.cpp</in>
         <in>Reframer.hpp</in>
         <in>Resampler.cpp</in>
@@ -114,6 +115,8 @@
           </incDir>
         </ccTool>
       </item>
+      <item path="src/aumiks/NullSource.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/aumiks/Reframer.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
@@ -210,6 +213,8 @@
       <item path="src/aumiks/Mixer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/aumiks/Mixer.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/aumiks/NullSource.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/aumiks/Reframer.cpp" ex="false" tool="1" flavor2="0">
       </item>

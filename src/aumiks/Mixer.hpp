@@ -10,8 +10,17 @@
 namespace aumiks{
 
 class Mixer : virtual public Source{
+	volatile bool isFinite_v;
 public:
 	virtual void connect(std::shared_ptr<Source> source) = 0;
+	
+	void setFinite(bool finite)noexcept{
+		this->isFinite_v = finite;
+	}
+	
+	bool isFinite()const noexcept{
+		return this->isFinite_v;
+	}
 };
 
 
@@ -68,7 +77,11 @@ public:
 			}
 		}
 		
-		return this->inputs.size() == 0;
+		if(this->isFinite()){
+			return this->inputs.size() == 0;
+		}else{
+			return false;
+		}
 	}
 
 private:

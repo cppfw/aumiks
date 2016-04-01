@@ -1,6 +1,7 @@
 #include "../../src/aumiks/Mixer.hpp"
 #include "../../src/aumiks/WavSound.hpp"
 #include "../../src/aumiks/SpeakersSink.hpp"
+#include "../../src/aumiks/NullSource.hpp"
 
 
 
@@ -21,6 +22,9 @@ int main(int argc, char *argv[]){
 
 		mixer->connect(snd1->createSource(sink.frequency()));
 		mixer->connect(snd2->createSource(sink.frequency()));
+		
+//		mixer->setFinite(false);
+//		mixer->connect(utki::makeShared<aumiks::NullSource<decltype(sink)::sinkFrameType()>>());
 		
 		sink.input().connect(mixer);
 		
