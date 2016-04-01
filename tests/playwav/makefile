@@ -13,6 +13,7 @@ this_cxxflags += -Wno-format
 this_cxxflags += -fstrict-aliasing #strict aliasing!!!
 this_cxxflags += -g
 this_cxxflags += -std=c++11
+this_cxxflags += -O3
 
 ifeq ($(debug), true)
     this_cxxflags += -DDEBUG
