@@ -17,15 +17,7 @@ class Sink : utki::Unique{
 protected:	
 	Sink(){}
 public:
-	
-	std::uint8_t numChannels()const noexcept{
-		return audout::AudioFormat::numChannels(this->frameType());
-	}
-	
-	
 	virtual ~Sink()noexcept{}
-	
-	virtual audout::Frame_e frameType()const noexcept = 0;
 	
 	virtual void start() = 0;
 	
@@ -45,18 +37,13 @@ protected:
 protected:
 	aumiks::ChanneledInput<frame_type> input_var;
 public:
-	constexpr static audout::Frame_e sinkFrameType() noexcept{
+	constexpr static audout::Frame_e frameType() noexcept{
 		return frame_type;
 	}
 	
 	aumiks::Input& input()noexcept override{
 		return this->input_var;
 	}
-
-	audout::Frame_e frameType() const noexcept override{
-		return frame_type;
-	}
-
 };
 
 }
