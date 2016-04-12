@@ -33,6 +33,7 @@
                    displayName="Important Files"
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>debian/control.in</itemPath>
       <itemPath>makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
@@ -61,7 +62,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} debug=true CXX=g++-4.9</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
-          <executablePath>tests/playparallel/tests</executablePath>
+          <executablePath>tests/playwav/tests</executablePath>
           <ccTool>
             <standard>8</standard>
           </ccTool>
@@ -114,8 +115,6 @@
             <pElem>.</pElem>
           </incDir>
         </ccTool>
-      </item>
-      <item path="src/aumiks/NullSource.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/aumiks/Reframer.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">

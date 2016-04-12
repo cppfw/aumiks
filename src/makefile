@@ -50,6 +50,6 @@ else ifeq ($(prorab_os), macosx)
     #this_ldlibs += -framework Cocoa -framework OpenGL -lpng -lfreetype -ljpeg -lstob -lGLEW
 endif
 
-this_ldlibs += 
+this_ldlibs += -lpapki
 
 $(eval $(prorab-build-lib))

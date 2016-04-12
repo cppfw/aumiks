@@ -2,6 +2,9 @@ include prorab.mk
 
 $(eval $(prorab-build-subdirs))
 
+
+$(eval $(prorab-clear-this-vars))
+
 this_soname_dependency := $(prorab_this_dir)src/soname.txt
 this_soname := $(shell cat $(this_soname_dependency))
 

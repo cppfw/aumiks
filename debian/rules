@@ -1,16 +1,11 @@
 #!/usr/bin/make -f
+%:
+	dh $@
 
-build:
-	$(MAKE)
+.PHONY: override_dh_strip
+override_dh_strip:
+	dh_strip --dbg-package=$(filter %-dbg, $(shell awk '/^Package: /{print $2}' debian/control))
 
-clean:
-	rm -f debian/files
-	rm -rf debian/out
-	$(MAKE) clean
-
-binary:
-	./debian/libaumiks.sh
-	./debian/libaumiks-dbg.sh
-	./debian/libaumiks-dev.sh
-	./debian/libaumiks-doc.sh
-
+.PHONY: override_dh_auto_install
+override_dh_auto_install:
+	PREFIX=/usr dh_auto_install

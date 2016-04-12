@@ -1,0 +1,9 @@
+Name: aumiks   # human-readable name
+Description: C++ audio engine # human-readable description
+Version: $(version)
+URL: https://github.com/igagis/aumiks
+Requires:
+Conflicts:
+Libs: -laumiks
+Libs.private:
+Cflags:

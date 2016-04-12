@@ -7,23 +7,23 @@ Build-Depends: debhelper (>= 9), prorab,
 Build-Depends-Indep: doxygen
 Standards-Version: 3.9.2
 
-Package: libaumiks0
+Package: libaumiks$(soname)
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: cross-platform audio mixing C++ library.
  Audio mixing library in C++.
 
-Package: libaumiks0-dbg
+Package: libaumiks$(soname)-dbg
 Section: libdevel
 Architecture: any
-Depends: libaumiks0 (= ${binary:Version}), ${misc:Depends}
-Description: debugging symbols for libaumiks0 package.
+Depends: libaumiks$(soname) (= ${binary:Version}), ${misc:Depends}
+Description: debugging symbols for libaumiks$(soname) package.
 
 Package: libaumiks-dev
 Section: devel
 Architecture: all
-Depends: libaumiks0 (= ${binary:Version}), libaumiks0-dbg (= ${binary:Version}), ${misc:Depends},
+Depends: libaumiks$(soname) (= ${binary:Version}), libaumiks$(soname)-dbg (= ${binary:Version}), ${misc:Depends},
 		libpapki-dev, libaudout-dev
 Suggests: libaumiks-doc
 Description: Audio mixing and playback engine in C++.
