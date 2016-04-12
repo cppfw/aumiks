@@ -20,8 +20,8 @@ int main(int argc, char *argv[]){
 		ASSERT(snd1)
 		ASSERT(snd2)
 
-		mixer->connect(snd1->createSource(sink.frequency()));
-		mixer->connect(snd2->createSource(sink.frequency()));
+		mixer->connect(snd1->createSource(sink.samplingRate()));
+		mixer->connect(snd2->createSource(sink.samplingRate()));
 		
 //		mixer->setFinite(false);
 //		mixer->connect(utki::makeShared<aumiks::NullSource<decltype(sink)::sinkFrameType()>>());
