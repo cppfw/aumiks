@@ -17,7 +17,7 @@ namespace aumiks{
 
 class Input{
 protected:
-	std::shared_ptr<aumiks::Source> src;
+	std::shared_ptr<aumiks::ASource> src;
 	
 	utki::SpinLock spinLock;
 	
@@ -29,7 +29,7 @@ public:
 	
 	void disconnect()noexcept;
 	
-	void connect(std::shared_ptr<aumiks::Source> source);
+	void connect(std::shared_ptr<aumiks::ASource> source);
 	
 	bool isConnected()const{
 		return this->src.operator bool();
@@ -39,7 +39,7 @@ public:
 
 
 template <audout::Frame_e frame_type> class ChanneledInput : public Input{
-	std::shared_ptr<ChanneledSource<frame_type>> srcInUse;
+	std::shared_ptr<Source<frame_type>> srcInUse;
 
 public:
 

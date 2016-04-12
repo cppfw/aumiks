@@ -15,19 +15,19 @@ namespace aumiks{
 
 
 //TODO: doxygen
-class Source : virtual public utki::Shared{
+class ASource : virtual public utki::Shared{
 	friend class Input;
 	
 	bool isConnected_var = false;
 	
 protected:
-	Source(const Source&) = delete;
-	Source& operator=(const Source&) = delete;
+	ASource(const ASource&) = delete;
+	ASource& operator=(const ASource&) = delete;
 	
-	Source(){}
+	ASource(){}
 public:
 	
-	virtual ~Source()noexcept{}
+	virtual ~ASource()noexcept{}
 	
 	virtual audout::Frame_e frameType()const noexcept = 0;
 	
@@ -40,12 +40,12 @@ private:
 };
 
 
-template <audout::Frame_e frame_type> class ChanneledSource : virtual public Source{
+template <audout::Frame_e frame_type> class Source : virtual public ASource{
 public:
-	ChanneledSource(const ChanneledSource&) = delete;
-	ChanneledSource& operator=(const ChanneledSource&) = delete;
+	Source(const Source&) = delete;
+	Source& operator=(const Source&) = delete;
 	
-	ChanneledSource(){}
+	Source(){}
 	
 	virtual bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept = 0;
 	

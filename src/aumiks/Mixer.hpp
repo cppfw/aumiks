@@ -9,10 +9,10 @@
 
 namespace aumiks{
 
-class Mixer : virtual public Source{
+class AMixer : virtual public ASource{
 	volatile bool isFinite_v;
 public:
-	virtual void connect(std::shared_ptr<Source> source) = 0;
+	virtual void connect(std::shared_ptr<ASource> source) = 0;
 	
 	void setFinite(bool finite)noexcept{
 		this->isFinite_v = finite;
@@ -24,9 +24,9 @@ public:
 };
 
 
-template <audout::Frame_e frame_type> class ChanneledMixer :
-		public ChanneledSource<frame_type>,
-		public Mixer
+template <audout::Frame_e frame_type> class Mixer :
+		public Source<frame_type>,
+		public AMixer
 {
 	std::list<ChanneledInput<frame_type>> inputs;
 	
@@ -37,12 +37,12 @@ template <audout::Frame_e frame_type> class ChanneledMixer :
 	std::vector<Frame<frame_type>> tmpBuf;
 	
 public:
-	ChanneledMixer(){}
+	Mixer(){}
 	
-	ChanneledMixer(const ChanneledMixer&) = delete;
-	ChanneledMixer& operator=(const ChanneledMixer&) = delete;
+	Mixer(const Mixer&) = delete;
+	Mixer& operator=(const Mixer&) = delete;
 	
-	void connect(std::shared_ptr<Source> source) override{
+	void connect(std::shared_ptr<ASource> source) override{
 		std::lock_guard<decltype(this->spinLock)> guard(this->spinLock);
 		this->inputsToAdd.emplace_back();
 		this->inputsToAdd.back().connect(std::move(source));

@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		auto mixer = utki::makeShared<aumiks::ChanneledMixer<sink.frameType()>>();
+		auto mixer = utki::makeShared<aumiks::Mixer<sink.frameType()>>();
 		
 		std::shared_ptr<aumiks::Sound> snd1 = aumiks::WavSound::load("../samples/sample44100mono16.wav");
 		std::shared_ptr<aumiks::Sound> snd2 = aumiks::WavSound::load("../samples/ice_break.wav");

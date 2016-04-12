@@ -13,11 +13,11 @@
 namespace aumiks{
 
 //TODO: doxygen
-class Sink : utki::Unique{
+class ASink : utki::Unique{
 protected:	
-	Sink(){}
+	ASink(){}
 public:
-	virtual ~Sink()noexcept{}
+	virtual ~ASink()noexcept{}
 	
 	virtual void start() = 0;
 	
@@ -30,9 +30,9 @@ public:
 
 
 
-template <audout::Frame_e frame_type> class ChanneledSink : public Sink{
+template <audout::Frame_e frame_type> class Sink : public ASink{
 protected:
-	ChanneledSink(){}
+	Sink(){}
 	
 protected:
 	aumiks::ChanneledInput<frame_type> input_var;

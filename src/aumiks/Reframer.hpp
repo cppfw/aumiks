@@ -8,16 +8,16 @@
 
 namespace aumiks{
 
-class Reframer : virtual public Source{
+class AReframer : virtual public ASource{
 protected:
-	Reframer(){}
+	AReframer(){}
 public:
 	virtual Input& input() = 0;
 };
 
-template <audout::Frame_e from_type, audout::Frame_e to_type> class ChanneledReframer :
-		public ChanneledSource<to_type>,
-		public Reframer
+template <audout::Frame_e from_type, audout::Frame_e to_type> class Reframer :
+		public Source<to_type>,
+		public AReframer
 	{
 	
 	void fillSampleBuffer_i(utki::Buf<Frame<to_type>> buf)noexcept;

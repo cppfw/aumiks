@@ -6,17 +6,17 @@
 namespace aumiks{
 
 
-class Resampler : virtual public Source{
+class AResampler : virtual public ASource{
 protected:
-	Resampler(){}
+	AResampler(){}
 public:
 	virtual Input& input() = 0;
 };
 
 
-template <audout::Frame_e frame_type> class ChanneledResampler :
-		public ChanneledSource<frame_type>,
-		public Resampler
+template <audout::Frame_e frame_type> class Resampler :
+		public Source<frame_type>,
+		public AResampler
 {
 	static const std::uint16_t DScale = 128;
 	
@@ -26,10 +26,10 @@ template <audout::Frame_e frame_type> class ChanneledResampler :
 	
 	ChanneledInput<frame_type> input_v;
 public:
-	ChanneledResampler(const ChanneledResampler&) = delete;
-	ChanneledResampler& operator=(const ChanneledResampler&) = delete;
+	Resampler(const Resampler&) = delete;
+	Resampler& operator=(const Resampler&) = delete;
 	
-	ChanneledResampler(){}
+	Resampler(){}
 	
 	Input& input() override{
 		return this->input_v;
