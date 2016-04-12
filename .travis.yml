@@ -1,0 +1,72 @@
+language: cpp
+sudo: required
+dist: trusty
+osx_image: xcode7.3
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - clang
+  - gcc
+
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
+
+env:
+  global:
+  #encrypted HOMEBREW_GITHUB_ACCESS_TOKEN for publishing to homebrew-tap
+  - secure: "5N3WCLkGAbj50kPLgES80DqqvcZjlIufQoUI8jAsTiktKrC4Qv2s/BJIitnCjUP8dRB/FYlbSpgQXHZHeVxfOs3zREGPzryrkAAGXdARHsGDk3cYLq502NyknMJ+ElIu1my+pfgrccNirBYwATq/w0d6j53r10wb6mFFMwcHlxZQYLLTAPCnK0V2sCT708mV5ZCHgYGpfL/qOS/XjFGVSU2pu9KLypLf/tjpkqKLUsIg9Bx01i6LZ7wNsUleo8ytRzUjy9krJEIAmXHDuWeZZfsp22ylNTHeVWL5wWBQCgrRmNeiZtqTAbSx8y/z95l7GFYPinzoWDCB4THeZX7DjlKe2mmccjZjNFB3ETPsj+v7gAWahRZ1nYII3np2Zo/5ZM7O8vQoPEmwOC9OVZ5fscFCsJ/7UJS1WMR6Hdrp7vkiXguB7VqjDAGp5g8+YEI9OMIpPyqKTjT2lpj+hmN38T9uabZzpVcTvnjauphjqGQbOLZ++BWoUkk38pI+I/f0ZVyJW7hE78+DigjV1TZi2M8UEJK/Y9IkYrNEcvjViD/PuL5b4lB9QeL3mQbFqflR/jbD6gReVR6oTdQSpaCf6edIdEJHfdi/UWrGT1F2CTxpnWHk8ztU/nbtzaI8H/qWblHARXYhCHrdcr+l4kJ7GoQeFA6asAQ88u9Jq5KZUu0="
+  - HOMEBREW_GITHUB_USERNAME=igagis
+
+before_install:
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    echo "deb https://dl.bintray.com/igagis/deb /" | sudo tee /etc/apt/sources.list.d/igagis.list > /dev/null &&
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61 &&
+    sudo apt-get update -qq &&
+    sudo apt-get install -qq debhelper prorab doxygen libpapki-dev libaudout-dev;
+  fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+    rvm use ruby-2.2.1 &&
+    pod repo add --silent igagis https://$HOMEBREW_GITHUB_USERNAME:$HOMEBREW_GITHUB_ACCESS_TOKEN@github.com/igagis/cocoapods-repo.git &&
+    pod install --project-directory=ios &&
+
+    brew tap igagis/tap &&
+    brew update > /dev/null &&
+    brew install prorab libpapki libaudout;
+  fi
+
+
+script:
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    make deb;
+  fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+    make &&
+    make test &&
+
+    xcodebuild -workspace ios/tests.xcworkspace -scheme tests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO &&
+
+    if [ -n "$TRAVIS_TAG" ]; then prorab-deploy-cocoapods.sh igagis; else echo "Skip deploying to cocoapods because not a tagged commit!!!"; fi;
+  fi
+
+deploy:
+- provider: bintray
+  skip_cleanup: true
+  on:
+    tags: true
+    condition: $TRAVIS_OS_NAME = linux && $CC = gcc
+  file: travis_bintray.json
+  user: igagis
+  key:
+    secure: "vjNT2wU4a9GTVO5boULmCC31aRs+F3+gANx5of6Jg9Lf246oquHbeTqCH9dvOH51tXEiSc6LKFg7pM0/DVqXDnwdZ19fioqTgjPFyP9fkvW/Nps6nhxVxtHYsEv18Fg3umDT6al5ZFLvuGn9l45q7d7lBxVa2N6YF9XhB/k7X1VdpGa7aL2csVko+BemoHgM4omWf0FUl1arMQCL1V78BNYmMowPZ3eGb0x+FtQAd5ksis3Bgdh1X3mUV565k2jnzF+Nu6SfTCA+mMcxKdrwZfCWmrkF8UgEN2H7ZXq+QAliXSQvccM3yCiPzq01egCvoIai5rszGPk8VDrlez2+jETv9ufjGZiw7sICQ/B+kgrmp1UGoRrXNJJSH0DUs7bbysAx2GhaFMRmGpHxKjRCp8Bti4BUvBxbo/xdXHaeSwHCErvg1P8dMcj3u0h1ulv34RQymZFE9YGuS9Djxu+p6QWk52EnQwk8kmqZCGYoO1AkuAO/aUbNQMgmhkHMASanldI5qseNbKo4LaQGhGyU6Pw0GQkNY/dYUGJq7PDoTXSYOFmqR85dO3QzK/AAmTjnn6hq89oj8f2gP89us3IoZUHjtrR/aJWMHcvvFFMPZrpJZs9yijG8O2z74F/OQbzkKsQJQCId1hWFi1glK6hArAFY/uVgnWiwDK75CjQyudI="
+  dry-run: false
+- provider: script
+  skip_cleanup: true
+  script: prorab-deploy-homebrew.sh igagis/tap
+  on:
+    tags: true
+    condition: $TRAVIS_OS_NAME = osx && $CC = clang
