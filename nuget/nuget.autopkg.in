@@ -1,0 +1,52 @@
+nuget{
+	nuspec{
+		id = aumiks;
+		version : $(version);
+		title: C++ audio mixer library;
+		authors: {Ivan Gagis};
+		owners: {Ivan Gagis};
+		licenseUrl: "https://raw.githubusercontent.com/igagis/aumiks/master/LICENSE";
+		projectUrl: "https://github.com/igagis/aumiks";
+		iconUrl: "https://github.com/igagis/aumiks/blob/master/logo.svg";
+		requireLicenseAcceptance:false;
+		summary: C++ audio mixer library;
+
+		description: @"C++ audio mixer library";
+		releaseNotes: "Initial release";
+		copyright: Copyright 2016 Ivan Gagis;
+		tags: { native};
+	}
+	dependencies {
+		packages : {
+			libpapki/1.0.9;
+			audout/0.3.2;
+		};
+	}
+	files {
+		include: { "..\src\**\*.hpp" };
+		
+		[x86,release] { 
+			lib: ..\msvs_solution\Release\aumiks.lib;
+//			symbols: ..\msvs_solution\Release\aumiks.pdb;
+//			bin: ..\msvs_solution\Release\aumiks.dll;
+		}
+
+		[x86,debug] { 
+			lib: ..\msvs_solution\Debug\aumiks.lib;
+//			symbols: ..\msvs_solution\Debug\aumiks.pdb;
+//			bin: ..\msvs_solution\Debug\aumiks.dll;
+		}
+
+		[x64,release] { 
+			lib: ..\msvs_solution\x64\Release\aumiks.lib;
+//			symbols: ..\msvs_solution\x64\Release\aumiks.pdb;
+//			bin: ..\msvs_solution\x64\Release\aumiks.dll;
+		}
+
+		[x64,debug] { 
+			lib: ..\msvs_solution\x64\Debug\aumiks.lib;
+//			symbols: ..\msvs_solution\x64\Debug\aumiks.pdb;
+//			bin: ..\msvs_solution\x64\Debug\aumiks.dll;
+		}  
+	}
+}
