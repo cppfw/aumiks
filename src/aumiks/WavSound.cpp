@@ -131,7 +131,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 	{
 		std::array<std::uint8_t, 4> riff;
 		fi.read(utki::wrapBuf(riff));//Read 'RIFF' signature
-		if(std::string(reinterpret_cast<char*>(riff.begin()), riff.size()) != "RIFF"){
+		if(std::string(reinterpret_cast<char*>(&*riff.begin()), riff.size()) != "RIFF"){
 			throw Exc("WavSound::LoadWAV(): 'RIFF' signature not found");
 		}
 	}
@@ -141,7 +141,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 	{
 		std::array<std::uint8_t, 4> wave;
 		fi.read(utki::wrapBuf(wave));//Read 'WAVE' signature
-		if(std::string(reinterpret_cast<char*>(wave.begin()), wave.size()) != "WAVE"){
+		if(std::string(reinterpret_cast<char*>(&*wave.begin()), wave.size()) != "WAVE"){
 			throw Exc("WavSound::LoadWAV(): 'WAVE' signature not found");
 		}
 	}
@@ -149,7 +149,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 	{
 		std::array<std::uint8_t, 4> fmt;
 		fi.read(utki::wrapBuf(fmt));//Read 'fmt ' signature
-		if(std::string(reinterpret_cast<char*>(fmt.begin()), fmt.size()) != "fmt "){
+		if(std::string(reinterpret_cast<char*>(&*fmt.begin()), fmt.size()) != "fmt "){
 			throw Exc("WavSound::LoadWAV(): 'fmt ' signature not found");
 		}
 	}
