@@ -27,7 +27,7 @@ template <class TSampleType, audout::Frame_e frame_type>
 
 		const std::shared_ptr<const WavSoundImpl> wavSound;
 		
-		std::uint32_t curSmp = 0;
+		size_t curSmp = 0;
 	
 	public:
 		Source(const std::shared_ptr<const WavSoundImpl>& sound) :
@@ -208,9 +208,9 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 	//read in the sound data
 	std::vector<std::uint8_t> data(dataSize);
 	{
-		unsigned bytesRead = fi.read(utki::wrapBuf(data));//Load Sound data
+		auto bytesRead = fi.read(utki::wrapBuf(data));//Load Sound data
 
-		if(bytesRead != dataSize){
+		if(bytesRead != size_t(dataSize)){
 			throw Exc("WavSound::LoadWAV(): sound data size is incorrect");
 		}
 	}
