@@ -1,0 +1,7 @@
+xcodeproj 'tests.xcodeproj'
+
+source 'https://github.com/igagis/cocoapods-repo.git'
+
+pod 'libutki', '>= 1.0.9'
+pod 'libaudout', '>= 0.3.2'
+pod 'libpapki'', ''>= 1.0.9'
