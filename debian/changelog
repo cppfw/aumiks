@@ -1,3 +1,9 @@
+libaumiks (0.3.2) stable; urgency=medium
+
+  * bintray secret api key updated
+
+ -- Ivan Gagis <igagis@gmail.com>  Sat, 16 Apr 2016 23:29:30 +0300
+
 libaumiks (0.3.1) stable; urgency=medium
 
   * ios
