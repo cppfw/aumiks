@@ -65,7 +65,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} debug=true CXX=g++-4.9</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
-          <executablePath>tests/playwav/tests</executablePath>
+          <executablePath>tests/playparallel/tests</executablePath>
           <ccTool>
             <standard>8</standard>
           </ccTool>

@@ -23,7 +23,12 @@ template <audout::Frame_e frame_type> class SpeakersSink :
 
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
 	void fillPlayBuf(utki::Buf<std::int16_t> playBuf)noexcept override{
-		ASSERT_INFO(this->smpBuf.size() * audout::AudioFormat::numChannels(frame_type) == playBuf.size(), "this->smpBuf.size() = " << this->smpBuf.size() << " playBuf.size() = " << playBuf.size())
+		ASSERT_INFO(
+				playBuf.size() % audout::AudioFormat::numChannels(frame_type) == 0,
+				"playBuf.size = " << playBuf.size()
+						<< "numChannels = " << audout::AudioFormat::numChannels(frame_type)
+			)
+		this->smpBuf.resize(playBuf.size() / audout::AudioFormat::numChannels(frame_type));
 
 		if(this->input_var.fillSampleBuffer(utki::wrapBuf(this->smpBuf))){
 			this->input_var.disconnect();
@@ -43,8 +48,7 @@ template <audout::Frame_e frame_type> class SpeakersSink :
 public:
 	SpeakersSink(audout::SamplingRate_e samplingRate, std::uint16_t bufferSizeMillis = 100) :
 			samplingRate_v(audout::AudioFormat(frame_type, samplingRate).frequency()),
-			smpBuf((samplingRate_v * bufferSizeMillis / 1000)),
-	player(audout::AudioFormat(frame_type, samplingRate), std::uint32_t(smpBuf.size()), this)
+			player(audout::AudioFormat(frame_type, samplingRate), (samplingRate_v * bufferSizeMillis / 1000), this)
 	{}
 
 	SpeakersSink(const SpeakersSink&) = delete;

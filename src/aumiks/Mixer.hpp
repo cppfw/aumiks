@@ -10,7 +10,7 @@
 namespace aumiks{
 
 class AMixer : virtual public ASource{
-	volatile bool isFinite_v;
+	volatile bool isFinite_v = true;
 public:
 	virtual void connect(std::shared_ptr<ASource> source) = 0;
 	
