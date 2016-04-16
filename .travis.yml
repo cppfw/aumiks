@@ -36,7 +36,7 @@ before_install:
 
     brew tap igagis/tap &&
     brew update > /dev/null &&
-    brew install prorab libpapki libaudout libnitki;
+    brew install prorab libpapki libaudout;
   fi
 
 
