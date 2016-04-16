@@ -30,11 +30,12 @@ ifeq ($(prorab_os),windows)
     #WORKAROUND for MinGW bug:
 #    this_cxxflags += -D__STDC_FORMAT_MACROS
 else ifeq ($(prorab_os),macosx)
-#    this_ldlibs += $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension) -lGLEW -framework OpenGL -framework Cocoa -lpng -ljpeg -lfreetype
+     this_ldlibs += -framework AudioUnit
 else ifeq ($(prorab_os),linux)
-    this_ldlibs += $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension)
     this_ldlibs += -lpthread -lpulse-simple -lpulse
 endif
+
+this_ldlibs += $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension)
 
 this_ldlibs += -lpogodi -lnitki -laudout -lpapki
 

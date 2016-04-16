@@ -3,6 +3,7 @@
 #include "../../src/aumiks/SpeakersSink.hpp"
 #include "../../src/aumiks/NullSource.hpp"
 
+#include <nitki/Thread.hpp>
 
 
 int main(int argc, char *argv[]){
