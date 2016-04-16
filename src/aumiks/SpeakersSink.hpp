@@ -44,7 +44,7 @@ public:
 	SpeakersSink(audout::SamplingRate_e samplingRate, std::uint16_t bufferSizeMillis = 100) :
 			samplingRate_v(audout::AudioFormat(frame_type, samplingRate).frequency()),
 			smpBuf((samplingRate_v * bufferSizeMillis / 1000)),
-			player(audout::AudioFormat(frame_type, samplingRate), smpBuf.size(), this)
+	player(audout::AudioFormat(frame_type, samplingRate), std::uint32_t(smpBuf.size()), this)
 	{}
 
 	SpeakersSink(const SpeakersSink&) = delete;
