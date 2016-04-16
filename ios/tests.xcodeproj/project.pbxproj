@@ -7,22 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2C67AE001CC2716F00A552F3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C67ADFF1CC2716F00A552F3 /* main.m */; };
 		2C67AE0B1CC2716F00A552F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C67AE0A1CC2716F00A552F3 /* Assets.xcassets */; };
 		2CB98A2C1CC273BE00837278 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A271CC273BE00837278 /* Input.cpp */; };
 		2CB98A2D1CC273BE00837278 /* Mixer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A281CC273BE00837278 /* Mixer.cpp */; };
 		2CB98A2E1CC273BE00837278 /* Reframer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A291CC273BE00837278 /* Reframer.cpp */; };
 		2CB98A2F1CC273BE00837278 /* Resampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A2A1CC273BE00837278 /* Resampler.cpp */; };
 		2CB98A301CC273BE00837278 /* WavSound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A2B1CC273BE00837278 /* WavSound.cpp */; };
-		2CB98A321CC273DE00837278 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A311CC273DE00837278 /* main.cpp */; };
 		2CB98A341CC273F300837278 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A331CC273F300837278 /* main.cpp */; };
-		2CB98A361CC2770500837278 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CB98A351CC2770500837278 /* AudioUnit.framework */; };
+		2CB98A381CC279A000837278 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CB98A371CC279A000837278 /* AudioToolbox.framework */; };
 		BEE235CDDD79EFE06A3B49EA /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1DCB4415773CA4A7BF1354B /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2C67ADFB1CC2716F00A552F3 /* tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tests.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2C67ADFF1CC2716F00A552F3 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		2C67AE0A1CC2716F00A552F3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2C67AE0F1CC2716F00A552F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2CB98A271CC273BE00837278 /* Input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Input.cpp; path = ../src/aumiks/Input.cpp; sourceTree = "<group>"; };
@@ -30,9 +27,8 @@
 		2CB98A291CC273BE00837278 /* Reframer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Reframer.cpp; path = ../src/aumiks/Reframer.cpp; sourceTree = "<group>"; };
 		2CB98A2A1CC273BE00837278 /* Resampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Resampler.cpp; path = ../src/aumiks/Resampler.cpp; sourceTree = "<group>"; };
 		2CB98A2B1CC273BE00837278 /* WavSound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WavSound.cpp; path = ../src/aumiks/WavSound.cpp; sourceTree = "<group>"; };
-		2CB98A311CC273DE00837278 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../tests/playwav/main.cpp; sourceTree = "<group>"; };
 		2CB98A331CC273F300837278 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../tests/playparallel/main.cpp; sourceTree = "<group>"; };
-		2CB98A351CC2770500837278 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		2CB98A371CC279A000837278 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		4FB7C247ADF14884D362D026 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		C32C035B55C9C4D1D61DB0BE /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		E1DCB4415773CA4A7BF1354B /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -43,7 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CB98A361CC2770500837278 /* AudioUnit.framework in Frameworks */,
+				2CB98A381CC279A000837278 /* AudioToolbox.framework in Frameworks */,
 				BEE235CDDD79EFE06A3B49EA /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -74,7 +70,6 @@
 			isa = PBXGroup;
 			children = (
 				2CB98A331CC273F300837278 /* main.cpp */,
-				2CB98A311CC273DE00837278 /* main.cpp */,
 				2C67AE0A1CC2716F00A552F3 /* Assets.xcassets */,
 				2C67AE0F1CC2716F00A552F3 /* Info.plist */,
 				2C67ADFE1CC2716F00A552F3 /* Supporting Files */,
@@ -85,7 +80,6 @@
 		2C67ADFE1CC2716F00A552F3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				2C67ADFF1CC2716F00A552F3 /* main.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -114,7 +108,7 @@
 		EB244745AFCE927BD0A8AB23 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2CB98A351CC2770500837278 /* AudioUnit.framework */,
+				2CB98A371CC279A000837278 /* AudioToolbox.framework */,
 				E1DCB4415773CA4A7BF1354B /* libPods.a */,
 			);
 			name = Frameworks;
@@ -243,10 +237,8 @@
 				2CB98A2D1CC273BE00837278 /* Mixer.cpp in Sources */,
 				2CB98A2E1CC273BE00837278 /* Reframer.cpp in Sources */,
 				2CB98A2C1CC273BE00837278 /* Input.cpp in Sources */,
-				2CB98A321CC273DE00837278 /* main.cpp in Sources */,
 				2CB98A2F1CC273BE00837278 /* Resampler.cpp in Sources */,
 				2CB98A341CC273F300837278 /* main.cpp in Sources */,
-				2C67AE001CC2716F00A552F3 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
