@@ -1,3 +1,9 @@
+libaumiks (0.3.5) stable; urgency=medium
+
+  * test release
+
+ -- Ivan Gagis <igagis@gmail.com>  Sun, 17 Apr 2016 13:40:44 +0300
+
 libaumiks (0.3.4) stable; urgency=medium
 
   * homebrew token fix
