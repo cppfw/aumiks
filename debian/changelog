@@ -1,3 +1,9 @@
+libaumiks (0.3.3) stable; urgency=medium
+
+  * homebrew token fix
+
+ -- Ivan Gagis <igagis@gmail.com>  Sun, 17 Apr 2016 13:09:11 +0300
+
 libaumiks (0.3.2) stable; urgency=medium
 
   * bintray secret api key updated
