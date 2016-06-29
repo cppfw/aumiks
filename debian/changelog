@@ -1,3 +1,9 @@
+libaumiks (0.3.7) unstable; urgency=medium
+
+  * bintray version fix
+
+ -- Ivan Gagis <igagis@gmail.com>  Wed, 29 Jun 2016 18:12:20 +0300
+
 libaumiks (0.3.6) stable; urgency=medium
 
   * win fix
