@@ -27,25 +27,25 @@ nuget{
 		
 		[x86,release] { 
 			lib: ..\msvs_solution\Release\aumiks.lib;
-//			symbols: ..\msvs_solution\Release\aumiks.pdb;
+			symbols: ..\msvs_solution\aumiks\Release\aumiks.pdb;
 //			bin: ..\msvs_solution\Release\aumiks.dll;
 		}
 
 		[x86,debug] { 
 			lib: ..\msvs_solution\Debug\aumiks.lib;
-//			symbols: ..\msvs_solution\Debug\aumiks.pdb;
+			symbols: ..\msvs_solution\aumiks\Debug\aumiks.pdb;
 //			bin: ..\msvs_solution\Debug\aumiks.dll;
 		}
 
 		[x64,release] { 
 			lib: ..\msvs_solution\x64\Release\aumiks.lib;
-//			symbols: ..\msvs_solution\x64\Release\aumiks.pdb;
+			symbols: ..\msvs_solution\aumiks\x64\Release\aumiks.pdb;
 //			bin: ..\msvs_solution\x64\Release\aumiks.dll;
 		}
 
 		[x64,debug] { 
 			lib: ..\msvs_solution\x64\Debug\aumiks.lib;
-//			symbols: ..\msvs_solution\x64\Debug\aumiks.pdb;
+			symbols: ..\msvs_solution\aumiks\x64\Debug\aumiks.pdb;
 //			bin: ..\msvs_solution\x64\Debug\aumiks.dll;
 		}  
 	}

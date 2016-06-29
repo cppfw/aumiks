@@ -38,6 +38,7 @@
       <itemPath>homebrew/aumiks.rb.in</itemPath>
       <itemPath>debian/control.in</itemPath>
       <itemPath>makefile</itemPath>
+      <itemPath>nuget/nuget.autopkg.in</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
