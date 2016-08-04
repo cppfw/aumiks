@@ -34,6 +34,7 @@
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>.travis.yml</itemPath>
+      <itemPath>ios/Podfile</itemPath>
       <itemPath>cocoapods/aumiks.podspec.in</itemPath>
       <itemPath>homebrew/aumiks.rb.in</itemPath>
       <itemPath>debian/control.in</itemPath>

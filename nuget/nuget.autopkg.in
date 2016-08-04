@@ -23,30 +23,30 @@ nuget{
 		};
 	}
 	files {
-		include: { "..\src\**\*.hpp" };
+		//this is needed to put headers in the base folder
+		nestedInclude: {
+			#destination = ${d_include}aumiks;
+			"..\src\aumiks\**\*.hpp"
+		};
 		
 		[x86,release] { 
 			lib: ..\msvs_solution\Release\aumiks.lib;
 			symbols: ..\msvs_solution\aumiks\Release\aumiks.pdb;
-//			bin: ..\msvs_solution\Release\aumiks.dll;
 		}
 
 		[x86,debug] { 
 			lib: ..\msvs_solution\Debug\aumiks.lib;
 			symbols: ..\msvs_solution\aumiks\Debug\aumiks.pdb;
-//			bin: ..\msvs_solution\Debug\aumiks.dll;
 		}
 
 		[x64,release] { 
 			lib: ..\msvs_solution\x64\Release\aumiks.lib;
 			symbols: ..\msvs_solution\aumiks\x64\Release\aumiks.pdb;
-//			bin: ..\msvs_solution\x64\Release\aumiks.dll;
 		}
 
 		[x64,debug] { 
 			lib: ..\msvs_solution\x64\Debug\aumiks.lib;
 			symbols: ..\msvs_solution\aumiks\x64\Debug\aumiks.pdb;
-//			bin: ..\msvs_solution\x64\Debug\aumiks.dll;
 		}  
 	}
 }
