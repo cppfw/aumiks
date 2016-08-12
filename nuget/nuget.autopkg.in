@@ -18,8 +18,8 @@ nuget{
 	}
 	dependencies {
 		packages : {
-			libpapki/1.0.9;
-			audout/0.3.2;
+			libpapki/1.0.15;
+			audout/0.3.7;
 		};
 	}
 	files {
@@ -28,25 +28,21 @@ nuget{
 			#destination = ${d_include}aumiks;
 			"..\src\aumiks\**\*.hpp"
 		};
-		
-		[x86,release] { 
+
+		[x86,release] {
 			lib: ..\msvs_solution\Release\aumiks.lib;
-			symbols: ..\msvs_solution\aumiks\Release\aumiks.pdb;
 		}
 
-		[x86,debug] { 
+		[x86,debug] {
 			lib: ..\msvs_solution\Debug\aumiks.lib;
-			symbols: ..\msvs_solution\aumiks\Debug\aumiks.pdb;
 		}
 
-		[x64,release] { 
+		[x64,release] {
 			lib: ..\msvs_solution\x64\Release\aumiks.lib;
-			symbols: ..\msvs_solution\aumiks\x64\Release\aumiks.pdb;
 		}
 
-		[x64,debug] { 
+		[x64,debug] {
 			lib: ..\msvs_solution\x64\Debug\aumiks.lib;
-			symbols: ..\msvs_solution\aumiks\x64\Debug\aumiks.pdb;
-		}  
+		}
 	}
 }
