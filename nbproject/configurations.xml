@@ -56,9 +56,9 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <flagsDictionary>
-        <element flagsID="0"
-                 commonFlags="-mtune=generic -march=x86-64 -O3 -std=c++11 -funsigned-char -fPIC -fstack-protector-strong"/>
+        <element flagsID="0" commonFlags="-funsigned-char -O3 -std=c++11 -fPIC"/>
         <element flagsID="1" commonFlags="-std=c++11"/>
+        <element flagsID="2" commonFlags="-std=c++11 -O3"/>
       </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
@@ -90,52 +90,31 @@
       <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>/usr/include/utki</pElem>
-            <pElem>/usr/include/c++/4.9/bits</pElem>
-            <pElem>src/aumiks</pElem>
-            <pElem>/usr/include/c++/4.9/ext</pElem>
-            <pElem>/usr/include/c++/4.9</pElem>
-            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9/bits</pElem>
-            <pElem>/usr/include/c++/4.9/debug</pElem>
-            <pElem>/usr/lib/gcc/x86_64-linux-gnu/4.9/include</pElem>
-            <pElem>/usr/include/audout</pElem>
-            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9</pElem>
             <pElem>.</pElem>
           </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/aumiks/Mixer.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>src/aumiks</pElem>
-            <pElem>/usr/include/c++/4.9</pElem>
-            <pElem>/usr/include/c++/4.9/bits</pElem>
-            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9/bits</pElem>
-            <pElem>/usr/include/c++/4.9/debug</pElem>
-            <pElem>/usr/include/c++/4.9/ext</pElem>
-            <pElem>/usr/lib/gcc/x86_64-linux-gnu/4.9/include</pElem>
-            <pElem>/usr/include/utki</pElem>
-            <pElem>/usr/include/audout</pElem>
-            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9</pElem>
             <pElem>.</pElem>
           </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/aumiks/Reframer.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>/usr/include/c++/4.9/bits</pElem>
-            <pElem>/usr/include/c++/4.9/ext</pElem>
-            <pElem>/usr/include/utki</pElem>
-            <pElem>/usr/include/c++/4.9</pElem>
-            <pElem>src/aumiks</pElem>
-            <pElem>/usr/include/audout</pElem>
-            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9/bits</pElem>
-            <pElem>/usr/include/c++/4.9/debug</pElem>
-            <pElem>/usr/lib/gcc/x86_64-linux-gnu/4.9/include</pElem>
-            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9</pElem>
             <pElem>.</pElem>
           </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/aumiks/Resampler.cpp" ex="false" tool="1" flavor2="8">
@@ -145,19 +124,11 @@
       <item path="src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>/usr/include/c++/4.9/bits</pElem>
-            <pElem>/usr/include/utki</pElem>
-            <pElem>src/aumiks</pElem>
-            <pElem>/usr/include/c++/4.9</pElem>
-            <pElem>/usr/include/c++/4.9/ext</pElem>
-            <pElem>/usr/include/papki</pElem>
-            <pElem>/usr/lib/gcc/x86_64-linux-gnu/4.9/include</pElem>
-            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9/bits</pElem>
-            <pElem>/usr/include/c++/4.9/debug</pElem>
-            <pElem>/usr/include/audout</pElem>
-            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9</pElem>
             <pElem>.</pElem>
           </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="tests/effects/main.cpp" ex="false" tool="1" flavor2="8">
@@ -169,7 +140,7 @@
         </ccTool>
       </item>
       <item path="tests/playwav/main.cpp" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="2">
         </ccTool>
       </item>
       <item path="tests/sinesynth/main.cpp" ex="false" tool="1" flavor2="8">

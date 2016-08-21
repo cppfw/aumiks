@@ -37,7 +37,7 @@ endif
 
 this_ldlibs += $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension)
 
-this_ldlibs += -lpogodi -lnitki -laudout -lpapki
+this_ldlibs += -lpogodi -lnitki -laudout -lpapki -lstdc++
 
 
 $(eval $(prorab-build-app))
