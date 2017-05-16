@@ -1,7 +1,3 @@
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
 #pragma once
 
 #include <utki/Unique.hpp>
@@ -13,11 +9,11 @@
 namespace aumiks{
 
 //TODO: doxygen
-class ASink : utki::Unique{
+class Sink : utki::Unique{
 protected:	
-	ASink(){}
+	Sink(){}
 public:
-	virtual ~ASink()noexcept{}
+	virtual ~Sink()noexcept{}
 	
 	virtual void start() = 0;
 	
@@ -30,12 +26,12 @@ public:
 
 
 
-template <audout::Frame_e frame_type> class Sink : public ASink{
+template <audout::Frame_e frame_type> class FramedSink : public Sink{
 protected:
-	Sink(){}
+	FramedSink(){}
 	
 protected:
-	aumiks::ChanneledInput<frame_type> input_var;
+	aumiks::FramedInput<frame_type> input_var;
 public:
 	constexpr static audout::Frame_e frameType() noexcept{
 		return frame_type;

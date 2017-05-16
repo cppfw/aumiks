@@ -1,7 +1,3 @@
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
 #pragma once
 
 #include <utki/SpinLock.hpp>
@@ -17,7 +13,7 @@ namespace aumiks{
 
 class Input{
 protected:
-	std::shared_ptr<aumiks::ASource> src;
+	std::shared_ptr<aumiks::Source> src;
 	
 	utki::SpinLock spinLock;
 	
@@ -29,7 +25,7 @@ public:
 	
 	void disconnect()noexcept;
 	
-	void connect(std::shared_ptr<aumiks::ASource> source);
+	void connect(std::shared_ptr<aumiks::Source> source);
 	
 	bool isConnected()const{
 		return this->src.operator bool();
@@ -38,12 +34,12 @@ public:
 
 
 
-template <audout::Frame_e frame_type> class ChanneledInput : public Input{
-	std::shared_ptr<Source<frame_type>> srcInUse;
+template <audout::Frame_e frame_type> class FramedInput : public Input{
+	std::shared_ptr<FramedSource<frame_type>> srcInUse;
 
 public:
 
-	ChanneledInput(){}
+	FramedInput(){}
 
 	audout::Frame_e frameType() const noexcept override{
 		return frame_type;

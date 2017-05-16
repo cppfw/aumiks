@@ -8,23 +8,17 @@
 
 namespace aumiks{
 
-class AReframer : virtual public ASource{
-protected:
-	AReframer(){}
-public:
-	virtual Input& input() = 0;
-};
 
 template <audout::Frame_e from_type, audout::Frame_e to_type> class Reframer :
-		public Source<to_type>,
-		public AReframer
+		public FramedSource<to_type>,
+		public SingleInputSource
 	{
 	
 	void fillSampleBuffer_i(utki::Buf<Frame<to_type>> buf)noexcept;
 	
 	std::vector<Frame<from_type>> tmpBuf;
 	
-	ChanneledInput<from_type> input_v;
+	FramedInput<from_type> input_v;
 public:
 	Input& input()override{
 		return this->input_v;

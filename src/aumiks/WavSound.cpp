@@ -22,7 +22,7 @@ template <class TSampleType, audout::Frame_e frame_type>
 	std::vector<TSampleType> data;
 	
 
-	class Source : public aumiks::Source<frame_type>{
+	class Source : public aumiks::FramedSource<frame_type>{
 //		friend class WavSoundImpl;
 
 		const std::shared_ptr<const WavSoundImpl> wavSound;
@@ -72,7 +72,7 @@ template <class TSampleType, audout::Frame_e frame_type>
 	};//~class Source
 
 private:
-	std::shared_ptr<aumiks::ASource> createSource(std::uint32_t frequency = 0)const override{
+	std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const override{
 		auto src = utki::makeShared<Source>(this->sharedFromThis(this));
 		if(frequency == 0 || frequency == this->frequency()){
 			return src;

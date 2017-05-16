@@ -1,7 +1,3 @@
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
 #pragma once
 
 
@@ -26,7 +22,7 @@ public:
 	virtual ~Sound()noexcept{}
 
 	//TODO: doxygen
-	virtual std::shared_ptr<aumiks::ASource> createSource(std::uint32_t frequency = 0)const = 0;
+	virtual std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const = 0;
 };
 
-}//~namespace
+}

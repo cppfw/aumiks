@@ -6,17 +6,10 @@
 namespace aumiks{
 
 
-class AResampler : virtual public ASource{
-protected:
-	AResampler(){}
-public:
-	virtual Input& input() = 0;
-};
-
 
 template <audout::Frame_e frame_type> class Resampler :
-		public Source<frame_type>,
-		public AResampler
+		public FramedSource<frame_type>,
+		public SingleInputSource
 {
 	static const std::uint16_t DScale = 128;
 	
@@ -24,7 +17,7 @@ template <audout::Frame_e frame_type> class Resampler :
 	
 	volatile std::uint16_t step = DScale;
 	
-	ChanneledInput<frame_type> input_v;
+	FramedInput<frame_type> input_v;
 public:
 	Resampler(const Resampler&) = delete;
 	Resampler& operator=(const Resampler&) = delete;

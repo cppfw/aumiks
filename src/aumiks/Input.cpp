@@ -6,7 +6,7 @@ using namespace aumiks;
 
 
 
-void Input::connect(std::shared_ptr<aumiks::ASource> source) {
+void Input::connect(std::shared_ptr<aumiks::Source> source) {
 	ASSERT(source)
 
 	if (this->isConnected()) {
@@ -18,7 +18,7 @@ void Input::connect(std::shared_ptr<aumiks::ASource> source) {
 	}
 
 	if(this->frameType() != source->frameType()){
-		std::shared_ptr<AReframer> r;
+		std::shared_ptr<SingleInputSource> r;
 		if(source->frameType() == audout::Frame_e::STEREO && this->frameType() == audout::Frame_e::MONO){
 			r = utki::makeShared<Reframer<audout::Frame_e::STEREO, audout::Frame_e::MONO>>();
 		}else if(source->frameType() == audout::Frame_e::MONO && this->frameType() == audout::Frame_e::STEREO){
@@ -42,7 +42,7 @@ void Input::connect(std::shared_ptr<aumiks::ASource> source) {
 void Input::disconnect() noexcept{
 	//To minimize the time with locked spinlock need to avoid object destruction
 	//within the locked spinlock period. To achieve that use temporary strong reference.
-	std::shared_ptr<aumiks::ASource> tmp;
+	std::shared_ptr<aumiks::Source> tmp;
 
 	if (this->src) {
 		std::lock_guard<utki::SpinLock> guard(this->spinLock);
