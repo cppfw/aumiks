@@ -35,7 +35,7 @@ else ifeq ($(prorab_os),linux)
     this_ldlibs += -lpthread -lpulse-simple -lpulse
 endif
 
-this_ldlibs += $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension)
+this_ldlibs += $(abspath $(d)../../src/libaumiks$(prorab_lib_extension))
 
 this_ldlibs += -lpogodi -lnitki -laudout -lpapki -lstdc++
 
@@ -53,10 +53,10 @@ $(eval $(this_rules))
 
 #add dependency on libaumiks
 ifeq ($(prorab_os),windows)
-    $(prorab_this_dir)libaumiks$(prorab_lib_extension): $(abspath $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension))
+    $(d)libaumiks$(prorab_lib_extension): $(abspath $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension))
 	@cp $< $@
 
-    $(prorab_this_name): $(prorab_this_dir)libaumiks$(prorab_lib_extension)
+    $(prorab_this_name): $(d)libaumiks$(prorab_lib_extension)
 
     define this_rules
         clean::
@@ -64,8 +64,8 @@ ifeq ($(prorab_os),windows)
     endef
     $(eval $(this_rules))
 else
-    $(prorab_this_name): $(abspath $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension))
+    $(prorab_this_name): $(abspath $(d)../../src/libaumiks$(prorab_lib_extension))
 endif
 
 
-$(eval $(call prorab-include,$(prorab_this_dir)../../src/makefile))
+$(eval $(call prorab-include,$(d)../../src/makefile))

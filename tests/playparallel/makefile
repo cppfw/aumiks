@@ -35,7 +35,7 @@ else ifeq ($(prorab_os),linux)
     this_ldlibs += -lpthread -lpulse-simple -lpulse
 endif
 
-this_ldlibs += $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension)
+this_ldlibs += $(abspath $(d)../../src/libaumiks$(prorab_lib_extension))
 
 this_ldlibs += -lpogodi -lnitki -laudout -lpapki -lstdc++
 
