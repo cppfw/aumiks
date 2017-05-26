@@ -9,7 +9,7 @@
 namespace aumiks{
 
 //TODO: doxygen
-class Sink : utki::Unique{
+template <class T_Sample> class Sink : utki::Unique{
 protected:	
 	Sink(){}
 public:
@@ -21,23 +21,23 @@ public:
 		throw aumiks::Exc("Sink::Stop(): unsupported");
 	}
 	
-	virtual aumiks::Input& input()noexcept = 0;
+	virtual aumiks::Input<T_Sample>& input()noexcept = 0;
 };
 
 
 
-template <audout::Frame_e frame_type> class FramedSink : public Sink{
+template <class T_Sample, audout::Frame_e frame_type> class FramedSink : public Sink<T_Sample>{
 protected:
 	FramedSink(){}
 	
 protected:
-	aumiks::FramedInput<frame_type> input_var;
+	aumiks::FramedInput<T_Sample, frame_type> input_var;
 public:
 	constexpr static audout::Frame_e frameType() noexcept{
 		return frame_type;
 	}
 	
-	aumiks::Input& input()noexcept override{
+	aumiks::Input<T_Sample>& input()noexcept override{
 		return this->input_var;
 	}
 };

@@ -22,7 +22,7 @@ template <class TSampleType, audout::Frame_e frame_type>
 	std::vector<TSampleType> data;
 	
 
-	class Source : public aumiks::FramedSource<frame_type>{
+	class Source : public aumiks::FramedSource<std::int32_t, frame_type>{
 //		friend class WavSoundImpl;
 
 		const std::shared_ptr<const WavSoundImpl> wavSound;
@@ -35,7 +35,7 @@ template <class TSampleType, audout::Frame_e frame_type>
 		{}
 
 	private:
-		bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept override{
+		bool fillSampleBuffer(utki::Buf<Frame<std::int32_t, frame_type>> buf)noexcept override{
 			ASSERT(this->wavSound->data.size() % audout::AudioFormat::numChannels(frame_type) == 0)
 			ASSERT(this->curSmp % audout::AudioFormat::numChannels(frame_type) == 0)
 			
@@ -72,13 +72,13 @@ template <class TSampleType, audout::Frame_e frame_type>
 	};//~class Source
 
 private:
-	std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const override{
+	std::shared_ptr<aumiks::Source<std::int32_t>> createSource(std::uint32_t frequency = 0)const override{
 		auto src = utki::makeShared<Source>(this->sharedFromThis(this));
 		if(frequency == 0 || frequency == this->frequency()){
 			return src;
 		}
 		
-		auto resampler = utki::makeShared<Resampler<frame_type>>();
+		auto resampler = utki::makeShared<Resampler<std::int32_t, frame_type>>();
 		
 		resampler->input().connect(std::move(src));
 		

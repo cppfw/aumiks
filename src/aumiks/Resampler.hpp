@@ -7,9 +7,9 @@ namespace aumiks{
 
 
 
-template <audout::Frame_e frame_type> class Resampler :
-		public FramedSource<frame_type>,
-		public SingleInputSource
+template <class T_Sample, audout::Frame_e frame_type> class Resampler :
+		public FramedSource<T_Sample, frame_type>,
+		public SingleInputSource<T_Sample>
 {
 	static const std::uint16_t DScale = 128;
 	
@@ -17,14 +17,14 @@ template <audout::Frame_e frame_type> class Resampler :
 	
 	volatile std::uint16_t step = DScale;
 	
-	FramedInput<frame_type> input_v;
+	FramedInput<T_Sample, frame_type> input_v;
 public:
 	Resampler(const Resampler&) = delete;
 	Resampler& operator=(const Resampler&) = delete;
 	
 	Resampler(){}
 	
-	Input& input() override{
+	Input<T_Sample>& input() override{
 		return this->input_v;
 	}
 	
@@ -40,10 +40,10 @@ public:
 	}
 	
 private:
-	std::vector<Frame<frame_type>> tmpBuf;
-	Frame<frame_type> lastFrameForUpsampling;
+	std::vector<Frame<T_Sample, frame_type>> tmpBuf;
+	Frame<T_Sample, frame_type> lastFrameForUpsampling;
 	
-	bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept override{
+	bool fillSampleBuffer(utki::Buf<Frame<T_Sample, frame_type>> buf)noexcept override{
 		ASSERT(this->step > 0) //if step is 0 then there will be infinite loop
 		
 		//variable step can be changed from another thread, so copy it here
