@@ -12,13 +12,21 @@
 
 class SineSource : public aumiks::FramedSource<float, audout::Frame_e::MONO>{
 	float t = 0;
+	
+	float limit;
+	float freq;
 public:
+	SineSource(float limit, float freq) :
+			limit(limit),
+			freq(freq)
+	{}
+	
 	bool fillSampleBuffer(utki::Buf<aumiks::Frame<float, audout::Frame_e::MONO> > buf)noexcept override{
 		for(auto d = buf.begin(), e = buf.end(); d != e; ++d){
-			d->channel[0] = 0xfff * std::sin(2 * utki::pi<float>() * this->t * 440);
+			d->channel[0] = 0xfff * std::sin(2 * utki::pi<float>() * this->t * this->freq);
 			this->t += 1 / 44100.0f;
 		}
-		return t > 5;
+		return this->t > this->limit;
 	}
 };
 
@@ -41,7 +49,8 @@ int main(int argc, char *argv[]){
 
 		mixer->connect(snd1->createSource(sink.samplingRate()));
 		mixer->connect(snd2->createSource(sink.samplingRate()));
-		mixer->connect(utki::makeShared<SineSource>());
+		mixer->connect(utki::makeShared<SineSource>(6, 440));
+		mixer->connect(utki::makeShared<SineSource>(10, 220));
 		
 //		mixer->setFinite(false);
 //		mixer->connect(utki::makeShared<aumiks::NullSource<decltype(sink)::sinkFrameType()>>());

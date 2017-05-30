@@ -75,9 +75,11 @@ public:
 				++i;
 			}
 			
-			auto dst = buf.begin();
-			auto src = this->tmpBuf.cbegin();
-			for(; dst != buf.end(); ++dst, ++src){
+			for(auto dst = buf.begin(), end = buf.end(), src = this->tmpBuf.cbegin();
+					dst != end;
+					++dst, ++src
+				)
+			{
 				ASSERT(src != this->tmpBuf.cend())
 				dst->add(*src);
 			}

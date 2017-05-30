@@ -69,7 +69,7 @@ template <class TSampleType, audout::Frame_e frame_type>
 			}
 			return false;
 		}
-	};//~class Source
+	};
 
 private:
 	std::shared_ptr<aumiks::Source<std::int32_t>> createSource(std::uint32_t frequency = 0)const override{
