@@ -11,8 +11,17 @@ namespace aumiks{
 
 template <class T_Sample> class Mixer : virtual public Source<T_Sample>{
 	volatile bool isFinite_v = true;
+	
+protected:
+	utki::SpinLock spinLock;
+	
+	virtual Input<T_Sample>& add() = 0;
+	
 public:
-	virtual void connect(std::shared_ptr<Source<T_Sample>> source) = 0;
+	template <class T> void connect(std::shared_ptr<T> source){
+		std::lock_guard<decltype(this->spinLock)> guard(this->spinLock);
+		this->add().connect(std::move(source));
+	}
 	
 	void setFinite(bool finite)noexcept{
 		this->isFinite_v = finite;
@@ -30,23 +39,20 @@ template <class T_Sample, audout::Frame_e frame_type> class FramedMixer :
 {
 	std::list<FramedInput<T_Sample, frame_type>> inputs;
 	
-	utki::SpinLock spinLock;
-	
 	decltype(inputs) inputsToAdd;
 	
 	std::vector<Frame<T_Sample, frame_type>> tmpBuf;
+	
+	Input<T_Sample>& add() override{
+		this->inputsToAdd.emplace_back();
+		return this->inputsToAdd.back();
+	}
 	
 public:
 	FramedMixer(){}
 	
 	FramedMixer(const FramedMixer&) = delete;
 	FramedMixer& operator=(const FramedMixer&) = delete;
-	
-	void connect(std::shared_ptr<Source<T_Sample>> source) override{
-		std::lock_guard<decltype(this->spinLock)> guard(this->spinLock);
-		this->inputsToAdd.emplace_back();
-		this->inputsToAdd.back().connect(std::move(source));
-	}
 	
 	bool fillSampleBuffer(utki::Buf<Frame<T_Sample, frame_type>> buf)noexcept override{
 		{

@@ -23,6 +23,8 @@ protected:
 	
 	Source(){}
 public:
+
+	typedef T_Sample Sample_t;
 	
 	virtual ~Source()noexcept{}
 	

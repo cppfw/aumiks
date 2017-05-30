@@ -3,7 +3,25 @@
 #include "../../src/aumiks/SpeakersSink.hpp"
 #include "../../src/aumiks/NullSource.hpp"
 
+#include <utki/math.hpp>
+
 #include <nitki/Thread.hpp>
+
+#include <cmath>
+
+
+class SineSource : public aumiks::FramedSource<float, audout::Frame_e::MONO>{
+	float t = 0;
+public:
+	bool fillSampleBuffer(utki::Buf<aumiks::Frame<float, audout::Frame_e::MONO> > buf)noexcept override{
+		for(auto d = buf.begin(), e = buf.end(); d != e; ++d){
+			d->channel[0] = 0xfff * std::sin(2 * utki::pi<float>() * this->t * 440);
+			this->t += 1 / 44100.0f;
+		}
+		return t > 5;
+	}
+};
+
 
 
 int main(int argc, char *argv[]){
@@ -23,6 +41,7 @@ int main(int argc, char *argv[]){
 
 		mixer->connect(snd1->createSource(sink.samplingRate()));
 		mixer->connect(snd2->createSource(sink.samplingRate()));
+		mixer->connect(utki::makeShared<SineSource>());
 		
 //		mixer->setFinite(false);
 //		mixer->connect(utki::makeShared<aumiks::NullSource<decltype(sink)::sinkFrameType()>>());

@@ -1,7 +1,10 @@
 #pragma once
 
 #include <utki/SpinLock.hpp>
+
 #include <mutex>
+
+#include <type_traits>
 
 #include "Exc.hpp"
 #include "Source.hpp"
@@ -36,11 +39,17 @@ public:
 		}
 	}
 	
-	void connect(std::shared_ptr<aumiks::Source<T_Sample>> source);
+	template <class T> void connect(std::shared_ptr<T> source){
+		this->connectInternal(std::static_pointer_cast<aumiks::Source<typename T::Sample_t>>(source));
+	}
 	
 	bool isConnected()const{
 		return this->src.operator bool();
 	}
+	
+private:
+	template <class T_SrcSample> void connectInternal(std::shared_ptr<aumiks::Source<T_SrcSample>> source);
+	
 };
 
 
@@ -142,7 +151,85 @@ public:
 	
 };
 
-template <class T_Sample> void Input<T_Sample>::connect(std::shared_ptr<aumiks::Source<T_Sample> > source){
+template <class T_To, class T_From, audout::Frame_e frame_type> class Retyper :
+		public FramedSource<T_To, frame_type>
+	{
+	
+	FramedInput<T_From, frame_type> input_v;
+	
+	std::vector<Frame<T_From, frame_type>> tmpBuf;
+public:
+	Input<T_From> & input(){
+		return this->input_v;
+	}
+	
+	bool fillSampleBuffer(utki::Buf<Frame<T_To, frame_type>> buf)noexcept override{
+		if(this->tmpBuf.size() != buf.size()){
+			this->tmpBuf.resize(buf.size());
+		}
+		
+		bool ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
+		
+		for(
+				auto s = this->tmpBuf.begin(), se = this->tmpBuf.end(), d = buf.begin(), de = buf.end();
+				s != se;
+				++s, ++d
+			)
+		{
+			ASSERT_INFO(d != de, "buf.size() = " << buf.size() << ", this->tmpBuf.size() = " << this->tmpBuf.size())
+			for(
+					auto dd = d->channel.begin(), dde = d->channel.end(), ss = s->channel.begin(), sse = s->channel.end();
+					ss != sse;
+					++ss, ++dd
+				)
+			{
+				ASSERT(dd != dde)
+				*dd = T_To(*ss);
+			}
+		}
+		
+		return ret;
+	}
+	
+};
+
+
+
+template<class T_Sample, class T_SrcSample>
+typename std::enable_if<std::is_same<T_Sample, T_SrcSample>::value, std::shared_ptr<aumiks::Source<T_Sample>>>::type
+    retypeInternal(std::shared_ptr<aumiks::Source<T_SrcSample>>& source)
+{
+    return source;
+}
+
+template<class T_Sample, class T_SrcSample>
+typename std::enable_if<!std::is_same<T_Sample, T_SrcSample>::value, std::shared_ptr<aumiks::Source<T_Sample>>>::type
+    retypeInternal(std::shared_ptr<aumiks::Source<T_SrcSample>>& source)
+{
+    switch(source->frameType()){
+		case audout::Frame_e::MONO:
+			{
+				auto r = utki::makeShared<Retyper<T_Sample, T_SrcSample, audout::Frame_e::MONO>>();
+				r->input().connect(std::move(source));
+				return r;
+			}
+		case audout::Frame_e::STEREO:
+			{
+				auto r = utki::makeShared<Retyper<T_Sample, T_SrcSample, audout::Frame_e::STEREO>>();
+				r->input().connect(std::move(source));
+				return r;
+			}
+		default:
+			ASSERT(false)
+			return nullptr;
+	}
+}
+ 
+
+
+template <class T_Sample>
+template <class T_SrcSample>
+void Input<T_Sample>::connectInternal(std::shared_ptr<aumiks::Source<T_SrcSample>> source){
 	ASSERT(source)
 
 	if (this->isConnected()) {
@@ -154,11 +241,11 @@ template <class T_Sample> void Input<T_Sample>::connect(std::shared_ptr<aumiks::
 	}
 
 	if(this->frameType() != source->frameType()){
-		std::shared_ptr<SingleInputSource<T_Sample>> r;
+		std::shared_ptr<SingleInputSource<T_SrcSample>> r;
 		if(source->frameType() == audout::Frame_e::STEREO && this->frameType() == audout::Frame_e::MONO){
-			r = utki::makeShared<Reframer<T_Sample, audout::Frame_e::STEREO, audout::Frame_e::MONO>>();
+			r = utki::makeShared<Reframer<T_SrcSample, audout::Frame_e::STEREO, audout::Frame_e::MONO>>();
 		}else if(source->frameType() == audout::Frame_e::MONO && this->frameType() == audout::Frame_e::STEREO){
-			r = utki::makeShared<Reframer<T_Sample, audout::Frame_e::MONO, audout::Frame_e::STEREO>>();
+			r = utki::makeShared<Reframer<T_SrcSample, audout::Frame_e::MONO, audout::Frame_e::STEREO>>();
 		}else{
 			throw Exc("Unimplemented!!! Reframer for requested frame types is not implemented yet!");
 		}
@@ -167,10 +254,14 @@ template <class T_Sample> void Input<T_Sample>::connect(std::shared_ptr<aumiks::
 		source = std::move(r);
 	}
 
+	std::shared_ptr<aumiks::Source<T_Sample>> finalSource;
+	
+	finalSource = retypeInternal<T_Sample, T_SrcSample>(source);
+	
 	{
 		std::lock_guard<utki::SpinLock> guard(this->spinLock);
-		source->isConnected_v = true;
-		this->src = std::move(source);
+		finalSource->isConnected_v = true;
+		this->src = std::move(finalSource);
 	}
 }
 
