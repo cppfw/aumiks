@@ -75,7 +75,8 @@ public:
 				++i;
 			}
 			
-			for(auto dst = buf.begin(), end = buf.end(), src = this->tmpBuf.cbegin();
+			auto src = this->tmpBuf.cbegin();
+			for(auto dst = buf.begin(), end = buf.end();
 					dst != end;
 					++dst, ++src
 				)

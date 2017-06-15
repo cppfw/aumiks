@@ -170,15 +170,17 @@ public:
 		
 		bool ret = this->input_v.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
 		
+		auto d = buf.begin(), de = buf.end();
 		for(
-				auto s = this->tmpBuf.begin(), se = this->tmpBuf.end(), d = buf.begin(), de = buf.end();
+				auto s = this->tmpBuf.begin(), se = this->tmpBuf.end();
 				s != se;
 				++s, ++d
 			)
 		{
 			ASSERT_INFO(d != de, "buf.size() = " << buf.size() << ", this->tmpBuf.size() = " << this->tmpBuf.size())
+			auto ss = s->channel.begin(), sse = s->channel.end();
 			for(
-					auto dd = d->channel.begin(), dde = d->channel.end(), ss = s->channel.begin(), sse = s->channel.end();
+					auto dd = d->channel.begin(), dde = d->channel.end();
 					ss != sse;
 					++ss, ++dd
 				)
