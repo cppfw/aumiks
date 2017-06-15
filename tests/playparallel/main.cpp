@@ -49,8 +49,8 @@ int main(int argc, char *argv[]){
 
 		mixer->connect(snd1->createSource(sink.samplingRate()));
 		mixer->connect(snd2->createSource(sink.samplingRate()));
-		mixer->connect(utki::makeShared<SineSource>(6, 440));
-		mixer->connect(utki::makeShared<SineSource>(10, 220));
+		mixer->connect(utki::makeShared<SineSource>(6.0f, 440.0f));
+		mixer->connect(utki::makeShared<SineSource>(10.0f, 220.0f));
 		
 //		mixer->setFinite(false);
 //		mixer->connect(utki::makeShared<aumiks::NullSource<decltype(sink)::sinkFrameType()>>());
