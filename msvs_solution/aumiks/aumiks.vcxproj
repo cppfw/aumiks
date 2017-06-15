@@ -140,11 +140,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\aumiks\Input.cpp" />
-    <ClCompile Include="..\..\src\aumiks\Mixer.cpp" />
-    <ClCompile Include="..\..\src\aumiks\Reframer.cpp" />
-    <ClCompile Include="..\..\src\aumiks\Resampler.cpp" />
-    <ClCompile Include="..\..\src\aumiks\WavSound.cpp" />
+    <ClCompile Include="..\..\src\**\*.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
