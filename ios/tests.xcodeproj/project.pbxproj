@@ -8,10 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2C67AE0B1CC2716F00A552F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C67AE0A1CC2716F00A552F3 /* Assets.xcassets */; };
-		2CB98A2C1CC273BE00837278 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A271CC273BE00837278 /* Input.cpp */; };
-		2CB98A2D1CC273BE00837278 /* Mixer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A281CC273BE00837278 /* Mixer.cpp */; };
-		2CB98A2E1CC273BE00837278 /* Reframer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A291CC273BE00837278 /* Reframer.cpp */; };
-		2CB98A2F1CC273BE00837278 /* Resampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A2A1CC273BE00837278 /* Resampler.cpp */; };
 		2CB98A301CC273BE00837278 /* WavSound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A2B1CC273BE00837278 /* WavSound.cpp */; };
 		2CB98A341CC273F300837278 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A331CC273F300837278 /* main.cpp */; };
 		2CB98A381CC279A000837278 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CB98A371CC279A000837278 /* AudioToolbox.framework */; };
@@ -22,10 +18,6 @@
 		2C67ADFB1CC2716F00A552F3 /* tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tests.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C67AE0A1CC2716F00A552F3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2C67AE0F1CC2716F00A552F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2CB98A271CC273BE00837278 /* Input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Input.cpp; path = ../src/aumiks/Input.cpp; sourceTree = "<group>"; };
-		2CB98A281CC273BE00837278 /* Mixer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mixer.cpp; path = ../src/aumiks/Mixer.cpp; sourceTree = "<group>"; };
-		2CB98A291CC273BE00837278 /* Reframer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Reframer.cpp; path = ../src/aumiks/Reframer.cpp; sourceTree = "<group>"; };
-		2CB98A2A1CC273BE00837278 /* Resampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Resampler.cpp; path = ../src/aumiks/Resampler.cpp; sourceTree = "<group>"; };
 		2CB98A2B1CC273BE00837278 /* WavSound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WavSound.cpp; path = ../src/aumiks/WavSound.cpp; sourceTree = "<group>"; };
 		2CB98A331CC273F300837278 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../tests/playparallel/main.cpp; sourceTree = "<group>"; };
 		2CB98A371CC279A000837278 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -96,10 +88,6 @@
 		2CB98A261CC273A100837278 /* aumiks */ = {
 			isa = PBXGroup;
 			children = (
-				2CB98A271CC273BE00837278 /* Input.cpp */,
-				2CB98A281CC273BE00837278 /* Mixer.cpp */,
-				2CB98A291CC273BE00837278 /* Reframer.cpp */,
-				2CB98A2A1CC273BE00837278 /* Resampler.cpp */,
 				2CB98A2B1CC273BE00837278 /* WavSound.cpp */,
 			);
 			name = aumiks;
@@ -143,7 +131,7 @@
 		2C67ADF31CC2716F00A552F3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Ivan Gagis";
 				TargetAttributes = {
 					2C67ADFA1CC2716F00A552F3 = {
@@ -234,10 +222,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CB98A301CC273BE00837278 /* WavSound.cpp in Sources */,
-				2CB98A2D1CC273BE00837278 /* Mixer.cpp in Sources */,
-				2CB98A2E1CC273BE00837278 /* Reframer.cpp in Sources */,
-				2CB98A2C1CC273BE00837278 /* Input.cpp in Sources */,
-				2CB98A2F1CC273BE00837278 /* Resampler.cpp in Sources */,
 				2CB98A341CC273F300837278 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -259,8 +243,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -304,8 +290,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
