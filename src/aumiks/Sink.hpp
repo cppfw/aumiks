@@ -9,7 +9,7 @@
 namespace aumiks{
 
 //TODO: doxygen
-template <class T_Sample> class Sink : utki::Unique{
+template <class T_Sample> class Sink : public utki::Unique{
 protected:	
 	Sink(){}
 public:
