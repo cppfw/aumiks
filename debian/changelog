@@ -1,3 +1,9 @@
+libaumiks (0.3.10) unstable; urgency=medium
+
+  * test release
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 10 Jul 2018 15:43:52 +0300
+
 libaumiks (0.3.9) unstable; urgency=medium
 
   * msvs debug symbols
