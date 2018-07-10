@@ -49,30 +49,31 @@ env:
   global:
   #encrypted HOMEBREW_GITHUB_ACCESS_TOKEN for publishing to homebrew-tap
   - secure: "lKax5Leg/IULJ0NVNk38PgV+o5lKetxbbSvKXgR1q4aav8Z7TY+zAzd7Z1weU+ZiHxyimiE/y50tyMJd51aNI8Y+KdFV3/a6wU0z6SAlqB1URRCSHNPXF4QKrD2aUB7FrwAdngKyqJfcUx6H/E+qXcmUxDeqypw3AZ2Ua4BcDIYurdxKQ29w2J8diJBisSZO1J995TsWTCNWQ36fl0Hoz722B6DQZaG6TJ6rYU9MhTQqj+wHjATg2UMSOjWiPomgJZ1L+hMlfYANFY9rDPuUDJ+glc2nQGCJnqQenQKhaq4nJcgWjEDVuOzCnWgu1JmSBBlw051wVBa1WHE+Yh3J1kuXtH1aCBlWJU7Xui/tMmtFXixLkh8aEPdsTPd+LkLwMJuaOKhLmZpMlXlie40qchPuvwK2kBLDQSn1eV9Z6qum5PTcLhoKt5E5BU8V0QWcrDwvHuCo/bz06bYWBJRQ51B1iiOLzPvhfRYHiMD5ScxnpmBBnwnOyX0v32MsQMWs2KiNV3aWIbT+OSPVQd9D8QZXuKzDWWPLTw1jCjfLgj4bLjkO8Sq9Jeixn5g3B6NFygiGT3Vdru/UNBSrNZgxuJhsZ9yo67IsqWG24NCk+vm7STirL5/xHTiKrO0OTqDqb3gJPnNHQvlfwpqjzep143uchGruqjXdauNjCMdRT9Y="
-  - PRORAB_GIT_USERNAME=igagis
-  - PRORAB_GIT_ACCESS_TOKEN=$HOMEBREW_GITHUB_ACCESS_TOKEN
+  - MYCI_GIT_USERNAME=igagis
+  - MYCI_GIT_ACCESS_TOKEN=$HOMEBREW_GITHUB_ACCESS_TOKEN
   - linuxDependencies="lintian debhelper prorab doxygen libpapki-dev libaudout-dev"
 
 before_install:
 - if [ "$BUILD_NAME" == "macosx" ]; then
+    rvm install ruby-2.3.3 &&
+    rvm use ruby-2.3.3 &&
+    
+    brew update > /dev/null &&
     brew tap igagis/tap &&
     brew update > /dev/null &&
     brew install prorab libpapki libaudout;
   fi
 - if [ "$BUILD_NAME" == "ios" ]; then
+    rvm install ruby-2.3.3 &&
+    rvm use ruby-2.3.3 &&
+    
+    brew update > /dev/null &&
     brew tap igagis/tap &&
     brew update > /dev/null &&
     brew install prorab &&
-
-    brew install --force openssl &&
-    rvm install ruby-2.2.2 &&
-    rvm use ruby-2.2.2 &&
-    
-    rvm 2.2.1 do gem uninstall bundler -v '>1.12.5' --force &&
-    rvm 2.2.1 do gem install bundler -v 1.12.5 --no-rdoc --no-ri --no-document --quiet &&
     
     sudo gem install cocoapods &&
-    pod repo add --silent igagis https://$PRORAB_GIT_USERNAME:$PRORAB_GIT_ACCESS_TOKEN@github.com/igagis/cocoapods-repo.git &&
+    pod repo add --silent igagis https://$MYCI_GIT_USERNAME:$MYCI_GIT_ACCESS_TOKEN@github.com/igagis/cocoapods-repo.git &&
     pod install --project-directory=ios;
   fi
 - if [ "$BUILD_NAME" == "android" ]; then
@@ -111,7 +112,7 @@ before_install:
     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61 &&
     sudo apt-get update -qq &&
     sudo apt-get install -qq prorab;
-    sudo prorab-make-raspberry-chroot.sh /srv/chroot/rasp-armhf &&
+    sudo myci-make-raspberry-chroot.sh /srv/chroot/rasp-armhf &&
     echo "deb http://dl.bintray.com/igagis/rasp unstable main" | sudo tee /srv/chroot/rasp-armhf/etc/apt/sources.list.d/igagis.list > /dev/null &&
     sudo chroot /srv/chroot/rasp-armhf sed -i -e 's/jessie/testing/g' /etc/apt/sources.list &&
     sudo chroot /srv/chroot/rasp-armhf apt-get update &&
@@ -137,15 +138,15 @@ before_script:
 
 script:
 - if [ "$BUILD_NAME" == "debian" ]; then
-    prorab-deb-prepare.sh &&
+    myci-deb-prepare.sh &&
     sg sbuild -c "sbuild -A -d testing-amd64-sbuild --run-lintian --debbuildopts '-us -uc'";
   fi
 - if [ "$BUILD_NAME" == "ubuntu" ]; then
-    prorab-deb-prepare.sh &&
+    myci-deb-prepare.sh &&
     sg sbuild -c "sbuild -A -d xenial-amd64-sbuild --debbuildopts '-us -uc'";
   fi
 - if [ "$BUILD_NAME" == "clang" ]; then
-    prorab-deb-prepare.sh &&
+    myci-deb-prepare.sh &&
     dpkg-buildpackage -uc -us;
   fi
 - if [ "$BUILD_NAME" == "macosx" ]; then
@@ -155,18 +156,18 @@ script:
     xcodebuild -workspace ios/tests.xcworkspace -scheme tests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO;
   fi
 - if [ "$BUILD_NAME" == "raspberry_pi" ]; then
-    sudo chroot /srv/chroot/rasp-armhf bash -c "cd /build && prorab-deb-prepare.sh" &&
+    sudo chroot /srv/chroot/rasp-armhf bash -c "cd /build && myci-deb-prepare.sh" &&
     sudo chroot /srv/chroot/rasp-armhf bash -c "cd /build && dpkg-buildpackage -us -uc";
   fi
 - if [ "$BUILD_NAME" == "android" ]; then
     (cd android && ./gradlew build) &&
-    prorab-apply-version.sh -v `prorab-deb-version.sh debian/changelog` android/*.pom.in &&
-    prorab-apply-version.sh -v `prorab-deb-version.sh debian/changelog` android/*.aar.in --filename-only;
+    myci-apply-version.sh -v `myci-deb-version.sh debian/changelog` android/*.pom.in &&
+    myci-apply-version.sh -v `myci-deb-version.sh debian/changelog` android/*.aar.in --filename-only;
   fi
 
 
 before_deploy:
-  - prorab-apply-version.sh -v `prorab-deb-version.sh debian/changelog` travis_bintray_*.json.in
+  - myci-apply-version.sh -v `myci-deb-version.sh debian/changelog` travis_bintray_*.json.in
 
 deploy:
 - provider: bintray
@@ -211,13 +212,13 @@ deploy:
   dry-run: false
 - provider: script
   skip_cleanup: true
-  script: prorab-deploy-homebrew.sh -t igagis/tap
+  script: myci-deploy-homebrew.sh -t igagis/tap
   on:
     tags: true
     condition: $BUILD_NAME = macosx
 - provider: script
   skip_cleanup: true
-  script: rvm 2.2.1 do prorab-deploy-cocoapods.sh -r igagis
+  script: rvm 2.3.3 do prorab-deploy-cocoapods.sh -r igagis
   on:
     tags: true
     condition: $BUILD_NAME = ios
