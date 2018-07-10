@@ -26,8 +26,8 @@ template <audout::Frame_e frame_type> class SpeakersSink :
 			)
 		this->smpBuf.resize(playBuf.size() / audout::AudioFormat::numChannels(frame_type));
 
-		if(this->input_var.fillSampleBuffer(utki::wrapBuf(this->smpBuf))){
-			this->input_var.disconnect();
+		if(this->input_v.fillSampleBuffer(utki::wrapBuf(this->smpBuf))){
+			this->input_v.disconnect();
 		}
 		
 		auto src = this->smpBuf.cbegin();

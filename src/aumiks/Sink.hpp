@@ -31,14 +31,14 @@ protected:
 	FramedSink(){}
 	
 protected:
-	aumiks::FramedInput<T_Sample, frame_type> input_var;
+	aumiks::FramedInput<T_Sample, frame_type> input_v;
 public:
 	constexpr static audout::Frame_e frameType() noexcept{
 		return frame_type;
 	}
 	
 	aumiks::Input<T_Sample>& input()noexcept override{
-		return this->input_var;
+		return this->input_v;
 	}
 };
 
