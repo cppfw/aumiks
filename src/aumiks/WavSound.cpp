@@ -31,8 +31,10 @@ template <class TSampleType, audout::Frame_e frame_type>
 	
 	public:
 		Source(const std::shared_ptr<const WavSoundImpl>& sound) :
-				wavSound(ASS(sound))
-		{}
+				wavSound(sound)
+		{
+			ASSERT(this->wavSound)
+		}
 
 	private:
 		bool fillSampleBuffer(utki::Buf<Frame<std::int32_t, frame_type>> buf)noexcept override{
