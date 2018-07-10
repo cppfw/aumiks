@@ -8,7 +8,7 @@ namespace aumiks{
 
 //TODO: make singleton
 template <audout::Frame_e frame_type> class SpeakersSink :
-public aumiks::FramedSink<std::int32_t, frame_type>,
+		public aumiks::FramedSink<std::int32_t, frame_type>,
 		private audout::Listener
 {
 	std::uint32_t samplingRate_v;
