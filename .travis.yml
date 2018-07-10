@@ -50,6 +50,7 @@ env:
   #encrypted MYCI_GIT_ACCESS_TOKEN for publishing to homebrew-tap and cocoapods-repo
   - secure: "e5sTF/wTHyKZmcF/A5cd7RfLO3g9oeYpXBzgxvG5fTbBn8O/SXUR//qQ62Ij5qtaSK0fm8j6uYL/QG/0PLXMrny639xFKLWnujiSYgr3JclZZhE81DRGbTqopjyAY4T/C6XQKEevLsIplEWXLCqXlLNQrRrD8g3fqaWvE3nL+Cr0Df+MocvuzNh/OxrsBFt1xtVXrHc3VTo8qc0EejWYT8UGscSco874/ZaA4IGURjopITr4BCi6s848hkxVZcZeJYWXs20gXd5qAacMNB/4PvVLXqKcGoU2YABlU46pd4atkFaCgQTsegG+HST2vp3YUZnNi1oiaX8des/fU4V7CQxThEGNbXrfCPZNC11REfB5HKY+DcQeynBDMZwufIRUKOlVkHekEq2LBobfZfg8S2Gm8/ZZJS457jZx5pwZsWxhxkVqwJQwMnNNPmEMCvZqQzEADNJPKhps6juiwip+p1pMIMnr4KwEn6xiYwAfLBhc7/3KWOFCrsIi243kOat//2zIskRAf4EM9rZPRiXg/OS/XN7VyMwizOuHqnXUp61gR4fbWjouwRpCTlfZDnNdb3cE8o54VLcVumnGfTOX8q0xMy0hN5QRqRQ9DlGkQjwnK/DxTbdWxusXAzaGwn5ZmhhZ53B8tN/LdEH+Ep6opasl7bLKtBh99pnLjpDfL7o="
   - MYCI_GIT_USERNAME=igagis
+  - USE_ANDROID_NDK_VERSION=15c
   - linuxDependencies="lintian debhelper prorab prorab-extra myci doxygen libpapki-dev libaudout-dev"
 
 before_install:
@@ -119,15 +120,14 @@ before_install:
     sudo rsync -av $TRAVIS_BUILD_DIR/ /srv/chroot/rasp-armhf/build/;
   fi
 
-  
 before_script:
   # download and install android NDK
   - if [ "$BUILD_NAME" == "android" ]; then
       export TERM=dumb &&
-      curl -L https://dl.google.com/android/repository/android-ndk-r14b-linux-x86_64.zip -O &&
-      unzip ./android-ndk-r14b-linux-x86_64.zip > /dev/null &&
-      rm android-ndk-r14b-linux-x86_64.zip &&
-      export ANDROID_NDK_HOME=`pwd`/android-ndk-r14b &&
+      curl -L https://dl.google.com/android/repository/android-ndk-r$USE_ANDROID_NDK_VERSION-linux-x86_64.zip -O &&
+      unzip ./android-ndk-r$USE_ANDROID_NDK_VERSION-linux-x86_64.zip > /dev/null &&
+      rm android-ndk-r$USE_ANDROID_NDK_VERSION-linux-x86_64.zip &&
+      export ANDROID_NDK_HOME=`pwd`/android-ndk-r$USE_ANDROID_NDK_VERSION &&
       export LOCAL_ANDROID_NDK_HOME="$ANDROID_NDK_HOME" &&
       export LOCAL_ANDROID_NDK_HOST_PLATFORM="linux-x86_64" &&
       export PATH=$PATH:${ANDROID_NDK_HOME} &&
