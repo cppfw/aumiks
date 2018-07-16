@@ -18,7 +18,7 @@ template <class T_Sample> class Input{
 protected:
 	std::shared_ptr<aumiks::Source<T_Sample>> src;
 	
-	utki::SpinLock spinLock;
+	std::mutex mutex;
 	
 	Input(){}
 public:
@@ -27,14 +27,10 @@ public:
 	virtual audout::Frame_e frameType()const noexcept = 0;
 	
 	void disconnect()noexcept{
-		//To minimize the time with locked spinlock need to avoid object destruction
-		//within the locked spinlock period. To achieve that use temporary strong reference outside of spinlock.
-		std::shared_ptr<aumiks::Source<T_Sample>> tmp;
-
+		std::lock_guard<decltype(this->mutex)> guard(this->mutex);
+		
 		if (this->src) {
-			std::lock_guard<utki::SpinLock> guard(this->spinLock);
-			tmp = this->src;
-			tmp->isConnected_v = false;
+			this->src->isConnected_v = false;
 			this->src.reset();
 		}
 	}
@@ -44,7 +40,7 @@ public:
 	}
 	
 	bool isConnected()const{
-		return this->src.operator bool();
+		return this->src.get() != nullptr;
 	}
 	
 private:
@@ -66,10 +62,12 @@ public:
 	}
 
 	bool fillSampleBuffer(utki::Buf<Frame<T_Sample, frame_type>> buf)noexcept{
-		if(this->src != std::static_pointer_cast<aumiks::Source<T_Sample>>(this->srcInUse)){
-			std::lock_guard<utki::SpinLock> guard(this->spinLock);
-			ASSERT(!this->src || this->src->frameType() == frame_type)
-			this->srcInUse = std::dynamic_pointer_cast<typename decltype(srcInUse)::element_type>(this->src);
+		{
+			std::lock_guard<decltype(this->mutex)> guard(this->mutex);
+			if(this->src != std::static_pointer_cast<aumiks::Source<T_Sample>>(this->srcInUse)){
+				ASSERT(!this->src || this->src->frameType() == frame_type)
+				this->srcInUse = std::dynamic_pointer_cast<typename decltype(srcInUse)::element_type>(this->src);
+			}
 		}
 		if(!this->srcInUse){
 			for(auto& b : buf){
@@ -211,13 +209,13 @@ typename std::enable_if<!std::is_same<T_Sample, T_SrcSample>::value, std::shared
     switch(source->frameType()){
 		case audout::Frame_e::MONO:
 			{
-				auto r = utki::makeShared<Retyper<T_Sample, T_SrcSample, audout::Frame_e::MONO>>();
+				auto r = std::make_shared<Retyper<T_Sample, T_SrcSample, audout::Frame_e::MONO>>();
 				r->input().connect(std::move(source));
 				return r;
 			}
 		case audout::Frame_e::STEREO:
 			{
-				auto r = utki::makeShared<Retyper<T_Sample, T_SrcSample, audout::Frame_e::STEREO>>();
+				auto r = std::make_shared<Retyper<T_Sample, T_SrcSample, audout::Frame_e::STEREO>>();
 				r->input().connect(std::move(source));
 				return r;
 			}
@@ -245,9 +243,9 @@ void Input<T_Sample>::connectInternal(std::shared_ptr<aumiks::Source<T_SrcSample
 	if(this->frameType() != source->frameType()){
 		std::shared_ptr<SingleInputSource<T_SrcSample>> r;
 		if(source->frameType() == audout::Frame_e::STEREO && this->frameType() == audout::Frame_e::MONO){
-			r = utki::makeShared<Reframer<T_SrcSample, audout::Frame_e::STEREO, audout::Frame_e::MONO>>();
+			r = std::make_shared<Reframer<T_SrcSample, audout::Frame_e::STEREO, audout::Frame_e::MONO>>();
 		}else if(source->frameType() == audout::Frame_e::MONO && this->frameType() == audout::Frame_e::STEREO){
-			r = utki::makeShared<Reframer<T_SrcSample, audout::Frame_e::MONO, audout::Frame_e::STEREO>>();
+			r = std::make_shared<Reframer<T_SrcSample, audout::Frame_e::MONO, audout::Frame_e::STEREO>>();
 		}else{
 			throw Exc("Unimplemented!!! Reframer for requested frame types is not implemented yet!");
 		}
@@ -261,7 +259,7 @@ void Input<T_Sample>::connectInternal(std::shared_ptr<aumiks::Source<T_SrcSample
 	finalSource = retypeInternal<T_Sample, T_SrcSample>(source);
 	
 	{
-		std::lock_guard<utki::SpinLock> guard(this->spinLock);
+		std::lock_guard<decltype(this->mutex)> guard(this->mutex);
 		finalSource->isConnected_v = true;
 		this->src = std::move(finalSource);
 	}

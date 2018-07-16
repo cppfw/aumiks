@@ -60,7 +60,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} debug=true</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
-          <executablePath>tests/playparallel/tests</executablePath>
+          <executablePath>tests/playwav/tests</executablePath>
           <ccTool>
             <standard>8</standard>
             <incDir>

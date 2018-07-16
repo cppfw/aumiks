@@ -29,8 +29,12 @@ int main(int argc, char *argv[]){
 		
 		std::shared_ptr<aumiks::Sound> snd = aumiks::WavSound::load("../samples/sample44100stereo16.wav");
 		
-		sink.input().connect(snd->createSource(sink.samplingRate()));
+		auto src = snd->createSource(sink.samplingRate());
 		
+		//test disconnect and connect again
+//		sink.input().connect(src);
+//		sink.input().disconnect();
+		sink.input().connect(src);
 		
 		while(sink.input().isConnected()){
 			nitki::Thread::sleep(333);

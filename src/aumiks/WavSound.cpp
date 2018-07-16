@@ -75,12 +75,12 @@ template <class TSampleType, audout::Frame_e frame_type>
 
 private:
 	std::shared_ptr<aumiks::Source<std::int32_t>> createSource(std::uint32_t frequency = 0)const override{
-		auto src = utki::makeShared<Source>(this->sharedFromThis(this));
+		auto src = std::make_shared<Source>(this->sharedFromThis(this));
 		if(frequency == 0 || frequency == this->frequency()){
 			return src;
 		}
 		
-		auto resampler = utki::makeShared<Resampler<std::int32_t, frame_type>>();
+		auto resampler = std::make_shared<Resampler<std::int32_t, frame_type>>();
 		
 		resampler->input().connect(std::move(src));
 		
@@ -232,10 +232,10 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 		//set the format
 		switch(chans){
 			case 1://mono
-				ret = utki::makeShared<WavSoundImpl<std::int16_t, audout::Frame_e::MONO>>(utki::wrapBuf(data), frequency);
+				ret = std::make_shared<WavSoundImpl<std::int16_t, audout::Frame_e::MONO>>(utki::wrapBuf(data), frequency);
 				break;
 			case 2://stereo
-				ret = utki::makeShared<WavSoundImpl<std::int16_t, audout::Frame_e::STEREO>>(utki::wrapBuf(data), frequency);
+				ret = std::make_shared<WavSoundImpl<std::int16_t, audout::Frame_e::STEREO>>(utki::wrapBuf(data), frequency);
 				break;
 			default:
 				throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");

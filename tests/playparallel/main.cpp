@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		auto mixer = utki::makeShared<aumiks::FramedMixer<std::int32_t, sink.frameType()>>();
+		auto mixer = std::make_shared<aumiks::FramedMixer<std::int32_t, sink.frameType()>>();
 		
 		std::shared_ptr<aumiks::Sound> snd1 = aumiks::WavSound::load("../samples/sample44100mono16.wav");
 		std::shared_ptr<aumiks::Sound> snd2 = aumiks::WavSound::load("../samples/ice_break.wav");
@@ -49,11 +49,11 @@ int main(int argc, char *argv[]){
 
 		mixer->connect(snd1->createSource(sink.samplingRate()));
 		mixer->connect(snd2->createSource(sink.samplingRate()));
-		mixer->connect(utki::makeShared<SineSource>(6.0f, 440.0f));
-		mixer->connect(utki::makeShared<SineSource>(10.0f, 220.0f));
+		mixer->connect(std::make_shared<SineSource>(6.0f, 440.0f));
+		mixer->connect(std::make_shared<SineSource>(10.0f, 220.0f));
 		
 //		mixer->setFinite(false);
-//		mixer->connect(utki::makeShared<aumiks::NullSource<decltype(sink)::sinkFrameType()>>());
+//		mixer->connect(std::make_shared<aumiks::NullSource<decltype(sink)::sinkFrameType()>>());
 		
 		sink.input().connect(mixer);
 		
