@@ -28,12 +28,6 @@ template <audout::Frame_e frame_type> class SpeakersSink :
 
 		if(this->input_v.fillSampleBuffer(utki::wrapBuf(this->smpBuf))){
 			this->input_v.disconnect();
-		}else{
-			for(auto& v : this->smpBuf){
-				for(auto& c : v.channel){
-					c = 0;
-				}
-			}
 		}
 		
 		auto src = this->smpBuf.cbegin();

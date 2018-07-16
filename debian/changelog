@@ -1,3 +1,9 @@
+libaumiks (0.3.15) unstable; urgency=medium
+
+  * fill buffer with silence if sink is not connected
+
+ -- Ivan Gagis <igagis@gmail.com>  Mon, 16 Jul 2018 23:37:33 +0300
+
 libaumiks (0.3.14) unstable; urgency=medium
 
   * fill buffer with silence if sink is not connected

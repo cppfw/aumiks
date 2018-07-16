@@ -72,6 +72,11 @@ public:
 			this->srcInUse = std::dynamic_pointer_cast<typename decltype(srcInUse)::element_type>(this->src);
 		}
 		if(!this->srcInUse){
+			for(auto& b : buf){
+				for(auto& c : b.channel){
+					c = 0;
+				}
+			}
 			return false;
 		}
 		return this->srcInUse->fillSampleBuffer(buf);
