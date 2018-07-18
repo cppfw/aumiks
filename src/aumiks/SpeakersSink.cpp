@@ -2,9 +2,17 @@
 
 using namespace aumiks;
 
+void SpeakersSink::start() {
+	this->player.setPaused(false);
+}
+
+void SpeakersSink::stop() {
+	this->player.setPaused(true);
+}
+
 SpeakersSink::SpeakersSink(audout::SamplingRate_e samplingRate, std::uint16_t bufferSizeMillis) :
-		samplingRate_v(audout::AudioFormat(audout::Frame_e::STEREO, samplingRate).frequency()),
-		player(audout::AudioFormat(audout::Frame_e::STEREO, samplingRate), (samplingRate_v * bufferSizeMillis / 1000), this)
+		samplingRate(audout::AudioFormat(audout::Frame_e::STEREO, samplingRate).frequency()),
+		player(audout::AudioFormat(audout::Frame_e::STEREO, samplingRate), (this->samplingRate * bufferSizeMillis / 1000), this)
 {}
 
 

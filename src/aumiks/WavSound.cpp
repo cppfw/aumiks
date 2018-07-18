@@ -72,9 +72,9 @@ template <class TSampleType, audout::Frame_e frame_type>
 	};
 
 private:
-	std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const override{
+	std::shared_ptr<aumiks::Source> createSource(std::uint32_t samplingRate = 0)const override{
 		auto src = std::make_shared<Source>(this->sharedFromThis(this));
-		if(frequency == 0 || frequency == this->frequency()){
+		if(samplingRate == 0 || samplingRate == this->samplingRate){
 			return src;
 		}
 		
@@ -82,7 +82,7 @@ private:
 		
 		resampler->input.connect(std::move(src));
 		
-		resampler->setScale(this->frequency(), frequency);
+		resampler->setScale(this->samplingRate, samplingRate);
 		
 		return resampler;
 	}
@@ -92,7 +92,7 @@ public:
 	WavSoundImpl(const utki::Buf<std::uint8_t> d, std::uint32_t frequency) :
 			WavSound(audout::AudioFormat::numChannels(audout::Frame_e::STEREO), frequency)
 	{
-		ASSERT(d.size() % (this->numChannels() * sizeof(TSampleType)) == 0)
+		ASSERT(d.size() % (this->numChannels * sizeof(TSampleType)) == 0)
 
 		this->data.resize(d.size() / sizeof(TSampleType));
 

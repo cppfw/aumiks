@@ -9,8 +9,6 @@
 
 namespace aumiks{
 
-class Input;
-
 //TODO: doxygen
 class Source : virtual public utki::Shared{
 	friend class Input;

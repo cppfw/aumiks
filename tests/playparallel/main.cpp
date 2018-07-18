@@ -47,8 +47,8 @@ int main(int argc, char *argv[]){
 		ASSERT(snd1)
 		ASSERT(snd2)
 
-		mixer->connect(snd1->createSource(sink.samplingRate()));
-		mixer->connect(snd2->createSource(sink.samplingRate()));
+		mixer->connect(snd1->createSource(sink.samplingRate));
+		mixer->connect(snd2->createSource(sink.samplingRate));
 		mixer->connect(std::make_shared<SineSource>(6.0f, 440.0f));
 		mixer->connect(std::make_shared<SineSource>(10.0f, 220.0f));
 		
