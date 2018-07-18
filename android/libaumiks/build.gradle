@@ -15,9 +15,9 @@ model {
         ndk {
             platformVersion = 21
             moduleName = "aumiks"
-//            toolchain = 'clang'
-            abiFilters.addAll(['armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64', 'mips', 'mips64']) //this is default
-            ldLibs.addAll(['android', 'log', 'papki', 'audout'])
+            toolchain = 'clang'
+            abiFilters.addAll(['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64']) //this is default
+            ldLibs.addAll(['android', 'log', 'papki', 'audout', 'OpenSLES'])
             stl = 'c++_shared'
             cppFlags.add("-std=c++11")
             cppFlags.add("-fexceptions")
