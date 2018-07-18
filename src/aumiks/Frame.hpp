@@ -10,8 +10,8 @@
 
 namespace aumiks{
 
-template <audout::Frame_e frame_type> struct Frame{
-	std::array<real, audout::AudioFormat::numChannels(frame_type)> channel;
+struct Frame{
+	std::array<real, audout::AudioFormat::numChannels(audout::Frame_e::STEREO)> channel;
 	
 	void add(const Frame& f){
 		ASSERT(this->channel.size() == f.channel.size())

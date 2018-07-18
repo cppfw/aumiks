@@ -22,10 +22,10 @@ protected:
 	Source& operator=(const Source&) = delete;
 	
 	Source(){}
+	
+	virtual bool fillSampleBuffer(utki::Buf<Frame> buf)noexcept = 0;
 public:	
 	virtual ~Source()noexcept{}
-	
-	virtual audout::Frame_e frameType()const noexcept = 0;
 	
 	//thread safe
 	bool isConnected()const noexcept{
@@ -34,26 +34,5 @@ public:
 private:
 
 };
-
-class SingleInputSource : virtual public Source{
-public:
-	virtual Input& input() = 0;
-};
-
-
-template <audout::Frame_e frame_type> class FramedSource : virtual public Source{
-public:
-	FramedSource(const FramedSource&) = delete;
-	FramedSource& operator=(const FramedSource&) = delete;
-	
-	FramedSource(){}
-	
-	virtual bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept = 0;
-	
-	audout::Frame_e frameType() const noexcept override{
-		return frame_type;
-	}
-};
-
 
 }

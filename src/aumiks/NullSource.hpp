@@ -4,16 +4,9 @@
 
 namespace aumiks{
 
-template <audout::Frame_e frame_type> class NullSource : public FramedSource<frame_type>{
+class NullSource : public Source{
 public:
-	bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept override{
-		for(auto& f : buf){
-			for(auto& c : f.channel){
-				c = real(0);
-			}
-		}
-		return false;
-	}
+	bool fillSampleBuffer(utki::Buf<Frame> buf)noexcept override;
 };
 
 }

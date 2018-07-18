@@ -4,9 +4,15 @@
     <df root="src" name="0">
       <df name="aumiks">
         <in>Frame.hpp</in>
+        <in>Input.cpp</in>
+        <in>Mixer.cpp</in>
         <in>Mixer.hpp</in>
+        <in>NullSource.cpp</in>
         <in>NullSource.hpp</in>
+        <in>Resampler.cpp</in>
         <in>Resampler.hpp</in>
+        <in>SingleInputSource.hpp</in>
+        <in>SpeakersSink.cpp</in>
         <in>WavSound.cpp</in>
       </df>
     </df>
@@ -49,7 +55,8 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <flagsDictionary>
-        <element flagsID="0" commonFlags="-funsigned-char -O3 -std=c++11 -fPIC"/>
+        <element flagsID="0"
+                 commonFlags="-mtune=generic -march=x86-64 -O3 -std=c++11 -funsigned-char -fPIC"/>
         <element flagsID="1" commonFlags="-std=c++11 -O3"/>
       </flagsDictionary>
       <codeAssistance>
@@ -57,17 +64,11 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE} debug=true</buildCommand>
+          <buildCommand>${MAKE} debug=true -j8</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
           <executablePath>tests/playwav/tests</executablePath>
           <ccTool>
             <standard>8</standard>
-            <incDir>
-              <pElem>.</pElem>
-            </incDir>
-            <preprocessorList>
-              <Elem>DEBUG</Elem>
-            </preprocessorList>
           </ccTool>
         </makeTool>
         <preBuild>
@@ -75,13 +76,80 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
-      <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="0">
+      <folder path="1">
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/include/utki</pElem>
+            <pElem>src/aumiks</pElem>
+            <pElem>/usr/include/audout</pElem>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/aumiks/Mixer.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/aumiks</pElem>
+            <pElem>/usr/include/utki</pElem>
+            <pElem>/usr/include/audout</pElem>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/aumiks/NullSource.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/aumiks</pElem>
+            <pElem>/usr/include/utki</pElem>
+            <pElem>/usr/include/audout</pElem>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/aumiks/Resampler.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/aumiks</pElem>
+            <pElem>/usr/include/utki</pElem>
+            <pElem>/usr/include/audout</pElem>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/aumiks/SpeakersSink.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/include/utki</pElem>
+            <pElem>/usr/include/nitki</pElem>
+            <pElem>/usr/include/audout/backend</pElem>
+            <pElem>src/aumiks</pElem>
+            <pElem>/usr/include/audout</pElem>
+            <pElem>/usr/include/pogodi</pElem>
+            <pElem>/usr/include/pulse</pElem>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
+          <incDir>
+            <pElem>/usr/include/utki</pElem>
+            <pElem>/usr/include/papki</pElem>
+            <pElem>src/aumiks</pElem>
+            <pElem>/usr/include/audout</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
-      </item>
-      <item path="src/aumiks/config.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tests/playparallel/main.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="1">
@@ -127,15 +195,21 @@
       </folder>
       <item path="src/aumiks/Frame.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/aumiks/Mixer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/aumiks/Mixer.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/aumiks/NullSource.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/aumiks/NullSource.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/aumiks/Resampler.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/aumiks/Resampler.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/aumiks/config.hpp" ex="false" tool="3" flavor2="0">
+      <item path="src/aumiks/SingleInputSource.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/aumiks/SpeakersSink.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/playwav/main.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">

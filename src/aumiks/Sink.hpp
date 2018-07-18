@@ -21,25 +21,7 @@ public:
 		throw Exc("Sink::Stop(): unsupported");
 	}
 	
-	virtual Input& input()noexcept = 0;
-};
-
-
-
-template <audout::Frame_e frame_type> class FramedSink : public Sink{
-protected:
-	FramedSink(){}
-	
-protected:
-	aumiks::FramedInput<frame_type> input_v;
-public:
-	constexpr static audout::Frame_e frameType() noexcept{
-		return frame_type;
-	}
-	
-	aumiks::Input& input()noexcept override{
-		return this->input_v;
-	}
+	Input input;
 };
 
 }

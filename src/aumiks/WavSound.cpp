@@ -18,23 +18,20 @@ template <class TSampleType, audout::Frame_e frame_type>
 {
 	std::vector<TSampleType> data;
 	
-
-	class Source : public aumiks::FramedSource<frame_type>{
-//		friend class WavSoundImpl;
-
+	class Source : public aumiks::Source{
 		const std::shared_ptr<const WavSoundImpl> wavSound;
 		
 		size_t curSmp = 0;
 	
 	public:
-		Source(const std::shared_ptr<const WavSoundImpl>& sound) :
-				wavSound(sound)
+		Source(std::shared_ptr<const WavSoundImpl> sound) :
+				wavSound(std::move(sound))
 		{
 			ASSERT(this->wavSound)
 		}
 
 	private:
-		bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept override{
+		bool fillSampleBuffer(utki::Buf<Frame> buf)noexcept override{
 			ASSERT(this->wavSound->data.size() % audout::AudioFormat::numChannels(frame_type) == 0)
 			ASSERT(this->curSmp % audout::AudioFormat::numChannels(frame_type) == 0)
 			
@@ -55,8 +52,12 @@ template <class TSampleType, audout::Frame_e frame_type>
 			
 			auto dst = buf.begin();
 			for(const TSampleType *src = startSmp; dst != buf.begin() + framesToCopy; ++dst){
-				for(unsigned i = 0; i != audout::AudioFormat::numChannels(frame_type); ++i, ++src){
+				unsigned i = 0;
+				for(; i != audout::AudioFormat::numChannels(frame_type); ++i, ++src){
 					dst->channel[i] = real(*src);
+				}
+				for(; i != audout::AudioFormat::numChannels(audout::Frame_e::STEREO); ++i){
+					dst->channel[i] = real(0);
 				}
 			}
 
@@ -77,9 +78,9 @@ private:
 			return src;
 		}
 		
-		auto resampler = std::make_shared<Resampler<frame_type>>();
+		auto resampler = std::make_shared<Resampler>();
 		
-		resampler->input().connect(std::move(src));
+		resampler->input.connect(std::move(src));
 		
 		resampler->setScale(this->frequency(), frequency);
 		
@@ -89,7 +90,7 @@ private:
 public:
 	//NOTE: assume that data in d is little-endian
 	WavSoundImpl(const utki::Buf<std::uint8_t> d, std::uint32_t frequency) :
-			WavSound(audout::AudioFormat::numChannels(frame_type), frequency)
+			WavSound(audout::AudioFormat::numChannels(audout::Frame_e::STEREO), frequency)
 	{
 		ASSERT(d.size() % (this->numChannels() * sizeof(TSampleType)) == 0)
 
