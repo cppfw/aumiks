@@ -13,16 +13,13 @@ using namespace aumiks;
 
 
 namespace{
-
-
-
 template <class TSampleType, audout::Frame_e frame_type>
 		class WavSoundImpl : public WavSound
 {
 	std::vector<TSampleType> data;
 	
 
-	class Source : public aumiks::FramedSource<std::int32_t, frame_type>{
+	class Source : public aumiks::FramedSource<frame_type>{
 //		friend class WavSoundImpl;
 
 		const std::shared_ptr<const WavSoundImpl> wavSound;
@@ -37,7 +34,7 @@ template <class TSampleType, audout::Frame_e frame_type>
 		}
 
 	private:
-		bool fillSampleBuffer(utki::Buf<Frame<std::int32_t, frame_type>> buf)noexcept override{
+		bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept override{
 			ASSERT(this->wavSound->data.size() % audout::AudioFormat::numChannels(frame_type) == 0)
 			ASSERT(this->curSmp % audout::AudioFormat::numChannels(frame_type) == 0)
 			
@@ -59,14 +56,14 @@ template <class TSampleType, audout::Frame_e frame_type>
 			auto dst = buf.begin();
 			for(const TSampleType *src = startSmp; dst != buf.begin() + framesToCopy; ++dst){
 				for(unsigned i = 0; i != audout::AudioFormat::numChannels(frame_type); ++i, ++src){
-					dst->channel[i] = std::int32_t(*src);
+					dst->channel[i] = real(*src);
 				}
 			}
 
 			//fill the rest with zeroes
 			for(; dst != buf.end(); ++dst){
 				for(auto& c : dst->channel){
-					c = 0;
+					c = real(0);
 				}
 			}
 			return false;
@@ -74,13 +71,13 @@ template <class TSampleType, audout::Frame_e frame_type>
 	};
 
 private:
-	std::shared_ptr<aumiks::Source<std::int32_t>> createSource(std::uint32_t frequency = 0)const override{
+	std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const override{
 		auto src = std::make_shared<Source>(this->sharedFromThis(this));
 		if(frequency == 0 || frequency == this->frequency()){
 			return src;
 		}
 		
-		auto resampler = std::make_shared<Resampler<std::int32_t, frame_type>>();
+		auto resampler = std::make_shared<Resampler<frame_type>>();
 		
 		resampler->input().connect(std::move(src));
 		
@@ -112,10 +109,7 @@ public:
 		}
 	}
 };
-
-
-
-}//~namespace
+}
 
 
 

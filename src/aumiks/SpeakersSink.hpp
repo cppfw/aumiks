@@ -8,12 +8,12 @@ namespace aumiks{
 
 //TODO: make singleton
 template <audout::Frame_e frame_type> class SpeakersSink :
-		public aumiks::FramedSink<std::int32_t, frame_type>,
+		public aumiks::FramedSink<frame_type>,
 		private audout::Listener
 {
 	std::uint32_t samplingRate_v;
 	
-	std::vector<Frame<std::int32_t, frame_type>> smpBuf;
+	std::vector<Frame<frame_type>> smpBuf;
 	
 	audout::Player player;
 
@@ -35,7 +35,7 @@ template <audout::Frame_e frame_type> class SpeakersSink :
 		for(; src != this->smpBuf.cend(); ++src){
 			for(unsigned i = 0; i != src->channel.size(); ++i, ++dst){
 				ASSERT(playBuf.overlaps(dst))
-				*dst = std::int16_t(utki::clampedRange(src->channel[i], -0x7fff, 0x7fff));
+				*dst = std::int16_t(utki::clampedRange(std::int32_t(src->channel[i]), -0x7fff, 0x7fff));
 			}
 		}
 		ASSERT(dst == playBuf.end())

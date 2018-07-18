@@ -6,7 +6,6 @@
         <in>Frame.hpp</in>
         <in>Mixer.hpp</in>
         <in>NullSource.hpp</in>
-        <in>Reframer.hpp</in>
         <in>Resampler.hpp</in>
         <in>WavSound.cpp</in>
       </df>
@@ -76,9 +75,13 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
+      <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
+      </item>
+      <item path="src/aumiks/config.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tests/playparallel/main.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="1">
@@ -124,13 +127,15 @@
       </folder>
       <item path="src/aumiks/Frame.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/aumiks/Mixer.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/aumiks/NullSource.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/aumiks/Reframer.hpp" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="src/aumiks/Resampler.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/aumiks/config.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tests/playwav/main.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">

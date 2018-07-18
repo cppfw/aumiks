@@ -10,7 +10,7 @@
 #include <cmath>
 
 
-class SineSource : public aumiks::FramedSource<float, audout::Frame_e::MONO>{
+class SineSource : public aumiks::FramedSource<audout::Frame_e::MONO>{
 	float t = 0;
 	
 	float limit;
@@ -21,7 +21,7 @@ public:
 			freq(freq)
 	{}
 	
-	bool fillSampleBuffer(utki::Buf<aumiks::Frame<float, audout::Frame_e::MONO> > buf)noexcept override{
+	bool fillSampleBuffer(utki::Buf<aumiks::Frame<audout::Frame_e::MONO> > buf)noexcept override{
 		for(auto d = buf.begin(), e = buf.end(); d != e; ++d){
 			d->channel[0] = 0xfff * std::sin(2 * utki::pi<float>() * this->t * this->freq);
 			this->t += 1 / 44100.0f;
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		auto mixer = std::make_shared<aumiks::FramedMixer<std::int32_t, sink.frameType()>>();
+		auto mixer = std::make_shared<aumiks::FramedMixer<sink.frameType()>>();
 		
 		std::shared_ptr<aumiks::Sound> snd1 = aumiks::WavSound::load("../samples/sample44100mono16.wav");
 		std::shared_ptr<aumiks::Sound> snd2 = aumiks::WavSound::load("../samples/ice_break.wav");

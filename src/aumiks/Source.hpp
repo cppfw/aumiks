@@ -9,11 +9,11 @@
 
 namespace aumiks{
 
-template <class T_Sample> class Input;
+class Input;
 
 //TODO: doxygen
-template<class T_Sample> class Source : virtual public utki::Shared{
-	template <class T> friend class Input;
+class Source : virtual public utki::Shared{
+	friend class Input;
 	
 	bool isConnected_v = false;
 	
@@ -22,10 +22,7 @@ protected:
 	Source& operator=(const Source&) = delete;
 	
 	Source(){}
-public:
-
-	typedef T_Sample Sample_t;
-	
+public:	
 	virtual ~Source()noexcept{}
 	
 	virtual audout::Frame_e frameType()const noexcept = 0;
@@ -38,20 +35,20 @@ private:
 
 };
 
-template <class T_Sample> class SingleInputSource : virtual public Source<T_Sample>{
+class SingleInputSource : virtual public Source{
 public:
-	virtual Input<T_Sample>& input() = 0;
+	virtual Input& input() = 0;
 };
 
 
-template <class T_Sample, audout::Frame_e frame_type> class FramedSource : virtual public Source<T_Sample>{
+template <audout::Frame_e frame_type> class FramedSource : virtual public Source{
 public:
 	FramedSource(const FramedSource&) = delete;
 	FramedSource& operator=(const FramedSource&) = delete;
 	
 	FramedSource(){}
 	
-	virtual bool fillSampleBuffer(utki::Buf<Frame<T_Sample, frame_type>> buf)noexcept = 0;
+	virtual bool fillSampleBuffer(utki::Buf<Frame<frame_type>> buf)noexcept = 0;
 	
 	audout::Frame_e frameType() const noexcept override{
 		return frame_type;
