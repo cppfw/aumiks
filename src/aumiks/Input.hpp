@@ -2,9 +2,8 @@
 
 #include <utki/SpinLock.hpp>
 
-#include <mutex>
-
 #include <type_traits>
+#include <mutex>
 
 #include "config.hpp"
 #include "Exc.hpp"
@@ -17,7 +16,7 @@ class Input{
 protected:
 	std::shared_ptr<Source> src;
 	
-	std::mutex mutex;
+	utki::SpinLock mutex;
 	
 	Input(){}
 public:
