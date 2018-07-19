@@ -1,3 +1,9 @@
+libaumiks (0.3.16) unstable; urgency=medium
+
+  * test release
+
+ -- Ivan Gagis <igagis@gmail.com>  Fri, 20 Jul 2018 00:11:28 +0300
+
 libaumiks (0.3.15) unstable; urgency=medium
 
   * fill buffer with silence if sink is not connected
