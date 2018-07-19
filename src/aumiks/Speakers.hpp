@@ -7,7 +7,7 @@
 namespace aumiks{
 
 //TODO: make singleton
-class SpeakersSink :
+class Speakers :
 		public aumiks::Sink,
 		private audout::Listener
 {
@@ -23,10 +23,10 @@ private:
 	audout::Player player;
 	
 public:
-	SpeakersSink(audout::SamplingRate_e samplingRate, std::uint16_t bufferSizeMillis = 100);
+	Speakers(audout::SamplingRate_e samplingRate, std::uint16_t bufferSizeMillis = 100);
 
-	SpeakersSink(const SpeakersSink&) = delete;
-	SpeakersSink& operator=(const SpeakersSink&) = delete;
+	Speakers(const Speakers&) = delete;
+	Speakers& operator=(const Speakers&) = delete;
 	
 	void start()override;
 

@@ -1,22 +1,22 @@
-#include "SpeakersSink.hpp"
+#include "Speakers.hpp"
 
 using namespace aumiks;
 
-void SpeakersSink::start() {
+void Speakers::start() {
 	this->player.setPaused(false);
 }
 
-void SpeakersSink::stop() {
+void Speakers::stop() {
 	this->player.setPaused(true);
 }
 
-SpeakersSink::SpeakersSink(audout::SamplingRate_e samplingRate, std::uint16_t bufferSizeMillis) :
+Speakers::Speakers(audout::SamplingRate_e samplingRate, std::uint16_t bufferSizeMillis) :
 		samplingRate(audout::AudioFormat(audout::Frame_e::STEREO, samplingRate).frequency()),
 		player(audout::AudioFormat(audout::Frame_e::STEREO, samplingRate), (this->samplingRate * bufferSizeMillis / 1000), this)
 {}
 
 
-void SpeakersSink::fillPlayBuf(utki::Buf<std::int16_t> playBuf) noexcept{
+void Speakers::fillPlayBuf(utki::Buf<std::int16_t> playBuf) noexcept{
 	ASSERT_INFO(
 			playBuf.size() % audout::AudioFormat::numChannels(audout::Frame_e::STEREO) == 0,
 			"playBuf.size = " << playBuf.size()

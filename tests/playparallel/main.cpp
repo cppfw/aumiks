@@ -1,6 +1,6 @@
 #include "../../src/aumiks/Mixer.hpp"
 #include "../../src/aumiks/WavSound.hpp"
-#include "../../src/aumiks/SpeakersSink.hpp"
+#include "../../src/aumiks/Speakers.hpp"
 #include "../../src/aumiks/NullSource.hpp"
 
 #include <utki/math.hpp>
@@ -35,7 +35,7 @@ public:
 int main(int argc, char *argv[]){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: mono 44100" << std::endl)
-		aumiks::SpeakersSink sink(audout::SamplingRate_e::HZ_44100);
+		aumiks::Speakers sink(audout::SamplingRate_e::HZ_44100);
 		
 		sink.start();
 		

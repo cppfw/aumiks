@@ -1,5 +1,5 @@
 #include "../../src/aumiks/WavSound.hpp"
-#include "../../src/aumiks/SpeakersSink.hpp"
+#include "../../src/aumiks/Speakers.hpp"
 
 #include <papki/FSFile.hpp>
 #include <nitki/Thread.hpp>
@@ -23,7 +23,7 @@
 
 int main(int argc, char *argv[]){
 	{
-		aumiks::SpeakersSink sink(audout::SamplingRate_e::HZ_22050);
+		aumiks::Speakers sink(audout::SamplingRate_e::HZ_22050);
 		
 		sink.start();
 		
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
 	}
 	
 	{
-		aumiks::SpeakersSink sink(audout::SamplingRate_e::HZ_22050);
+		aumiks::Speakers sink(audout::SamplingRate_e::HZ_22050);
 		
 		sink.start();
 		
