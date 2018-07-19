@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2C67AE0B1CC2716F00A552F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C67AE0A1CC2716F00A552F3 /* Assets.xcassets */; };
-		2CB98A301CC273BE00837278 /* WavSound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A2B1CC273BE00837278 /* WavSound.cpp */; };
 		2CB98A341CC273F300837278 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CB98A331CC273F300837278 /* main.cpp */; };
 		2CB98A381CC279A000837278 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CB98A371CC279A000837278 /* AudioToolbox.framework */; };
 		F871881F962F41191258570D /* libPods-tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5981E8232F07C5370BDD0BDC /* libPods-tests.a */; };
@@ -18,7 +17,6 @@
 		2C67ADFB1CC2716F00A552F3 /* tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tests.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C67AE0A1CC2716F00A552F3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2C67AE0F1CC2716F00A552F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2CB98A2B1CC273BE00837278 /* WavSound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WavSound.cpp; path = ../src/aumiks/WavSound.cpp; sourceTree = "<group>"; };
 		2CB98A331CC273F300837278 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../tests/playparallel/main.cpp; sourceTree = "<group>"; };
 		2CB98A371CC279A000837278 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		5981E8232F07C5370BDD0BDC /* libPods-tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,7 +49,6 @@
 		2C67ADF21CC2716F00A552F3 = {
 			isa = PBXGroup;
 			children = (
-				2CB98A261CC273A100837278 /* aumiks */,
 				2C67ADFD1CC2716F00A552F3 /* tests */,
 				2C67ADFC1CC2716F00A552F3 /* Products */,
 				EB244745AFCE927BD0A8AB23 /* Frameworks */,
@@ -83,14 +80,6 @@
 			children = (
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		2CB98A261CC273A100837278 /* aumiks */ = {
-			isa = PBXGroup;
-			children = (
-				2CB98A2B1CC273BE00837278 /* WavSound.cpp */,
-			);
-			name = aumiks;
 			sourceTree = "<group>";
 		};
 		EB244745AFCE927BD0A8AB23 /* Frameworks */ = {
@@ -221,7 +210,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CB98A301CC273BE00837278 /* WavSound.cpp in Sources */,
 				2CB98A341CC273F300837278 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

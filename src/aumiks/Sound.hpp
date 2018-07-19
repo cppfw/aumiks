@@ -22,7 +22,8 @@ public:
 	virtual ~Sound()noexcept{}
 
 	//TODO: doxygen
-	virtual std::shared_ptr<aumiks::Source<std::int32_t>> createSource(std::uint32_t frequency = 0)const = 0;
+	//TODO: make frequency real?
+	virtual std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const = 0;
 };
 
 }

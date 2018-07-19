@@ -1,5 +1,5 @@
 #include "../../src/aumiks/WavSound.hpp"
-#include "../../src/aumiks/SpeakersSink.hpp"
+#include "../../src/aumiks/Speakers.hpp"
 
 #include <papki/FSFile.hpp>
 #include <nitki/Thread.hpp>
@@ -23,35 +23,35 @@
 
 int main(int argc, char *argv[]){
 	{
-		aumiks::MonoSink sink(audout::SamplingRate_e::HZ_22050);
+		aumiks::Speakers sink(audout::SamplingRate_e::HZ_22050);
 		
 		sink.start();
 		
 		std::shared_ptr<aumiks::Sound> snd = aumiks::WavSound::load("../samples/sample44100stereo16.wav");
 		
-		auto src = snd->createSource(sink.samplingRate());
+		auto src = snd->createSource(sink.samplingRate);
 		
 		//test disconnect and connect again
-//		sink.input().connect(src);
-//		sink.input().disconnect();
-		sink.input().connect(src);
+//		sink.input.connect(src);
+//		sink.input.disconnect();
+		sink.input.connect(src);
 		
-		while(sink.input().isConnected()){
+		while(sink.input.isConnected()){
 			nitki::Thread::sleep(333);
 		}
 	}
 	
 	{
-		aumiks::StereoSink sink(audout::SamplingRate_e::HZ_22050);
+		aumiks::Speakers sink(audout::SamplingRate_e::HZ_22050);
 		
 		sink.start();
 		
 		std::shared_ptr<aumiks::Sound> snd = aumiks::WavSound::load("../samples/sample11025stereo16.wav");
 		
-		sink.input().connect(snd->createSource(sink.samplingRate()));
+		sink.input.connect(snd->createSource(sink.samplingRate));
 		
 		
-		while(sink.input().isConnected()){
+		while(sink.input.isConnected()){
 			nitki::Thread::sleep(333);
 		}
 	}

@@ -4,10 +4,15 @@
     <df root="src" name="0">
       <df name="aumiks">
         <in>Frame.hpp</in>
+        <in>Input.cpp</in>
+        <in>Mixer.cpp</in>
         <in>Mixer.hpp</in>
+        <in>NullSource.cpp</in>
         <in>NullSource.hpp</in>
-        <in>Reframer.hpp</in>
+        <in>Resampler.cpp</in>
         <in>Resampler.hpp</in>
+        <in>SingleInputSource.hpp</in>
+        <in>SpeakersSink.cpp</in>
         <in>WavSound.cpp</in>
       </df>
     </df>
@@ -58,7 +63,7 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE} debug=true</buildCommand>
+          <buildCommand>${MAKE} debug=true -j8</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
           <executablePath>tests/playwav/tests</executablePath>
           <ccTool>
@@ -76,6 +81,26 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
+      <item path="src/aumiks/Input.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="src/aumiks/Mixer.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="src/aumiks/NullSource.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="src/aumiks/Resampler.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="src/aumiks/SpeakersSink.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
       <item path="src/aumiks/WavSound.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
@@ -124,13 +149,21 @@
       </folder>
       <item path="src/aumiks/Frame.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/aumiks/Mixer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/aumiks/Mixer.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/aumiks/NullSource.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/aumiks/NullSource.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/aumiks/Reframer.hpp" ex="false" tool="3" flavor2="0">
+      <item path="src/aumiks/Resampler.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/aumiks/Resampler.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/aumiks/SingleInputSource.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/aumiks/SpeakersSink.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/playwav/main.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">

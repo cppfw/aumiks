@@ -1,6 +1,6 @@
 #include "../../src/aumiks/Mixer.hpp"
 #include "../../src/aumiks/WavSound.hpp"
-#include "../../src/aumiks/SpeakersSink.hpp"
+#include "../../src/aumiks/Speakers.hpp"
 #include "../../src/aumiks/NullSource.hpp"
 
 #include <utki/math.hpp>
@@ -10,7 +10,7 @@
 #include <cmath>
 
 
-class SineSource : public aumiks::FramedSource<float, audout::Frame_e::MONO>{
+class SineSource : public aumiks::Source{
 	float t = 0;
 	
 	float limit;
@@ -21,7 +21,7 @@ public:
 			freq(freq)
 	{}
 	
-	bool fillSampleBuffer(utki::Buf<aumiks::Frame<float, audout::Frame_e::MONO> > buf)noexcept override{
+	bool fillSampleBuffer(utki::Buf<aumiks::Frame> buf)noexcept override{
 		for(auto d = buf.begin(), e = buf.end(); d != e; ++d){
 			d->channel[0] = 0xfff * std::sin(2 * utki::pi<float>() * this->t * this->freq);
 			this->t += 1 / 44100.0f;
@@ -35,11 +35,11 @@ public:
 int main(int argc, char *argv[]){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: mono 44100" << std::endl)
-		aumiks::MonoSink sink(audout::SamplingRate_e::HZ_44100);
+		aumiks::Speakers sink(audout::SamplingRate_e::HZ_44100);
 		
 		sink.start();
 		
-		auto mixer = std::make_shared<aumiks::FramedMixer<std::int32_t, sink.frameType()>>();
+		auto mixer = std::make_shared<aumiks::Mixer>();
 		
 		std::shared_ptr<aumiks::Sound> snd1 = aumiks::WavSound::load("../samples/sample44100mono16.wav");
 		std::shared_ptr<aumiks::Sound> snd2 = aumiks::WavSound::load("../samples/ice_break.wav");
@@ -47,17 +47,17 @@ int main(int argc, char *argv[]){
 		ASSERT(snd1)
 		ASSERT(snd2)
 
-		mixer->connect(snd1->createSource(sink.samplingRate()));
-		mixer->connect(snd2->createSource(sink.samplingRate()));
+		mixer->connect(snd1->createSource(sink.samplingRate));
+		mixer->connect(snd2->createSource(sink.samplingRate));
 		mixer->connect(std::make_shared<SineSource>(6.0f, 440.0f));
 		mixer->connect(std::make_shared<SineSource>(10.0f, 220.0f));
 		
 //		mixer->setFinite(false);
 //		mixer->connect(std::make_shared<aumiks::NullSource<decltype(sink)::sinkFrameType()>>());
 		
-		sink.input().connect(mixer);
+		sink.input.connect(mixer);
 		
-		while(sink.input().isConnected()){
+		while(sink.input.isConnected()){
 			nitki::Thread::sleep(333);
 		}
 	}
