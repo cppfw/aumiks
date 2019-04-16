@@ -1,3 +1,9 @@
+libaumiks (0.3.19) unstable; urgency=medium
+
+  * deploy to bionic
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 16 Apr 2019 18:44:03 +0300
+
 libaumiks (0.3.18) unstable; urgency=medium
 
   * deploy to bionic
