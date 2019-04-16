@@ -1,163 +1,137 @@
+# build only master branch and version tags
 branches:
-  except:
-  - release
+  only:
+  - master
+  - /^\d*\.\d*\.\d*$/
 
 sudo: required
 
+services:
+- docker
+
+language: cpp
+dist: xenial
+os: linux
+
+addons:
+  apt:
+    sources:
+      - sourceline: 'deb http://dl.bintray.com/igagis/ubuntu xenial main'
+        key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x379CE192D401AB61'
+    update: true
+    packages:
+    - binfmt-support
+    - qemu-user-static
+    - myci
+
 matrix:
   include:
-    - os: osx
-      env: BUILD_NAME=macosx
+    - name: macosx
+      os: osx
       compiler: clang
-      language: cpp
-      osx_image: xcode7.3
-    - os: osx
-      env: BUILD_NAME=ios
+      osx_image: xcode8.3
+    - name: ios
+      os: osx
       compiler: clang
-      language: cpp
-      osx_image: xcode7.3
-    - os: linux
-      env: BUILD_NAME=debian
-      compiler: gcc
-      language: cpp
-      dist: trusty
-    - os: linux
-      env: BUILD_NAME=ubuntu
-      compiler: gcc
-      language: cpp
-      dist: trusty
-    - os: linux
-      env: BUILD_NAME=raspberry_pi
-      compiler: gcc
-      language: cpp
-      dist: trusty
-    - env: BUILD_NAME=android
+      osx_image: xcode8.3
+    - name: android
       language: android
-
-
-android:
-  components:
-    - platform-tools
-    - tools
-    - build-tools-26.0.2
-    - android-25
-#    - sys-img-armeabi-v7a-android-22
-    - extra-android-m2repository
+      android:
+        components:
+          - platform-tools
+          - tools
+          - build-tools-25.0.2
+          - android-25
+#          - sys-img-armeabi-v7a-android-22
+          - extra-android-m2repository
 
 
 env:
   global:
-  #encrypted MYCI_GIT_ACCESS_TOKEN for publishing to homebrew-tap and cocoapods-repo
+  # Encrypted MYCI_BINTRAY_API_KEY for publishing to bintray.
+  - secure: "uRzU7dQwYFqkpARm7a3hQy5iW4jIt7mhllsWGMmngz8/aEksr1X/PxvRaw8maHT2JB/dHRCvj1XKrM8GVs1lzXMfu2sAhYlfkqbd5GHF156evmkuQM5gyIEZqfX2B7/+UqXW6aHLvo4Ctp4A7rwoHrmeOIzz8oS4RpiaRbwgp4Nwx8INvuyEvs4k0g46aMBcNTDdXLAUTSMosI5uW5IzLTgZ8gnK5JQ6QG1CAynkFuF3FEmz6vFofMBnfwovEIWjiBLIn3p/W0bbtMRx37dR+oCkPcM7knf8kZAaeF6/CXUqgDimku2VrkhwLNnC1jxCR5Z6nk044wJdGYYQ8LuQoe9ctWqf7pJK5yvhIf3G0j4ik4q8XhmYUHmW5s0KK9UhV1u248O7ZKs8wZOpq1P17lPTzUBwAGKCklRqtvOptM3XdTQ/RSI1Vvp8v8z27gs8eN356/AQNjx6dgvzJEMPrpJUUgxSa5q/bYcX/wJY3J9bdfP2OOkzoppTneoBdI19KMTzh6p7bU4W/GsOeBqOYR8D6D4ceu0Qpsp7/XOYF7V67SvfdZKomSVcMezcX2BuLjCaEpZNEx+I6jBzmdQFKN+EFYnda0Rd4Ioqxh96DIwN0xI0NfZWvsEZvHcai2lxGWA3W3q5xQqkzlHbx5LQ8G0I7bdBxbzRniH7VOn+qHg="
+  # Encrypted MYCI_GIT_ACCESS_TOKEN for publishing to homebrew-tap and cocoapods-repo.
   - secure: "e5sTF/wTHyKZmcF/A5cd7RfLO3g9oeYpXBzgxvG5fTbBn8O/SXUR//qQ62Ij5qtaSK0fm8j6uYL/QG/0PLXMrny639xFKLWnujiSYgr3JclZZhE81DRGbTqopjyAY4T/C6XQKEevLsIplEWXLCqXlLNQrRrD8g3fqaWvE3nL+Cr0Df+MocvuzNh/OxrsBFt1xtVXrHc3VTo8qc0EejWYT8UGscSco874/ZaA4IGURjopITr4BCi6s848hkxVZcZeJYWXs20gXd5qAacMNB/4PvVLXqKcGoU2YABlU46pd4atkFaCgQTsegG+HST2vp3YUZnNi1oiaX8des/fU4V7CQxThEGNbXrfCPZNC11REfB5HKY+DcQeynBDMZwufIRUKOlVkHekEq2LBobfZfg8S2Gm8/ZZJS457jZx5pwZsWxhxkVqwJQwMnNNPmEMCvZqQzEADNJPKhps6juiwip+p1pMIMnr4KwEn6xiYwAfLBhc7/3KWOFCrsIi243kOat//2zIskRAf4EM9rZPRiXg/OS/XN7VyMwizOuHqnXUp61gR4fbWjouwRpCTlfZDnNdb3cE8o54VLcVumnGfTOX8q0xMy0hN5QRqRQ9DlGkQjwnK/DxTbdWxusXAzaGwn5ZmhhZ53B8tN/LdEH+Ep6opasl7bLKtBh99pnLjpDfL7o="
   - MYCI_GIT_USERNAME=igagis
   - USE_ANDROID_NDK_VERSION=15c
-  - linuxDependencies="lintian debhelper prorab prorab-extra myci doxygen libpapki-dev libaudout-dev"
+  - PACKAGE_NAME=aumiks
+  matrix:
+  - OS_REL=xenial OS=ubuntu DOCKER_IMAGE=$OS:$OS_REL PACKAGE_TYPE=deb
+  - OS_REL=bionic OS=ubuntu DOCKER_IMAGE=$OS:$OS_REL PACKAGE_TYPE=deb
+  - OS_REL=stretch OS=debian DOCKER_IMAGE=$OS:$OS_REL PACKAGE_TYPE=deb
+  - OS_REL=stretch OS=raspbian DOCKER_IMAGE=igagis/$OS:$OS_REL PACKAGE_TYPE=deb
 
 before_install:
-- if [ "$BUILD_NAME" == "macosx" ]; then
+- if [ "$TRAVIS_OS_NAME" == "linux" ] && [ -z "$TRAVIS_JOB_NAME" ]; then
+    docker run --name ccc -v $TRAVIS_BUILD_DIR/..:/build -w /build/$(basename $TRAVIS_BUILD_DIR) -it -d $DOCKER_IMAGE bash &&
+    if [ "$PACKAGE_TYPE" == "deb" ]; then
+      docker exec ccc apt update &&
+      docker exec ccc apt install -y dirmngr &&
+      docker exec ccc bash -c "echo 'deb http://dl.bintray.com/igagis/$OS $OS_REL main' > /etc/apt/sources.list.d/igagis.list" &&
+      docker exec ccc apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61 &&
+      docker exec ccc apt update &&
+      docker exec ccc apt install -y devscripts equivs myci &&
+      myci-deb-prepare.sh;
+    fi;
+  fi
+- if [ "$TRAVIS_JOB_NAME" == "macosx" ]; then
     rvm install ruby-2.3.3 &&
     rvm use ruby-2.3.3 &&
-    
+
     brew update > /dev/null &&
     brew tap igagis/tap &&
     brew update > /dev/null &&
     brew install myci prorab prorab-extra libpapki libaudout;
   fi
-- if [ "$BUILD_NAME" == "ios" ]; then
+- if [ "$TRAVIS_JOB_NAME" == "ios" ]; then
     rvm install ruby-2.3.3 &&
     rvm use ruby-2.3.3 &&
-    
+
     brew update > /dev/null &&
     brew tap igagis/tap &&
     brew update > /dev/null &&
     brew install myci &&
-    
+
     sudo gem install cocoapods &&
     pod repo add --silent igagis https://$MYCI_GIT_USERNAME:$MYCI_GIT_ACCESS_TOKEN@github.com/igagis/cocoapods-repo.git &&
     pod install --project-directory=ios;
   fi
-- if [ "$BUILD_NAME" == "android" ]; then
-    echo "deb [arch=amd64] https://dl.bintray.com/igagis/ubu unstable main" | sudo tee /etc/apt/sources.list.d/igagis.list > /dev/null &&
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61 &&
-    sudo apt-get update -qq &&
-    sudo apt-get install -qq myci;
+# download and install android NDK
+- if [ "$TRAVIS_JOB_NAME" == "android" ]; then
+    export TERM=dumb &&
+    curl -L https://dl.google.com/android/repository/android-ndk-r$USE_ANDROID_NDK_VERSION-linux-x86_64.zip -O &&
+    unzip ./android-ndk-r$USE_ANDROID_NDK_VERSION-linux-x86_64.zip > /dev/null &&
+    rm android-ndk-r$USE_ANDROID_NDK_VERSION-linux-x86_64.zip &&
+    export ANDROID_NDK_HOME=`pwd`/android-ndk-r$USE_ANDROID_NDK_VERSION &&
+    export LOCAL_ANDROID_NDK_HOME="$ANDROID_NDK_HOME" &&
+    export LOCAL_ANDROID_NDK_HOST_PLATFORM="linux-x86_64" &&
+    export PATH=$PATH:${ANDROID_NDK_HOME} &&
+    env;
   fi
-- if [ "$BUILD_NAME" == "debian" ]; then
-    echo "deb [arch=amd64] http://dl.bintray.com/igagis/ubu unstable main" | sudo tee /etc/apt/sources.list.d/igagis.list > /dev/null &&
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61 &&
-    sudo apt-get update -qq &&
-    sudo apt-get install -qq sbuild prorab prorab-extra myci debhelper &&
-    sudo sbuild-adduser $LOGNAME &&
-    echo lQHYBFfZDkYBBACyRm0LCwK/9rSzqSJyEBihVNA61meWp9MVjn3EBPp6MV1/mjZ80LPJ6ecYX6VMu861a5yQLnlA9krUxuHxjnsEYvMQiz0zHapp8Zqu0FIvcU1IWZV7Eio5Lej7QFeHFmtPlrSqT152lVUmQFW9ZCtWOOM1KnKBhoWWLf9z7LnwSwARAQABAAP/SWyYHKQ8TbPeWOCgPzpB6rBz0sfbgkE8vvQg+ErUnt8WEygAqQeMBO1BMNizzBbN3AqmQPvjFM5bo6cGB+cW4tbmWVtp8wMGVm8dobiZP3p1YLtvrweX3gYo1P4km8B7JkeJ0oyGa1k4yP5m4+o7t97EanKLFTFCbJvV/txT+YECAMLhKBMGJBqa8766tsyXbKaHQKvUDwlVCltAbeRb/V7cnIEuf/bn5DcN2O3yhN35OX5EvCeJxtCSBDh9HkQfK0cCAOowGoepffgLuuOfnpNU3GcHU9lNsLUnYJ17Oa38z1JGjggrUvQ5V6UbH0YY14vQXbrOVn+YE9Job9UCnM6DzN0B/19ZoYzH9anOf+nmTM56Rrk8itQXhN/gpI22EZ9n8koELvYrHj3iUgPJ+BOCKTP3E9brojEC048pK58GFJkr+/qjqbRgU2J1aWxkIFNpZ25lciAoU2J1aWxkIEJ1aWxkIERlcGVuZGVuY3kgQXJjaGl2ZSBLZXkpIDxidWlsZGQtdG9vbHMtZGV2ZWxAbGlzdHMuYWxpb3RoLmRlYmlhbi5vcmc+iLgEEwECACIFAlfZDkYCGy8GCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJELG4iKvjYvQgomAEAJzhmqIVxIU3+ROL0B8Q2Iv1gWRe6X17J1UQPYIGkRYcZWYUllWjmk32snT5Yv+x2TMVojD0JCCgltU0JBvydovItd+g6H+C8I/bhoq5twC9CIYGKmhDInxwCdHG8yU7AVdEopf38VsEC+3Hazh4V5sPldHMo9Lx6u5uXiil5qKi | base64 -d | sudo tee /var/lib/sbuild/apt-keys/sbuild-key.sec > /dev/null &&
-    echo mI0EV9kORgEEALJGbQsLAr/2tLOpInIQGKFU0DrWZ5an0xWOfcQE+noxXX+aNnzQs8np5xhfpUy7zrVrnJAueUD2StTG4fGOewRi8xCLPTMdqmnxmq7QUi9xTUhZlXsSKjkt6PtAV4cWa0+WtKpPXnaVVSZAVb1kK1Y44zUqcoGGhZYt/3PsufBLABEBAAG0YFNidWlsZCBTaWduZXIgKFNidWlsZCBCdWlsZCBEZXBlbmRlbmN5IEFyY2hpdmUgS2V5KSA8YnVpbGRkLXRvb2xzLWRldmVsQGxpc3RzLmFsaW90aC5kZWJpYW4ub3JnPoi4BBMBAgAiBQJX2Q5GAhsvBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRCxuIir42L0IKJgBACc4ZqiFcSFN/kTi9AfENiL9YFkXul9eydVED2CBpEWHGVmFJZVo5pN9rJ0+WL/sdkzFaIw9CQgoJbVNCQb8naLyLXfoOh/gvCP24aKubcAvQiGBipoQyJ8cAnRxvMlOwFXRKKX9/FbBAvtx2s4eFebD5XRzKPS8erubl4opeaiog== | base64 -d | sudo tee /var/lib/sbuild/apt-keys/sbuild-key.pub > /dev/null &&
-    sudo sbuild-createchroot --include=gnupg1,dirmngr,build-essential stretch /srv/chroot/deb-amd64 http://httpredir.debian.org/debian &&
-    echo "deb [trusted=yes] http://dl.bintray.com/igagis/deb unstable main" | sudo tee /srv/chroot/deb-amd64/etc/apt/sources.list.d/igagis.list > /dev/null &&
-    sudo chroot /srv/chroot/deb-amd64 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61 &&
-    sudo chroot /srv/chroot/deb-amd64 ln -s /usr/bin/gpg1 /usr/bin/gpg;
-  fi
-- if [ "$BUILD_NAME" == "ubuntu" ]; then
-    echo "deb [arch=amd64] http://dl.bintray.com/igagis/ubu unstable main" | sudo tee /etc/apt/sources.list.d/igagis.list > /dev/null &&
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61 &&
-    sudo apt-get update -qq &&
-    sudo apt-get install -qq sbuild prorab prorab-extra myci debhelper &&
-    sudo sbuild-adduser $LOGNAME &&
-    echo lQHYBFfZDkYBBACyRm0LCwK/9rSzqSJyEBihVNA61meWp9MVjn3EBPp6MV1/mjZ80LPJ6ecYX6VMu861a5yQLnlA9krUxuHxjnsEYvMQiz0zHapp8Zqu0FIvcU1IWZV7Eio5Lej7QFeHFmtPlrSqT152lVUmQFW9ZCtWOOM1KnKBhoWWLf9z7LnwSwARAQABAAP/SWyYHKQ8TbPeWOCgPzpB6rBz0sfbgkE8vvQg+ErUnt8WEygAqQeMBO1BMNizzBbN3AqmQPvjFM5bo6cGB+cW4tbmWVtp8wMGVm8dobiZP3p1YLtvrweX3gYo1P4km8B7JkeJ0oyGa1k4yP5m4+o7t97EanKLFTFCbJvV/txT+YECAMLhKBMGJBqa8766tsyXbKaHQKvUDwlVCltAbeRb/V7cnIEuf/bn5DcN2O3yhN35OX5EvCeJxtCSBDh9HkQfK0cCAOowGoepffgLuuOfnpNU3GcHU9lNsLUnYJ17Oa38z1JGjggrUvQ5V6UbH0YY14vQXbrOVn+YE9Job9UCnM6DzN0B/19ZoYzH9anOf+nmTM56Rrk8itQXhN/gpI22EZ9n8koELvYrHj3iUgPJ+BOCKTP3E9brojEC048pK58GFJkr+/qjqbRgU2J1aWxkIFNpZ25lciAoU2J1aWxkIEJ1aWxkIERlcGVuZGVuY3kgQXJjaGl2ZSBLZXkpIDxidWlsZGQtdG9vbHMtZGV2ZWxAbGlzdHMuYWxpb3RoLmRlYmlhbi5vcmc+iLgEEwECACIFAlfZDkYCGy8GCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJELG4iKvjYvQgomAEAJzhmqIVxIU3+ROL0B8Q2Iv1gWRe6X17J1UQPYIGkRYcZWYUllWjmk32snT5Yv+x2TMVojD0JCCgltU0JBvydovItd+g6H+C8I/bhoq5twC9CIYGKmhDInxwCdHG8yU7AVdEopf38VsEC+3Hazh4V5sPldHMo9Lx6u5uXiil5qKi | base64 -d | sudo tee /var/lib/sbuild/apt-keys/sbuild-key.sec > /dev/null &&
-    echo mI0EV9kORgEEALJGbQsLAr/2tLOpInIQGKFU0DrWZ5an0xWOfcQE+noxXX+aNnzQs8np5xhfpUy7zrVrnJAueUD2StTG4fGOewRi8xCLPTMdqmnxmq7QUi9xTUhZlXsSKjkt6PtAV4cWa0+WtKpPXnaVVSZAVb1kK1Y44zUqcoGGhZYt/3PsufBLABEBAAG0YFNidWlsZCBTaWduZXIgKFNidWlsZCBCdWlsZCBEZXBlbmRlbmN5IEFyY2hpdmUgS2V5KSA8YnVpbGRkLXRvb2xzLWRldmVsQGxpc3RzLmFsaW90aC5kZWJpYW4ub3JnPoi4BBMBAgAiBQJX2Q5GAhsvBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRCxuIir42L0IKJgBACc4ZqiFcSFN/kTi9AfENiL9YFkXul9eydVED2CBpEWHGVmFJZVo5pN9rJ0+WL/sdkzFaIw9CQgoJbVNCQb8naLyLXfoOh/gvCP24aKubcAvQiGBipoQyJ8cAnRxvMlOwFXRKKX9/FbBAvtx2s4eFebD5XRzKPS8erubl4opeaiog== | base64 -d | sudo tee /var/lib/sbuild/apt-keys/sbuild-key.pub > /dev/null &&
-    sudo sbuild-createchroot --include=gnupg,dirmngr,build-essential --components=main,universe xenial /srv/chroot/ubu-amd64 http://archive.ubuntu.com/ubuntu/ &&
-    echo "deb [trusted=yes] http://dl.bintray.com/igagis/ubu unstable main" | sudo tee /srv/chroot/ubu-amd64/etc/apt/sources.list.d/igagis.list > /dev/null &&
-    sudo chroot /srv/chroot/ubu-amd64 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61;
-  fi
-- if [ "$BUILD_NAME" == "raspberry_pi" ]; then
-    echo "deb [arch=amd64] http://dl.bintray.com/igagis/ubu unstable main" | sudo tee /etc/apt/sources.list.d/igagis.list > /dev/null &&
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61 &&
-    sudo apt-get update -qq &&
-    sudo apt-get install -qq myci &&
-    sudo myci-make-raspberry-chroot.sh /srv/chroot/rasp-armhf &&
-    echo "deb http://dl.bintray.com/igagis/rasp unstable main" | sudo tee /srv/chroot/rasp-armhf/etc/apt/sources.list.d/igagis.list > /dev/null &&
-    sudo chroot /srv/chroot/rasp-armhf apt-get update &&
-    sudo chroot /srv/chroot/rasp-armhf apt-get install --allow-unauthenticated -qq -y $linuxDependencies g++ &&
-    sudo mkdir -p /srv/chroot/rasp-armhf/build &&
-    sudo rsync -av $TRAVIS_BUILD_DIR/ /srv/chroot/rasp-armhf/build/;
+
+install:
+- if [ "$TRAVIS_OS_NAME" == "linux" ] && [ -z "$TRAVIS_JOB_NAME" ]; then
+    docker exec ccc myci-deb-install-build-deps.sh;
   fi
 
 before_script:
-  # download and install android NDK
-  - if [ "$BUILD_NAME" == "android" ]; then
-      export TERM=dumb &&
-      curl -L https://dl.google.com/android/repository/android-ndk-r$USE_ANDROID_NDK_VERSION-linux-x86_64.zip -O &&
-      unzip ./android-ndk-r$USE_ANDROID_NDK_VERSION-linux-x86_64.zip > /dev/null &&
-      rm android-ndk-r$USE_ANDROID_NDK_VERSION-linux-x86_64.zip &&
-      export ANDROID_NDK_HOME=`pwd`/android-ndk-r$USE_ANDROID_NDK_VERSION &&
-      export LOCAL_ANDROID_NDK_HOME="$ANDROID_NDK_HOME" &&
-      export LOCAL_ANDROID_NDK_HOST_PLATFORM="linux-x86_64" &&
-      export PATH=$PATH:${ANDROID_NDK_HOME} &&
-      env;
-    fi
-  - if [ "$BUILD_NAME" == "ios" ]; then
+  - if [ "$TRAVIS_JOB_NAME" == "ios" ]; then
       curl -L https://github.com/zackslash/Xcode-Proj-Adder/raw/master/bin/XcodeProjAdder -O &&
       chmod +x XcodeProjAdder &&
       (cd ios && ../XcodeProjAdder -XCP tests.xcodeproj -SCSV `echo $(find ../src -type f -name *.cpp) | sed -n -e 's/ /,/gp'`);
     fi
+
 script:
-- if [ "$BUILD_NAME" == "debian" ]; then
-    myci-deb-prepare.sh &&
-    sg sbuild -c "sbuild -A -d stretch-amd64-sbuild --run-lintian --debbuildopts '-us -uc'";
+- if [ "$TRAVIS_OS_NAME" == "linux" ] && [ -z "$TRAVIS_JOB_NAME" ]; then
+    docker exec ccc dpkg-buildpackage -us -uc;
   fi
-- if [ "$BUILD_NAME" == "ubuntu" ]; then
-    myci-deb-prepare.sh &&
-    sg sbuild -c "sbuild -A -d xenial-amd64-sbuild --debbuildopts '-us -uc'";
-  fi
-- if [ "$BUILD_NAME" == "macosx" ]; then
+- if [ "$TRAVIS_JOB_NAME" == "macosx" ]; then
     make;
   fi
-- if [ "$BUILD_NAME" == "ios" ]; then
+- if [ "$TRAVIS_JOB_NAME" == "ios" ]; then
     xcodebuild -workspace ios/tests.xcworkspace -scheme tests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO;
   fi
-- if [ "$BUILD_NAME" == "raspberry_pi" ]; then
-    sudo chroot /srv/chroot/rasp-armhf bash -c "cd /build && myci-deb-prepare.sh" &&
-    sudo chroot /srv/chroot/rasp-armhf bash -c "cd /build && dpkg-buildpackage -us -uc";
-  fi
-- if [ "$BUILD_NAME" == "android" ]; then
+- if [ "$TRAVIS_JOB_NAME" == "android" ]; then
     (cd android && ./gradlew build) &&
     myci-apply-version.sh -v `myci-deb-version.sh debian/changelog` android/*.pom.in &&
     myci-apply-version.sh -v `myci-deb-version.sh debian/changelog` android/*.aar.in --filename-only;
@@ -168,41 +142,17 @@ before_deploy:
   - myci-apply-version.sh -v `myci-deb-version.sh debian/changelog` travis_bintray_*.json.in
 
 deploy:
+- provider: script
+  skip_cleanup: true
+  on:
+    tags: true
+    condition: $PACKAGE_TYPE = deb && -z "$TRAVIS_JOB_NAME"
+  script: myci-deploy-debian-bintray.sh -u igagis -r $OS -p $PACKAGE_NAME -c main -d $OS_REL $TRAVIS_BUILD_DIR/../*.deb
 - provider: bintray
   skip_cleanup: true
   on:
     tags: true
-    condition: $BUILD_NAME = debian
-  file: travis_bintray_deb.json
-  user: igagis
-  key:
-    secure: "ClAQ9vIUw9heaB2dkYElOp0zzo8gAwOotWLv4HECbo6YwuRHhNnmWPvtMvuxz7SFupnhuAlmaRILFd7Wc50hGUvCHSW/eEerhVgUyjT0lyvVR+gAgnbOls5ORAgVkYr2Fz/TfsWSK9AKLG/qXL1YsF4vkDyDFRTkz9ZcoEo+WYMGNlj/g7b1rcHjSBOLfo3d6SGC7NL0w6kBH1PB+R3fH2yQxx6G8mOoJMowKK9FsosR/QnosS6CbI2d6PmHyJ5RRdOcPotBUCmK4tL+06zsGmxgoig8qhYr5YU0zRBillOTzDzqPsMC7GCxkJP3eTbbq8biOFxetY3IUrr25RsISjSaNFjzSxNB5yZtvEYClXKwqAOlUDsW63rpO2zb2iBDLPc5J3p1qtaMjFT8DMqtjfDufXEQuoWCuEc8CgMdln//kizGQC3F14Fr/fw7pWBRIxToNi42gSSzJnlKqkm3jvmS9lOWqBlMnR1DJEu4MqUajcCdLUDpHu/eqy8xMT2I3usRNzCcQRH86xngFPsT6px+UxVSLJ+i7i11SEDlWlpEzNTlrlYGtpGNvauAk/mFAaHjA7J0Njkql5C5Mx8Gc+OtUqT3BuuRuyL6EropfNluHfb3HQPE+Jax8Td1CpOO+H9T/+lTFsPxsnZGlEHKA5OwsC+cj1w4qhZSD+P15nU="
-  dry-run: false
-- provider: bintray
-  skip_cleanup: true
-  on:
-    tags: true
-    condition: $BUILD_NAME = ubuntu
-  file: travis_bintray_ubu.json
-  user: igagis
-  key:
-    secure: "ClAQ9vIUw9heaB2dkYElOp0zzo8gAwOotWLv4HECbo6YwuRHhNnmWPvtMvuxz7SFupnhuAlmaRILFd7Wc50hGUvCHSW/eEerhVgUyjT0lyvVR+gAgnbOls5ORAgVkYr2Fz/TfsWSK9AKLG/qXL1YsF4vkDyDFRTkz9ZcoEo+WYMGNlj/g7b1rcHjSBOLfo3d6SGC7NL0w6kBH1PB+R3fH2yQxx6G8mOoJMowKK9FsosR/QnosS6CbI2d6PmHyJ5RRdOcPotBUCmK4tL+06zsGmxgoig8qhYr5YU0zRBillOTzDzqPsMC7GCxkJP3eTbbq8biOFxetY3IUrr25RsISjSaNFjzSxNB5yZtvEYClXKwqAOlUDsW63rpO2zb2iBDLPc5J3p1qtaMjFT8DMqtjfDufXEQuoWCuEc8CgMdln//kizGQC3F14Fr/fw7pWBRIxToNi42gSSzJnlKqkm3jvmS9lOWqBlMnR1DJEu4MqUajcCdLUDpHu/eqy8xMT2I3usRNzCcQRH86xngFPsT6px+UxVSLJ+i7i11SEDlWlpEzNTlrlYGtpGNvauAk/mFAaHjA7J0Njkql5C5Mx8Gc+OtUqT3BuuRuyL6EropfNluHfb3HQPE+Jax8Td1CpOO+H9T/+lTFsPxsnZGlEHKA5OwsC+cj1w4qhZSD+P15nU="
-  dry-run: false
-- provider: bintray
-  skip_cleanup: true
-  on:
-    tags: true
-    condition: $BUILD_NAME = raspberry_pi
-  file: travis_bintray_rasp.json
-  user: igagis
-  key:
-    secure: "ClAQ9vIUw9heaB2dkYElOp0zzo8gAwOotWLv4HECbo6YwuRHhNnmWPvtMvuxz7SFupnhuAlmaRILFd7Wc50hGUvCHSW/eEerhVgUyjT0lyvVR+gAgnbOls5ORAgVkYr2Fz/TfsWSK9AKLG/qXL1YsF4vkDyDFRTkz9ZcoEo+WYMGNlj/g7b1rcHjSBOLfo3d6SGC7NL0w6kBH1PB+R3fH2yQxx6G8mOoJMowKK9FsosR/QnosS6CbI2d6PmHyJ5RRdOcPotBUCmK4tL+06zsGmxgoig8qhYr5YU0zRBillOTzDzqPsMC7GCxkJP3eTbbq8biOFxetY3IUrr25RsISjSaNFjzSxNB5yZtvEYClXKwqAOlUDsW63rpO2zb2iBDLPc5J3p1qtaMjFT8DMqtjfDufXEQuoWCuEc8CgMdln//kizGQC3F14Fr/fw7pWBRIxToNi42gSSzJnlKqkm3jvmS9lOWqBlMnR1DJEu4MqUajcCdLUDpHu/eqy8xMT2I3usRNzCcQRH86xngFPsT6px+UxVSLJ+i7i11SEDlWlpEzNTlrlYGtpGNvauAk/mFAaHjA7J0Njkql5C5Mx8Gc+OtUqT3BuuRuyL6EropfNluHfb3HQPE+Jax8Td1CpOO+H9T/+lTFsPxsnZGlEHKA5OwsC+cj1w4qhZSD+P15nU="
-  dry-run: false
-- provider: bintray
-  skip_cleanup: true
-  on:
-    tags: true
-    condition: $BUILD_NAME = android
+    condition: $TRAVIS_JOB_NAME = android
   file: travis_bintray_android.json
   user: igagis
   key:
@@ -213,11 +163,11 @@ deploy:
   script: myci-deploy-homebrew.sh -t igagis/tap
   on:
     tags: true
-    condition: $BUILD_NAME = macosx
+    condition: $TRAVIS_JOB_NAME = macosx
 - provider: script
   skip_cleanup: true
   script: rvm 2.3.3 do prorab-deploy-cocoapods.sh -r igagis
   on:
     tags: true
-    condition: $BUILD_NAME = ios
+    condition: $TRAVIS_JOB_NAME = ios
 
