@@ -1,4 +1,4 @@
-class Aumiks < Formula
+class Libaumiks < Formula
   desc "C++ cross-platform audio mixer library."
   homepage "https://github.com/igagis/aumiks"
   url "https://github.com/igagis/aumiks/archive/$(version).tar.gz"
@@ -9,7 +9,7 @@ class Aumiks < Formula
   depends_on "myci" => :build
   depends_on "libaudout"
   depends_on "libpapki"
-  
+
   def install
     ENV['PATH'] += ':/usr/local/bin'
     system "make", "-f", "src/makefile", "install", "PREFIX=#{prefix}"
