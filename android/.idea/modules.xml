@@ -6,8 +6,8 @@
       <module fileurl="file://$PROJECT_DIR$/android.iml" filepath="$PROJECT_DIR$/android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libaumiks/libaumiks.iml" filepath="$PROJECT_DIR$/libaumiks/libaumiks.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libaumiks/libaumiks.iml" filepath="$PROJECT_DIR$/libaumiks/libaumiks.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aumiks/aumiks.iml" filepath="$PROJECT_DIR$/aumiks/aumiks.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aumiks/aumiks.iml" filepath="$PROJECT_DIR$/aumiks/aumiks.iml" />
     </modules>
   </component>
 </project>

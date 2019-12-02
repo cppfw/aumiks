@@ -1,1 +1,1 @@
-include ':app', ':libaumiks'
+include ':app', ':aumiks'
