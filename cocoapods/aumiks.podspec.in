@@ -2,16 +2,19 @@ Pod::Spec.new do |s|
   s.name         = "aumiks"
   s.version      = "$(version)"
   s.summary      = "C++ cross-platform audio mixer library."
-  s.homepage     = "https://github.com/igagis/aumiks"
-  s.license      = 'MIT'
+  s.homepage     = "https://github.com/igagis/#{s.name}"
+  s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { "Ivan Gagis" => "igagis@gmail.com" }
-  s.platform     = :ios, "7.0"
-  
-  s.source = { :git => "https://github.com/igagis/aumiks.git", :tag => s.version }
+  s.platform     = :ios
+  s.ios.deployment_target = '8.0'
 
-  s.source_files  = "src/**/*.{hpp,cpp}"
-  s.header_mappings_dir = "src"
+  s.source = { :http => "https://dl.bintray.com/igagis/cocoapods/#{s.name}/#{s.version}/#{s.name}-#{s.version}.zip" }
 
-  s.dependency 'libaudout', '>= 0.3.2'
-  s.dependency 'libpapki', '>= 1.0.9'
+  s.source_files  = "include/**/*.{hpp,h}"
+  s.header_mappings_dir = "include"
+
+  s.ios.vendored_library = "lib/ios/lib#{s.name}.a"
+
+  s.dependency 'utki', '>= 1.1.30'
+  s.dependency 'papki', '>= 1.0.9'
 end
