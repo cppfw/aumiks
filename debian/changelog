@@ -1,3 +1,9 @@
+libaumiks (0.3.20) unstable; urgency=medium
+
+  * debian buster
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 05 Dec 2019 16:41:21 +0200
+
 libaumiks (0.3.19) unstable; urgency=medium
 
   * deploy to bionic
