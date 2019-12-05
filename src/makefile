@@ -32,7 +32,7 @@ ifeq ($(prorab_os), linux)
     this_cxxflags += -fPIC
     this_ldlibs += -lpthread
 else ifeq ($(prorab_os), windows)
-    this_ldlibs +=
+    this_ldlibs += -lstdc++ -lnitki -lpogodi -ldsound -laudout
 else ifeq ($(prorab_os), macosx)
     this_cxxflags += -stdlib=libc++ # this is needed to be able to use c++11 std lib
     this_ldlibs += -lc++
