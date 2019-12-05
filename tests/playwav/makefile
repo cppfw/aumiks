@@ -20,15 +20,7 @@ ifeq ($(debug), true)
 endif
 
 ifeq ($(prorab_os),windows)
-#    this_ldlibs += -lmingw32 #these should go first, otherwise linker will complain about undefined reference to WinMain
-#    this_ldlibs += $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension)
-#    this_ldflags += -L/usr/lib -L/usr/local/lib
-#    this_ldlibs +=  -lglew32 -lopengl32 -lpng -ljpeg -lz -lfreetype -mwindows
-
-#    this_cxxflags += -I/usr/include -I/usr/local/include
-
-    #WORKAROUND for MinGW bug:
-#    this_cxxflags += -D__STDC_FORMAT_MACROS
+#    this_ldlibs += $(d)../../src/libaumiks$(prorab_lib_extension)
 else ifeq ($(prorab_os),macosx)
      this_ldlibs += -framework AudioUnit
 else ifeq ($(prorab_os),linux)

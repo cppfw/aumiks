@@ -32,19 +32,10 @@ ifeq ($(prorab_os), linux)
     this_cxxflags += -fPIC
     this_ldlibs += -lpthread
 else ifeq ($(prorab_os), windows)
-    this_cxxflags += -Wno-format #due to bugs in some g++ versions it warns about format when not needed, so disable format warnings
-    this_cxxflags += -I/usr/include -I/usr/local/include/
-    this_ldflags += -L/usr/local/lib -L/usr/lib
-
-    #NOTE: order matters in MinGW, libs referenced by other libs should go after those libs which reference them.
-    this_ldlibs += #-lfreetype -lstob -ljpeg -lpng -lz -lopengl32 -lglew32 -lgdi32
-
-    #WORKAROUND for MinGW bug:
-    #this_cxxflags += -D__STDC_FORMAT_MACROS
+    this_ldlibs +=
 else ifeq ($(prorab_os), macosx)
-    this_cxxflags += -stdlib=libc++ #this is needed to be able to use c++11 std lib
+    this_cxxflags += -stdlib=libc++ # this is needed to be able to use c++11 std lib
     this_ldlibs += -lc++
-    #this_ldlibs += -framework Cocoa -framework OpenGL -lpng -lfreetype -ljpeg -lstob -lGLEW
 endif
 
 this_ldlibs += -lpapki
