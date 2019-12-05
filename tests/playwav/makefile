@@ -31,6 +31,7 @@ this_ldlibs += $(abspath $(d)../../src/libaumiks$(prorab_lib_extension))
 
 this_ldlibs += -lpogodi -lnitki -laudout -lpapki -lstdc++
 
+this_no_install := true
 
 $(eval $(prorab-build-app))
 
