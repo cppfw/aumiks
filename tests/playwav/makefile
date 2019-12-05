@@ -8,9 +8,9 @@ this_srcs := main.cpp
 
 
 this_cxxflags += -Wall
-this_cxxflags += -Wno-comment #no warnings on nested comments
+this_cxxflags += -Wno-comment # no warnings on nested comments
 this_cxxflags += -Werror
-this_cxxflags += -fstrict-aliasing #strict aliasing!!!
+this_cxxflags += -fstrict-aliasing # strict aliasing!!!
 this_cxxflags += -g
 this_cxxflags += -std=c++11
 this_cxxflags += -O3
@@ -20,14 +20,14 @@ ifeq ($(debug), true)
 endif
 
 ifeq ($(prorab_os),windows)
-#    this_ldlibs += $(d)../../src/libaumiks$(prorab_lib_extension)
+    this_ldlibs += $(d)../../src/libaumiks$(soext)
 else ifeq ($(prorab_os),macosx)
-     this_ldlibs += -framework AudioUnit
+    this_ldlibs += -framework AudioUnit
 else ifeq ($(prorab_os),linux)
     this_ldlibs += -lpthread -lpulse-simple -lpulse
 endif
 
-this_ldlibs += $(abspath $(d)../../src/libaumiks$(prorab_lib_extension))
+this_ldlibs += $(abspath $(d)../../src/libaumiks$(soext))
 
 this_ldlibs += -lpogodi -lnitki -laudout -lpapki -lstdc++
 
@@ -39,25 +39,25 @@ $(eval $(prorab-build-app))
 define this_rules
 test:: $(prorab_this_name)
 	@echo running $$^...
-	@(cd $(prorab_this_dir); LD_LIBRARY_PATH=../../src $$^)
+	@(cd $(d); LD_LIBRARY_PATH=../../src $$^)
 endef
 $(eval $(this_rules))
 
 
-#add dependency on libaumiks
+# add dependency on libaumiks
 ifeq ($(prorab_os),windows)
-    $(d)libaumiks$(prorab_lib_extension): $(abspath $(prorab_this_dir)../../src/libaumiks$(prorab_lib_extension))
+    $(d)libaumiks$(soext): $(abspath $(d)../../src/libaumiks$(soext))
 	@cp $< $@
 
-    $(prorab_this_name): $(d)libaumiks$(prorab_lib_extension)
+    $(prorab_this_name): $(d)libaumiks$(soext)
 
     define this_rules
         clean::
-		@rm -f $(prorab_this_dir)libaumiks$(prorab_lib_extension)
+		@rm -f $(d)libaumiks$(soext)
     endef
     $(eval $(this_rules))
 else
-    $(prorab_this_name): $(abspath $(d)../../src/libaumiks$(prorab_lib_extension))
+    $(prorab_this_name): $(abspath $(d)../../src/libaumiks$(soext))
 endif
 
 
