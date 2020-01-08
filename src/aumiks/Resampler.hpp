@@ -35,7 +35,7 @@ private:
 	std::vector<Frame> tmpBuf;
 	Frame lastFrameForUpsampling;
 	
-	bool fillSampleBuffer(utki::Buf<Frame> buf)noexcept override;
+	bool fillSampleBuffer(utki::span<Frame> buf)noexcept override;
 };
 
 }

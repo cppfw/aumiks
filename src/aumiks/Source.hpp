@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utki/Shared.hpp>
-#include <utki/Buf.hpp>
+#include <utki/shared.hpp>
+#include <utki/span.hpp>
 
 #include <audout/AudioFormat.hpp>
 
@@ -10,7 +10,7 @@
 namespace aumiks{
 
 //TODO: doxygen
-class Source : virtual public utki::Shared{
+class Source : virtual public utki::shared{
 	friend class Input;
 	
 	bool isConnected_v = false;
@@ -21,7 +21,7 @@ protected:
 	
 	Source(){}
 	
-	virtual bool fillSampleBuffer(utki::Buf<Frame> buf)noexcept = 0;
+	virtual bool fillSampleBuffer(utki::span<Frame> buf)noexcept = 0;
 public:	
 	virtual ~Source()noexcept{}
 	

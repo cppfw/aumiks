@@ -14,7 +14,7 @@ class Speakers :
 	std::vector<Frame> smpBuf;
 
 	//this function is not thread-safe, but it is supposed to be called from special audio thread
-	void fillPlayBuf(utki::Buf<std::int16_t> playBuf)noexcept override;
+	void fillPlayBuf(utki::span<std::int16_t> playBuf)noexcept override;
 	
 public:
 	const std::uint32_t samplingRate;

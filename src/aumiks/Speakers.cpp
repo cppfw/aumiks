@@ -16,7 +16,7 @@ Speakers::Speakers(audout::SamplingRate_e samplingRate, std::uint16_t bufferSize
 {}
 
 
-void Speakers::fillPlayBuf(utki::Buf<std::int16_t> playBuf) noexcept{
+void Speakers::fillPlayBuf(utki::span<std::int16_t> playBuf) noexcept{
 	ASSERT_INFO(
 			playBuf.size() % audout::AudioFormat::numChannels(audout::Frame_e::STEREO) == 0,
 			"playBuf.size = " << playBuf.size()
@@ -24,7 +24,7 @@ void Speakers::fillPlayBuf(utki::Buf<std::int16_t> playBuf) noexcept{
 		)
 	this->smpBuf.resize(playBuf.size() / audout::AudioFormat::numChannels(audout::Frame_e::STEREO));
 
-	if (this->input.fillSampleBuffer(utki::wrapBuf(this->smpBuf))) {
+	if (this->input.fillSampleBuffer(utki::make_span(this->smpBuf))) {
 		this->input.disconnect();
 	}
 

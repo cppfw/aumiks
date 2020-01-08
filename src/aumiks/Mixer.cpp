@@ -8,7 +8,7 @@ void Mixer::connect(std::shared_ptr<Source> source) {
 	this->inputsToAdd.back().connect(std::move(source));
 }
 
-bool Mixer::fillSampleBuffer(utki::Buf<Frame> buf) noexcept{
+bool Mixer::fillSampleBuffer(utki::span<Frame> buf) noexcept{
 	{
 		std::lock_guard<decltype(this->spinLock) > guard(this->spinLock);
 		this->inputs.splice(this->inputs.end(), this->inputsToAdd);
@@ -23,7 +23,7 @@ bool Mixer::fillSampleBuffer(utki::Buf<Frame> buf) noexcept{
 	}
 
 	for (auto i = this->inputs.begin(); i != this->inputs.end();) {
-		if (i->fillSampleBuffer(utki::wrapBuf(this->tmpBuf))) {
+		if (i->fillSampleBuffer(utki::make_span(this->tmpBuf))) {
 			i = this->inputs.erase(i);
 		} else {
 			++i;

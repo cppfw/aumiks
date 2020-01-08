@@ -14,7 +14,7 @@ namespace aumiks{
  * A sound object is an object which holds all the initial data required to play a particular sound.
  * Sound object is normally used to create instances of a source to play that sound.
  */
-class Sound : virtual public utki::Shared{
+class Sound : virtual public utki::shared{
 protected:
 	Sound(){}
 public:

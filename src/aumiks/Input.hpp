@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utki/SpinLock.hpp>
+#include <utki/spin_lock.hpp>
 
 #include <type_traits>
 #include <mutex>
@@ -18,7 +18,7 @@ protected:
 	
 	std::shared_ptr<Source> srcInUse;
 	
-	utki::SpinLock mutex;
+	utki::spin_lock mutex;
 	
 public:
 	Input(){}
@@ -33,7 +33,7 @@ public:
 		return this->src.get() != nullptr;
 	}
 
-	bool fillSampleBuffer(utki::Buf<Frame> buf)noexcept;	
+	bool fillSampleBuffer(utki::span<Frame> buf)noexcept;	
 };
 
 }

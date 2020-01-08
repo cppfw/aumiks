@@ -2,7 +2,7 @@
 
 using namespace aumiks;
 
-bool Resampler::fillSampleBuffer(utki::Buf<Frame> buf) noexcept{
+bool Resampler::fillSampleBuffer(utki::span<Frame> buf) noexcept{
 	ASSERT(this->step > 0) //if step is 0 then there will be infinite loop
 
 			//variable step can be changed from another thread, so copy it here
@@ -24,7 +24,7 @@ bool Resampler::fillSampleBuffer(utki::Buf<Frame> buf) noexcept{
 		this->tmpBuf.resize((buf.size()) * DScale / s);
 	}
 
-	bool ret = this->input.fillSampleBuffer(utki::wrapBuf(this->tmpBuf));
+	bool ret = this->input.fillSampleBuffer(utki::make_span(this->tmpBuf));
 
 	auto src = this->tmpBuf.cbegin();
 	for (; dst != buf.end(); ++src) {

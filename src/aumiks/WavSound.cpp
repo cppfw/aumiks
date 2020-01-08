@@ -1,6 +1,6 @@
 #include <papki/FSFile.hpp>
 
-#include <utki/Shared.hpp>
+#include <utki/shared.hpp>
 
 #include "Exc.hpp"
 #include "WavSound.hpp"
@@ -31,7 +31,7 @@ template <class TSampleType, audout::Frame_e frame_type>
 		}
 
 	private:
-		bool fillSampleBuffer(utki::Buf<Frame> buf)noexcept override{
+		bool fillSampleBuffer(utki::span<Frame> buf)noexcept override{
 			ASSERT(this->wavSound->data.size() % audout::AudioFormat::numChannels(frame_type) == 0)
 			ASSERT(this->curSmp % audout::AudioFormat::numChannels(frame_type) == 0)
 			
@@ -89,7 +89,7 @@ private:
 	
 public:
 	//NOTE: assume that data in d is little-endian
-	WavSoundImpl(const utki::Buf<std::uint8_t> d, std::uint32_t frequency) :
+	WavSoundImpl(const utki::span<std::uint8_t> d, std::uint32_t frequency) :
 			WavSound(audout::AudioFormat::numChannels(audout::Frame_e::STEREO), frequency)
 	{
 		ASSERT(d.size() % (this->numChannels * sizeof(TSampleType)) == 0)
@@ -121,13 +121,13 @@ std::shared_ptr<WavSound> WavSound::load(const std::string& fileName){
 
 
 
-std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
+std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 	papki::File::Guard fileGuard(fi, papki::File::E_Mode::READ);//make sure we close the file even in case of exception is thrown
 
 	//Start reading Wav-file header
 	{
 		std::array<std::uint8_t, 4> riff;
-		fi.read(utki::wrapBuf(riff));//Read 'RIFF' signature
+		fi.read(utki::make_span(riff));//Read 'RIFF' signature
 		if(std::string(reinterpret_cast<char*>(&*riff.begin()), riff.size()) != "RIFF"){
 			throw Exc("WavSound::LoadWAV(): 'RIFF' signature not found");
 		}
@@ -137,7 +137,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 
 	{
 		std::array<std::uint8_t, 4> wave;
-		fi.read(utki::wrapBuf(wave));//Read 'WAVE' signature
+		fi.read(utki::make_span(wave));//Read 'WAVE' signature
 		if(std::string(reinterpret_cast<char*>(&*wave.begin()), wave.size()) != "WAVE"){
 			throw Exc("WavSound::LoadWAV(): 'WAVE' signature not found");
 		}
@@ -145,7 +145,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 
 	{
 		std::array<std::uint8_t, 4> fmt;
-		fi.read(utki::wrapBuf(fmt));//Read 'fmt ' signature
+		fi.read(utki::make_span(fmt));//Read 'fmt ' signature
 		if(std::string(reinterpret_cast<char*>(&*fmt.begin()), fmt.size()) != "fmt "){
 			throw Exc("WavSound::LoadWAV(): 'fmt ' signature not found");
 		}
@@ -156,8 +156,8 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 	unsigned chans;
 	{
 		std::array<std::uint8_t, 4> pcmBuf;
-		fi.read(utki::wrapBuf(pcmBuf));
-		std::uint32_t pcm = utki::deserialize32LE(&*pcmBuf.begin());
+		fi.read(utki::make_span(pcmBuf));
+		std::uint32_t pcm = utki::deserialize32le(&*pcmBuf.begin());
 		if((pcm & 0x0000ffff) != 1){//Low word indicates whether the file is in PCM format
 			throw Exc("C_PCM_NonStreamedSound::LoadWAV(): not a PCM format, only PCM format is supported");
 		}
@@ -173,8 +173,8 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 	std::uint32_t frequency;
 	{
 		std::array<std::uint8_t, 4> buf;
-		fi.read(utki::wrapBuf(buf));
-		frequency = utki::deserialize32LE(&*buf.begin());
+		fi.read(utki::make_span(buf));
+		frequency = utki::deserialize32le(&*buf.begin());
 	}
 
 	fi.seekForward(4);//Playback speed (freq * PCMSampleSize). We don't need this info.
@@ -182,14 +182,14 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 	std::uint32_t bitDepth;
 	{
 		std::array<std::uint8_t, 4> buf;
-		fi.read(utki::wrapBuf(buf));
-		bitDepth = utki::deserialize32LE(&*buf.begin());
+		fi.read(utki::make_span(buf));
+		bitDepth = utki::deserialize32le(&*buf.begin());
 		bitDepth >>= 16;//High word contains the sound bit depth
 	}
 
 	{
 		std::array<std::uint8_t, 4> data;
-		fi.read(utki::wrapBuf(data));//Read 'data' signature
+		fi.read(utki::make_span(data));//Read 'data' signature
 		if(std::string(reinterpret_cast<char*>(&*data.begin()), data.size()) != "data"){
 			throw Exc("WavSound::LoadWAV(): 'data' signature not found");
 		}
@@ -198,14 +198,14 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 	std::uint32_t dataSize;
 	{
 		std::array<std::uint8_t, 4> buf;
-		fi.read(utki::wrapBuf(buf));//read the size of the sound data
-		dataSize = utki::deserialize32LE(&*buf.begin());
+		fi.read(utki::make_span(buf));//read the size of the sound data
+		dataSize = utki::deserialize32le(&*buf.begin());
 	}
 	
 	//read in the sound data
 	std::vector<std::uint8_t> data(dataSize);
 	{
-		auto bytesRead = fi.read(utki::wrapBuf(data));//Load Sound data
+		auto bytesRead = fi.read(utki::make_span(data));//Load Sound data
 
 		if(bytesRead != size_t(dataSize)){
 			throw Exc("WavSound::LoadWAV(): sound data size is incorrect");
@@ -227,10 +227,10 @@ std::shared_ptr<WavSound> WavSound::load(papki::File& fi){
 		//set the format
 		switch(chans){
 			case 1://mono
-				ret = std::make_shared<WavSoundImpl<std::int16_t, audout::Frame_e::MONO>>(utki::wrapBuf(data), frequency);
+				ret = std::make_shared<WavSoundImpl<std::int16_t, audout::Frame_e::MONO>>(utki::make_span(data), frequency);
 				break;
 			case 2://stereo
-				ret = std::make_shared<WavSoundImpl<std::int16_t, audout::Frame_e::STEREO>>(utki::wrapBuf(data), frequency);
+				ret = std::make_shared<WavSoundImpl<std::int16_t, audout::Frame_e::STEREO>>(utki::make_span(data), frequency);
 				break;
 			default:
 				throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");

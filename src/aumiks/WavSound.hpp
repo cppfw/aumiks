@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <papki/File.hpp>
+#include <papki/file.hpp>
 
 #include "Sound.hpp"
 
@@ -20,7 +20,7 @@ protected:
 
 public:
 	static std::shared_ptr<WavSound> load(const std::string& fileName);
-	static std::shared_ptr<WavSound> load(papki::File& fi);
+	static std::shared_ptr<WavSound> load(papki::file& fi);
 };
 
 }

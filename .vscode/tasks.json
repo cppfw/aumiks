@@ -6,7 +6,7 @@
 		{
 			"label": "build",
 			"type": "shell",
-			"command": "make aj=t",
+			"command": "make autojobs=true",
 			"problemMatcher": [
 				"$gcc"
 			]

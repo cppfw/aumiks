@@ -5,14 +5,14 @@
 
 #include <list>
 
-#include <utki/SpinLock.hpp>
+#include <utki/spin_lock.hpp>
 
 namespace aumiks{
 
 class Mixer : virtual public Source{
 	volatile bool isFinite_v = true;
 	
-	utki::SpinLock spinLock;
+	utki::spin_lock spinLock;
 	
 	std::list<Input> inputs;
 	
@@ -32,7 +32,7 @@ public:
 	}
 	
 protected:
-	bool fillSampleBuffer(utki::Buf<Frame> buf)noexcept override;
+	bool fillSampleBuffer(utki::span<Frame> buf)noexcept override;
 };
 
 
