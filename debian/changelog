@@ -1,3 +1,9 @@
+libaumiks (0.3.21) unstable; urgency=medium
+
+  * update to libs
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 09 Jan 2020 01:02:01 +0200
+
 libaumiks (0.3.20) unstable; urgency=medium
 
   * debian buster
