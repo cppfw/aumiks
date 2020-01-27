@@ -10,19 +10,19 @@ void Speakers::stop() {
 	this->player.set_paused(true);
 }
 
-Speakers::Speakers(audout::sampling_rate samplingRate, uint16_t bufferSizeMillis) :
-		samplingRate(audout::format(audout::frame_type::stereo, samplingRate).frequency()),
-		player(audout::format(audout::frame_type::stereo, samplingRate), (this->samplingRate * bufferSizeMillis / 1000), this)
+Speakers::Speakers(audout::rate samplingRate, uint16_t bufferSizeMillis) :
+		samplingRate(audout::format(audout::frame::stereo, samplingRate).frequency()),
+		player(audout::format(audout::frame::stereo, samplingRate), (this->samplingRate * bufferSizeMillis / 1000), this)
 {}
 
 
 void Speakers::fill(utki::span<std::int16_t> playBuf) noexcept{
 	ASSERT_INFO(
-			playBuf.size() % audout::AudioFormat::numChannels(audout::frame_type::stereo) == 0,
+			playBuf.size() % audout::AudioFormat::numChannels(audout::frame::stereo) == 0,
 			"playBuf.size = " << playBuf.size()
-			<< "numChannels = " << audout::AudioFormat::numChannels(audout::frame_type::stereo)
+			<< "numChannels = " << audout::AudioFormat::numChannels(audout::frame::stereo)
 		)
-	this->smpBuf.resize(playBuf.size() / audout::format::num_channels(audout::frame_type::stereo));
+	this->smpBuf.resize(playBuf.size() / audout::num_channels(audout::frame::stereo));
 
 	if (this->input.fillSampleBuffer(utki::make_span(this->smpBuf))) {
 		this->input.disconnect();

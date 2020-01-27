@@ -30,12 +30,10 @@ public:
 	}
 };
 
-
-
 int main(int argc, char *argv[]){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: mono 44100" << std::endl)
-		aumiks::Speakers sink(audout::sampling_rate::hz44100);
+		aumiks::Speakers sink(audout::rate::hz44100);
 		
 		sink.start();
 		

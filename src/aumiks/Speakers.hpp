@@ -23,7 +23,7 @@ private:
 	audout::player player;
 	
 public:
-	Speakers(audout::sampling_rate samplingRate, uint16_t bufferSizeMillis = 100);
+	Speakers(audout::rate samplingRate, uint16_t bufferSizeMillis = 100);
 
 	Speakers(const Speakers&) = delete;
 	Speakers& operator=(const Speakers&) = delete;
