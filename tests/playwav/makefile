@@ -29,7 +29,7 @@ endif
 
 this_ldlibs += $(abspath $(d)../../src/libaumiks$(soext))
 
-this_ldlibs += -lpogodi -lnitki -laudout -lpapki -lstdc++
+this_ldlibs += -laudout -lpapki -lstdc++
 
 this_no_install := true
 
