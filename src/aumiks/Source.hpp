@@ -3,7 +3,7 @@
 #include <utki/shared.hpp>
 #include <utki/span.hpp>
 
-#include <audout/AudioFormat.hpp>
+#include <audout/format.hpp>
 
 #include "Frame.hpp"
 

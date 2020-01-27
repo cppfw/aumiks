@@ -1,6 +1,6 @@
 #pragma once
 
-#include <audout/AudioFormat.hpp>
+#include <audout/format.hpp>
 
 #include <array>
 
@@ -11,7 +11,7 @@
 namespace aumiks{
 
 struct Frame{
-	std::array<real, audout::AudioFormat::numChannels(audout::Frame_e::STEREO)> channel;
+	std::array<real, audout::format::num_channels(audout::frame_type::stereo)> channel;
 	
 	void add(const Frame& f){
 		ASSERT(this->channel.size() == f.channel.size())

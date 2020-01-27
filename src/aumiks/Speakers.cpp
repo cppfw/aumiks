@@ -3,26 +3,26 @@
 using namespace aumiks;
 
 void Speakers::start() {
-	this->player.setPaused(false);
+	this->player.set_paused(false);
 }
 
 void Speakers::stop() {
-	this->player.setPaused(true);
+	this->player.set_paused(true);
 }
 
-Speakers::Speakers(audout::SamplingRate_e samplingRate, std::uint16_t bufferSizeMillis) :
-		samplingRate(audout::AudioFormat(audout::Frame_e::STEREO, samplingRate).frequency()),
-		player(audout::AudioFormat(audout::Frame_e::STEREO, samplingRate), (this->samplingRate * bufferSizeMillis / 1000), this)
+Speakers::Speakers(audout::sampling_rate samplingRate, uint16_t bufferSizeMillis) :
+		samplingRate(audout::format(audout::frame_type::stereo, samplingRate).frequency()),
+		player(audout::format(audout::frame_type::stereo, samplingRate), (this->samplingRate * bufferSizeMillis / 1000), this)
 {}
 
 
-void Speakers::fillPlayBuf(utki::span<std::int16_t> playBuf) noexcept{
+void Speakers::fill(utki::span<std::int16_t> playBuf) noexcept{
 	ASSERT_INFO(
-			playBuf.size() % audout::AudioFormat::numChannels(audout::Frame_e::STEREO) == 0,
+			playBuf.size() % audout::AudioFormat::numChannels(audout::frame_type::stereo) == 0,
 			"playBuf.size = " << playBuf.size()
-			<< "numChannels = " << audout::AudioFormat::numChannels(audout::Frame_e::STEREO)
+			<< "numChannels = " << audout::AudioFormat::numChannels(audout::frame_type::stereo)
 		)
-	this->smpBuf.resize(playBuf.size() / audout::AudioFormat::numChannels(audout::Frame_e::STEREO));
+	this->smpBuf.resize(playBuf.size() / audout::format::num_channels(audout::frame_type::stereo));
 
 	if (this->input.fillSampleBuffer(utki::make_span(this->smpBuf))) {
 		this->input.disconnect();

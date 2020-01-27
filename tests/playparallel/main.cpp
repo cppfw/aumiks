@@ -21,7 +21,7 @@ public:
 			freq(freq)
 	{}
 	
-	bool fillSampleBuffer(utki::Buf<aumiks::Frame> buf)noexcept override{
+	bool fillSampleBuffer(utki::span<aumiks::Frame> buf)noexcept override{
 		for(auto d = buf.begin(), e = buf.end(); d != e; ++d){
 			d->channel[0] = 0xfff * std::sin(2 * utki::pi<float>() * this->t * this->freq);
 			this->t += 1 / 44100.0f;
@@ -35,7 +35,7 @@ public:
 int main(int argc, char *argv[]){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: mono 44100" << std::endl)
-		aumiks::Speakers sink(audout::SamplingRate_e::HZ_44100);
+		aumiks::Speakers sink(audout::sampling_rate::hz44100);
 		
 		sink.start();
 		
