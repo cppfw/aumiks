@@ -32,8 +32,8 @@ template <class TSampleType, audout::frame frame_type>
 
 	private:
 		bool fillSampleBuffer(utki::span<Frame> buf)noexcept override{
-			ASSERT(this->wavSound->data.size() % audout::format::num_channels(frame_type) == 0)
-			ASSERT(this->curSmp % audout::format::num_channels(frame_type) == 0)
+			ASSERT(this->wavSound->data.size() % audout::num_channels(frame_type) == 0)
+			ASSERT(this->curSmp % audout::num_channels(frame_type) == 0)
 			
 			size_t framesToCopy = (this->wavSound->data.size() - this->curSmp) / audout::num_channels(frame_type);
 			utki::clampTop(framesToCopy, buf.size());
