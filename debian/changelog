@@ -1,3 +1,9 @@
+libaumiks (0.3.23) unstable; urgency=medium
+
+  * update to libs
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 28 Jan 2020 01:09:48 +0200
+
 libaumiks (0.3.22) unstable; urgency=medium
 
   * debian/buster i386 packages
