@@ -51,7 +51,7 @@ repositories {
 dependencies {
     implementation 'io.github.igagis:utki:+'
     implementation 'io.github.igagis:papki:+'
-    implementation 'io.github.igagis:audout:0.3.27'
+    implementation 'io.github.igagis:audout:+'
 }
 
 // copy and rename release AAR to unified name
