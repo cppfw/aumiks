@@ -1,23 +1,17 @@
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
 #pragma once
 
+// TODO: remove whole file
 
 #include <string>
-
-#include <utki/Exc.hpp>
-
-
+#include <stdexcept>
 
 namespace aumiks{
 
-class Exc : public utki::Exc{
+class Exc : public std::runtime_error{
 public:
 	inline Exc(const std::string&  msg) :
-			utki::Exc(msg)
+			std::runtime_error(msg)
 	{}
 };
 
-}//~namespace
+}

@@ -1,15 +1,12 @@
 #pragma once
 
-#include <utki/Unique.hpp>
-
 #include "Input.hpp"
 #include "Exc.hpp"
-
 
 namespace aumiks{
 
 //TODO: doxygen
-class Sink : public utki::Unique{
+class Sink{
 protected:	
 	Sink(){}
 public:
