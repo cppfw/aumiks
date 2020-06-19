@@ -1,3 +1,9 @@
+libaumiks (0.3.24) unstable; urgency=medium
+
+  * use android native bundle plugin
+
+ -- Ivan Gagis <igagis@gmail.com>  Fri, 19 Jun 2020 16:24:19 +0300
+
 libaumiks (0.3.23) unstable; urgency=medium
 
   * update to libs
