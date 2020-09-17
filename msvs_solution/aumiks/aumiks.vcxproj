@@ -154,7 +154,7 @@
     <Import Project="..\packages\libpapki.1.0.40\build\native\libpapki.targets" Condition="Exists('..\packages\libpapki.1.0.40\build\native\libpapki.targets')" />
     <Import Project="..\packages\libpogodi.1.0.16\build\native\libpogodi.targets" Condition="Exists('..\packages\libpogodi.1.0.16\build\native\libpogodi.targets')" />
     <Import Project="..\packages\libnitki.1.0.17\build\native\libnitki.targets" Condition="Exists('..\packages\libnitki.1.0.17\build\native\libnitki.targets')" />
-    <Import Project="..\packages\audout.0.3.11\build\native\audout.targets" Condition="Exists('..\packages\audout.0.3.11\build\native\audout.targets')" />
+    <Import Project="..\packages\libaudout.0.3.28\build\native\libaudout.targets" Condition="Exists('..\packages\libaudout.0.3.28\build\native\libaudout.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -164,6 +164,6 @@
     <Error Condition="!Exists('..\packages\libpapki.1.0.40\build\native\libpapki.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libpapki.1.0.40\build\native\libpapki.targets'))" />
     <Error Condition="!Exists('..\packages\libpogodi.1.0.16\build\native\libpogodi.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libpogodi.1.0.16\build\native\libpogodi.targets'))" />
     <Error Condition="!Exists('..\packages\libnitki.1.0.17\build\native\libnitki.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libnitki.1.0.17\build\native\libnitki.targets'))" />
-    <Error Condition="!Exists('..\packages\audout.0.3.11\build\native\audout.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\audout.0.3.11\build\native\audout.targets'))" />
+    <Error Condition="!Exists('..\packages\libaudout.0.3.28\build\native\libaudout.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libaudout.0.3.28\build\native\libaudout.targets'))" />
   </Target>
 </Project>
