@@ -33,7 +33,9 @@ void Speakers::fill(utki::span<std::int16_t> playBuf) noexcept{
 	for (; src != this->smpBuf.cend(); ++src) {
 		for (unsigned i = 0; i != src->channel.size(); ++i, ++dst) {
 			ASSERT(playBuf.overlaps(dst))
-					*dst = int16_t(utki::clampedRange(int32_t(src->channel[i]), -0x7fff, 0x7fff));
+			using std::min;
+			using std::max;
+			*dst = int16_t(max(-0x7fff, min(int32_t(src->channel[i]), 0x7fff)));
 		}
 	}
 	ASSERT(dst == playBuf.end())

@@ -5,7 +5,7 @@
 
 #include <utki/math.hpp>
 
-#include <nitki/Thread.hpp>
+#include <nitki/thread.hpp>
 
 #include <cmath>
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]){
 		sink.input.connect(mixer);
 		
 		while(sink.input.isConnected()){
-			nitki::Thread::sleep(333);
+			std::this_thread::sleep_for(std::chrono::milliseconds(333));
 		}
 	}
 	

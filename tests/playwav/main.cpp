@@ -1,8 +1,8 @@
 #include "../../src/aumiks/WavSound.hpp"
 #include "../../src/aumiks/Speakers.hpp"
 
-#include <papki/FSFile.hpp>
-#include <nitki/Thread.hpp>
+#include <papki/fs_file.hpp>
+#include <nitki/thread.hpp>
 
 
 //void Play(const std::string& fileName){
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]){
 		sink.input.connect(src);
 		
 		while(sink.input.isConnected()){
-			nitki::Thread::sleep(333);
+			std::this_thread::sleep_for(std::chrono::milliseconds(333));
 		}
 	}
 	
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
 		
 		
 		while(sink.input.isConnected()){
-			nitki::Thread::sleep(333);
+			std::this_thread::sleep_for(std::chrono::milliseconds(333));
 		}
 	}
 	
