@@ -22,7 +22,7 @@
     <ProjectGuid>{0CF2C290-ED2F-4B8F-B3D3-5A5E754F7A8C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>test_playparallel</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -154,20 +154,22 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\libutki.1.1.7\build\native\libutki.targets" Condition="Exists('..\packages\libutki.1.1.7\build\native\libutki.targets')" />
-    <Import Project="..\packages\libpapki.1.0.40\build\native\libpapki.targets" Condition="Exists('..\packages\libpapki.1.0.40\build\native\libpapki.targets')" />
-    <Import Project="..\packages\libpogodi.1.0.16\build\native\libpogodi.targets" Condition="Exists('..\packages\libpogodi.1.0.16\build\native\libpogodi.targets')" />
-    <Import Project="..\packages\libnitki.1.0.17\build\native\libnitki.targets" Condition="Exists('..\packages\libnitki.1.0.17\build\native\libnitki.targets')" />
-    <Import Project="..\packages\libaudout.0.3.28\build\native\libaudout.targets" Condition="Exists('..\packages\libaudout.0.3.28\build\native\libaudout.targets')" />
+    <Import Project="..\packages\libutki.1.1.101\build\native\libutki.targets" Condition="Exists('..\packages\libutki.1.1.101\build\native\libutki.targets')" />
+    <Import Project="..\packages\libopros.1.0.39\build\native\libopros.targets" Condition="Exists('..\packages\libopros.1.0.39\build\native\libopros.targets')" />
+    <Import Project="..\packages\libnitki.1.0.34\build\native\libnitki.targets" Condition="Exists('..\packages\libnitki.1.0.34\build\native\libnitki.targets')" />
+    <Import Project="..\packages\libaudout.0.3.29\build\native\libaudout.targets" Condition="Exists('..\packages\libaudout.0.3.29\build\native\libaudout.targets')" />
+    <Import Project="..\packages\libpapki.1.0.84\build\native\libpapki.targets" Condition="Exists('..\packages\libpapki.1.0.84\build\native\libpapki.targets')" />
+    <Import Project="..\packages\zlib_static.1.2.11.5\build\native\zlib_static.targets" Condition="Exists('..\packages\zlib_static.1.2.11.5\build\native\zlib_static.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\libutki.1.1.7\build\native\libutki.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libutki.1.1.7\build\native\libutki.targets'))" />
-    <Error Condition="!Exists('..\packages\libpapki.1.0.40\build\native\libpapki.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libpapki.1.0.40\build\native\libpapki.targets'))" />
-    <Error Condition="!Exists('..\packages\libpogodi.1.0.16\build\native\libpogodi.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libpogodi.1.0.16\build\native\libpogodi.targets'))" />
-    <Error Condition="!Exists('..\packages\libnitki.1.0.17\build\native\libnitki.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libnitki.1.0.17\build\native\libnitki.targets'))" />
-    <Error Condition="!Exists('..\packages\libaudout.0.3.28\build\native\libaudout.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libaudout.0.3.28\build\native\libaudout.targets'))" />
+    <Error Condition="!Exists('..\packages\libutki.1.1.101\build\native\libutki.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libutki.1.1.101\build\native\libutki.targets'))" />
+    <Error Condition="!Exists('..\packages\libopros.1.0.39\build\native\libopros.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libopros.1.0.39\build\native\libopros.targets'))" />
+    <Error Condition="!Exists('..\packages\libnitki.1.0.34\build\native\libnitki.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libnitki.1.0.34\build\native\libnitki.targets'))" />
+    <Error Condition="!Exists('..\packages\libaudout.0.3.29\build\native\libaudout.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libaudout.0.3.29\build\native\libaudout.targets'))" />
+    <Error Condition="!Exists('..\packages\libpapki.1.0.84\build\native\libpapki.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libpapki.1.0.84\build\native\libpapki.targets'))" />
+    <Error Condition="!Exists('..\packages\zlib_static.1.2.11.5\build\native\zlib_static.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib_static.1.2.11.5\build\native\zlib_static.targets'))" />
   </Target>
 </Project>
