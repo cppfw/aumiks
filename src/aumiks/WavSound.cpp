@@ -209,7 +209,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 	// Now we have Wav-file info
 	std::shared_ptr<WavSound> ret;
 	if(bitDepth == 8){
-//		C_Ref<C_PCM_ParticularNonStreamedSound<s8> > r = new C_PCM_ParticularNonStreamedSound<s8>(chans, igagis::uint(frequency), dataSize);
+//		C_Ref<C_PCM_ParticularNonStreamedSound<s8> > r = new C_PCM_ParticularNonStreamedSound<s8>(chans, cppfw::uint(frequency), dataSize);
 //		ret = static_cast<C_PCM_NonStreamedSound*>(r.operator->());
 //		bytesRead = fi.read(r->buf.Buf(), r->buf.SizeOfArray());//Load Sound data
 //		//convert data to signed format
