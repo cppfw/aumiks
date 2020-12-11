@@ -1,3 +1,9 @@
+libaumiks (0.3.27) unstable; urgency=medium
+
+  * msvs v142 tools, ubuntu focal
+
+ -- Ivan Gagis <igagis@gmail.com>  Fri, 11 Dec 2020 18:00:40 +0200
+
 libaumiks (0.3.26) unstable; urgency=medium
 
   * nuget update
