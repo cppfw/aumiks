@@ -1,3 +1,9 @@
+libaumiks (0.3.28) unstable; urgency=medium
+
+  * msvs: disable whole program optimization
+
+ -- Ivan Gagis <igagis@gmail.com>  Wed, 17 Mar 2021 15:53:00 +0200
+
 libaumiks (0.3.27) unstable; urgency=medium
 
   * msvs v142 tools, ubuntu focal
