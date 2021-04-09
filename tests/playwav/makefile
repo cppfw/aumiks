@@ -16,7 +16,7 @@ endif
 
 this_ldlibs += $(abspath $(this_libaumiks))
 
-this_ldlibs += -laudout -lpapki
+this_ldlibs += -laudout -lpapki -lutki
 
 this_no_install := true
 

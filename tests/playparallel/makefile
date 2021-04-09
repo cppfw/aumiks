@@ -16,7 +16,7 @@ endif
 
 this_ldlibs += $(this_libaumiks)
 
-this_ldlibs += -laudout -lpapki -lm
+this_ldlibs += -laudout -lpapki -lm -lutki
 
 this_no_install := true
 
