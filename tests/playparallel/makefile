@@ -1,64 +1,48 @@
 include prorab.mk
 
+$(eval $(call prorab-config, ../../config))
 
 this_name := tests
 
+this_srcs := $(call prorab-src-dir, .)
 
-this_srcs := main.cpp
+this_libaumiks := $(d)../../src/out/$(c)/libaumiks$(dot_so)
 
-
-this_cxxflags += -Wall
-this_cxxflags += -Wno-comment # no warnings on nested comments
-this_cxxflags += -Werror
-this_cxxflags += -fstrict-aliasing # strict aliasing!!!
-this_cxxflags += -g
-this_cxxflags += -std=c++11
-this_cxxflags += -O3
-
-ifeq ($(debug), true)
-    this_cxxflags += -DDEBUG
-endif
-
-ifeq ($(os),windows)
-    this_ldlibs += $(d)../../src/libaumiks$(soext)
-else ifeq ($(os),macosx)
+ifeq ($(os),macosx)
     this_ldlibs += -framework AudioUnit
 else ifeq ($(os),linux)
     this_ldlibs += -lpthread -lpulse-simple -lpulse
 endif
 
-this_ldlibs += $(abspath $(d)../../src/libaumiks$(soext))
+this_ldlibs += $(this_libaumiks)
 
-this_ldlibs += -laudout -lpapki -lstdc++ -lm
+this_ldlibs += -laudout -lpapki -lm
 
 this_no_install := true
 
 $(eval $(prorab-build-app))
 
-
 define this_rules
 run:: $(prorab_this_name)
-	@echo running $$^...
-	@(cd $(d); LD_LIBRARY_PATH=../../src $$^)
+$(.RECIPEPREFIX)@echo running $$^...
+$(.RECIPEPREFIX)$(a)(cd $(d); LD_LIBRARY_PATH=../../src/out/$(c) $$^)
 endef
 $(eval $(this_rules))
 
-
 # add dependency on libaumiks
 ifeq ($(os),windows)
-    $(d)libaumiks$(soext): $(abspath $(d)../../src/libaumiks$(soext))
+    $(d)out/$(c)/libaumiks$(dot_so): $(abspath $(this_libaumiks))
 	@cp $< $@
 
-    $(prorab_this_name): $(d)libaumiks$(soext)
+    $(prorab_this_name): $(d)out/$(c)/libaumiks$(dot_so)
 
     define this_rules
         clean::
-		@rm -f $(d)libaumiks$(soext)
+$(.RECIPEPREFIX)$(a)rm -f $(d)out/$(c)/libaumiks$(dot_so)
     endef
     $(eval $(this_rules))
 else
-    $(prorab_this_name): $(abspath $(d)../../src/libaumiks$(soext))
+    $(prorab_this_name): $(abspath $(this_libaumiks))
 endif
-
 
 $(eval $(call prorab-try-include,$(d)../../src/makefile))
