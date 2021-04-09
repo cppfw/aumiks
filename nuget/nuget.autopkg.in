@@ -31,8 +31,8 @@ nuget{
 	}
 	dependencies {
 		packages : {
-			libpapki/1.0.15;
-			libaudout/0.3.28;
+			libpapki/1.0.93;
+			libaudout/0.3.33;
 		};
 	}
 	files {
@@ -42,8 +42,8 @@ nuget{
 			"..\src\aumiks\**\*.hpp"
 		};
 
-// ======== v140 ========
-
+		// ======== v140 ========
+/*
 		[x86,v140,release] {
 			lib: ..\msvs_solution\v140_Release\aumiks.lib;
 		}
@@ -56,7 +56,7 @@ nuget{
 		[x64,v140,debug] {
 			lib: ..\msvs_solution\x64\v140_Debug\aumiks.lib;
 		}
-
+*/
 		// ======== v141 ========
 /*
 		[x86,v141,release] {

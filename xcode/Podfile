@@ -5,8 +5,8 @@ project 'aumiks/aumiks.xcodeproj'
 platform :ios, '8.0'
 
 target "aumiks" do
-	pod 'utki', '>= 1.1.30'
-	pod 'audout', '>= 0.3.2'
-	pod 'papki', '>= 1.0.9'
-	pod 'nitki', '>= 1.0.6'
+	pod 'utki', '>= 1.1.124'
+	pod 'audout', '>= 0.3.33'
+	pod 'papki', '>= 1.0.93'
+	pod 'nitki', '>= 1.0.41'
 end
