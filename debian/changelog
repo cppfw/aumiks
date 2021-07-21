@@ -1,3 +1,9 @@
+libaumiks (0.3.30) unstable; urgency=medium
+
+  * deploy to own repo
+
+ -- Ivan Gagis <igagis@gmail.com>  Wed, 21 Jul 2021 17:33:36 +0300
+
 libaumiks (0.3.29) unstable; urgency=medium
 
   * deploy to jfrog
