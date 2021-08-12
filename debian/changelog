@@ -1,3 +1,9 @@
+libaumiks (0.3.31) unstable; urgency=medium
+
+  * use latest make in homebrew formulae
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 12 Aug 2021 14:17:57 +0300
+
 libaumiks (0.3.30) unstable; urgency=medium
 
   * deploy to own repo
