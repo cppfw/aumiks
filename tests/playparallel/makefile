@@ -1,4 +1,5 @@
 include prorab.mk
+include prorab-test.mk
 
 $(eval $(call prorab-config, ../../config))
 
@@ -6,7 +7,7 @@ this_name := tests
 
 this_srcs := $(call prorab-src-dir, .)
 
-this_libaumiks := $(d)../../src/out/$(c)/libaumiks$(dot_so)
+this_libaumiks := ../../src/out/$(c)/libaumiks$(dot_so)
 
 ifeq ($(os),macosx)
     this_ldlibs += -framework AudioUnit
@@ -22,27 +23,12 @@ this_no_install := true
 
 $(eval $(prorab-build-app))
 
-define this_rules
-run:: $(prorab_this_name)
-$(.RECIPEPREFIX)@echo running $$^...
-$(.RECIPEPREFIX)$(a)(cd $(d); LD_LIBRARY_PATH=../../src/out/$(c) $$^)
-endef
-$(eval $(this_rules))
+$(eval $(call prorab-depend, $(prorab_this_name), $(this_libaumiks)))
 
-# add dependency on libaumiks
-ifeq ($(os),windows)
-    $(d)out/$(c)/libaumiks$(dot_so): $(abspath $(this_libaumiks))
-	@cp $< $@
+this_test_cmd := $(prorab_this_name)
+this_test_deps := $(prorab_this_name)
+this_test_ld_path := $(dir $(this_libaumiks))
+this_run_name := $(notdir $(abspath $(d)))
+$(eval $(prorab-run))
 
-    $(prorab_this_name): $(d)out/$(c)/libaumiks$(dot_so)
-
-    define this_rules
-        clean::
-$(.RECIPEPREFIX)$(a)rm -f $(d)out/$(c)/libaumiks$(dot_so)
-    endef
-    $(eval $(this_rules))
-else
-    $(prorab_this_name): $(abspath $(this_libaumiks))
-endif
-
-$(eval $(call prorab-try-include,$(d)../../src/makefile))
+$(eval $(call prorab-include, ../../src/makefile))

@@ -6,7 +6,7 @@
 		{
 			"label": "build",
 			"type": "shell",
-			"command": "make autojobs=true",
+			"command": "make",
 			"problemMatcher": [
 				"$gcc"
 			],
@@ -15,7 +15,7 @@
 		{
 			"label": "build_dbg",
 			"type": "shell",
-			"command": "make autojobs=true config=dbg",
+			"command": "make config=dbg",
 			"problemMatcher": [
 				"$gcc"
 			],
@@ -28,6 +28,16 @@
 			"problemMatcher": [
 				"$gcc"
 			],
+			"group": "build"
+		}
+		,{
+			"label": "test_",
+			"type": "shell",
+			"command": "make test",
+			"problemMatcher": [
+				"$gcc"
+			],
+			"dependsOn": "build",
 			"group": "build"
 		}
 	]
