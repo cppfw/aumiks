@@ -1,3 +1,9 @@
+libaumiks (0.3.32) unstable; urgency=medium
+
+  * xcode: static framework
+
+ -- Ivan Gagis <igagis@gmail.com>  Mon, 08 Nov 2021 18:17:37 +0200
+
 libaumiks (0.3.31) unstable; urgency=medium
 
   * use latest make in homebrew formulae
