@@ -1,4 +1,4 @@
-#include "../../src/aumiks/Mixer.hpp"
+#include "../../src/aumiks/mixer.hpp"
 #include "../../src/aumiks/WavSound.hpp"
 #include "../../src/aumiks/Speakers.hpp"
 #include "../../src/aumiks/NullSource.hpp"
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		auto mixer = std::make_shared<aumiks::Mixer>();
+		auto mixer = std::make_shared<aumiks::mixer>();
 		
 		std::shared_ptr<aumiks::Sound> snd1 = aumiks::WavSound::load("../samples/sample44100mono16.wav");
 		std::shared_ptr<aumiks::Sound> snd2 = aumiks::WavSound::load("../samples/ice_break.wav");

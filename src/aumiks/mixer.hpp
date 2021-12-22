@@ -25,54 +25,41 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#include "Mixer.hpp"
+#pragma once
 
-using namespace aumiks;
+#include "Source.hpp"
+#include "input.hpp"
 
-void Mixer::connect(std::shared_ptr<Source> source) {
-	std::lock_guard<decltype(this->spinLock) > guard(this->spinLock);
-	this->inputsToAdd.emplace_back();
-	this->inputsToAdd.back().connect(std::move(source));
-}
+#include <list>
 
-bool Mixer::fillSampleBuffer(utki::span<frame> buf) noexcept{
-	{
-		std::lock_guard<decltype(this->spinLock)> guard(this->spinLock);
-		this->inputs.splice(this->inputs.end(), this->inputsToAdd);
+#include <utki/spin_lock.hpp>
+
+namespace aumiks{
+
+class mixer : virtual public Source{
+	volatile bool is_mixer_finite = true;
+	
+	utki::spin_lock spin_lock;
+	
+	std::list<aumiks::input> inputs;
+	
+	decltype(inputs) inputs_to_add;
+	
+	std::vector<frame> tmp_buf;
+	
+public:
+	void connect(std::shared_ptr<Source> source);
+	
+	void set_finite(bool finite)noexcept{
+		this->is_mixer_finite = finite;
 	}
-
-	this->tmpBuf.resize(buf.size());
-
-	for(auto& f : buf){
-		for(auto& c : f.channel){
-			c = 0;
-		}
+	
+	bool is_finite()const noexcept{
+		return this->is_mixer_finite;
 	}
+	
+protected:
+	bool fillSampleBuffer(utki::span<frame> buf)noexcept override;
+};
 
-	for(auto i = this->inputs.begin(); i != this->inputs.end();){
-		if(i->fill_sample_buffer(utki::make_span(this->tmpBuf))){
-			i = this->inputs.erase(i);
-		}else{
-			++i;
-		}
-
-		auto src = this->tmpBuf.cbegin();
-		for(
-				auto dst = buf.begin(),
-						end = buf.end();
-				dst != end;
-				++dst,
-						++src
-			)
-		{
-			ASSERT(src != this->tmpBuf.cend())
-			dst->add(*src);
-		}
-	}
-
-	if(this->isFinite()){
-		return this->inputs.size() == 0;
-	}else{
-		return false;
-	}
 }
