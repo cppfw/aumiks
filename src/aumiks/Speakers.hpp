@@ -38,7 +38,7 @@ class Speakers :
 		public aumiks::Sink,
 		private audout::listener
 {
-	std::vector<Frame> smpBuf;
+	std::vector<frame> smpBuf;
 
 	// this function is not thread-safe, but it is supposed to be called from special audio thread
 	void fill(utki::span<std::int16_t> playBuf)noexcept override;

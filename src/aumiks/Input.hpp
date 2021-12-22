@@ -34,7 +34,7 @@ SOFTWARE.
 
 #include "config.hpp"
 #include "Source.hpp"
-#include "Frame.hpp"
+#include "frame.hpp"
 
 namespace aumiks{
 
@@ -59,7 +59,7 @@ public:
 		return this->src.get() != nullptr;
 	}
 
-	bool fillSampleBuffer(utki::span<Frame> buf)noexcept;	
+	bool fillSampleBuffer(utki::span<frame> buf)noexcept;	
 };
 
 }

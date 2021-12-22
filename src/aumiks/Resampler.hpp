@@ -59,10 +59,10 @@ public:
 	}
 	
 private:
-	std::vector<Frame> tmpBuf;
-	Frame lastFrameForUpsampling;
+	std::vector<frame> tmpBuf;
+	frame lastFrameForUpsampling;
 	
-	bool fillSampleBuffer(utki::span<Frame> buf)noexcept override;
+	bool fillSampleBuffer(utki::span<frame> buf)noexcept override;
 };
 
 }

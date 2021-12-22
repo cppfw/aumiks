@@ -53,7 +53,7 @@ template <class TSampleType, audout::frame frame_type>
 		}
 
 	private:
-		bool fillSampleBuffer(utki::span<Frame> buf)noexcept override{
+		bool fillSampleBuffer(utki::span<frame> buf)noexcept override{
 			ASSERT(this->wavSound->data.size() % audout::num_channels(frame_type) == 0)
 			ASSERT(this->curSmp % audout::num_channels(frame_type) == 0)
 			

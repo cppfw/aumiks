@@ -59,7 +59,7 @@ void Input::disconnect()noexcept {
 }
 
 
-bool Input::fillSampleBuffer(utki::span<Frame> buf) noexcept{
+bool Input::fillSampleBuffer(utki::span<frame> buf) noexcept{
 	{
 		std::lock_guard<decltype(this->mutex) > guard(this->mutex);
 		if (this->src != this->srcInUse) {

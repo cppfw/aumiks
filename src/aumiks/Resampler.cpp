@@ -29,7 +29,7 @@ SOFTWARE.
 
 using namespace aumiks;
 
-bool Resampler::fillSampleBuffer(utki::span<Frame> buf) noexcept{
+bool Resampler::fillSampleBuffer(utki::span<frame> buf) noexcept{
 	ASSERT(this->step > 0) //if step is 0 then there will be infinite loop
 
 			//variable step can be changed from another thread, so copy it here

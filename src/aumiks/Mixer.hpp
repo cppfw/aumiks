@@ -45,7 +45,7 @@ class Mixer : virtual public Source{
 	
 	decltype(inputs) inputsToAdd;
 	
-	std::vector<Frame> tmpBuf;
+	std::vector<frame> tmpBuf;
 	
 public:
 	void connect(std::shared_ptr<Source> source);
@@ -59,7 +59,7 @@ public:
 	}
 	
 protected:
-	bool fillSampleBuffer(utki::span<Frame> buf)noexcept override;
+	bool fillSampleBuffer(utki::span<frame> buf)noexcept override;
 };
 
 

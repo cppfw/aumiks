@@ -37,10 +37,10 @@ SOFTWARE.
 
 namespace aumiks{
 
-struct Frame{
+struct frame{
 	std::array<real, audout::num_channels(audout::frame::stereo)> channel;
 	
-	void add(const Frame& f){
+	void add(const frame& f){
 		ASSERT(this->channel.size() == f.channel.size())
 		for(unsigned i = 0; i != this->channel.size(); ++i){
 			this->channel[i] += f.channel[i];

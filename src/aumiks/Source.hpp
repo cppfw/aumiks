@@ -32,7 +32,7 @@ SOFTWARE.
 
 #include <audout/format.hpp>
 
-#include "Frame.hpp"
+#include "frame.hpp"
 
 namespace aumiks{
 
@@ -48,11 +48,11 @@ protected:
 	
 	Source(){}
 	
-	virtual bool fillSampleBuffer(utki::span<Frame> buf)noexcept = 0;
+	virtual bool fillSampleBuffer(utki::span<frame> buf)noexcept = 0;
 public:	
 	virtual ~Source()noexcept{}
 	
-	//thread safe
+	// thread safe
 	bool isConnected()const noexcept{
 		return this->isConnected_v;
 	}
