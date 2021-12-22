@@ -25,49 +25,54 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#include "Resampler.hpp"
+#include "resampler.hpp"
 
 using namespace aumiks;
 
-bool Resampler::fillSampleBuffer(utki::span<frame> buf) noexcept{
+bool resampler::fillSampleBuffer(utki::span<frame> buf) noexcept{
 	ASSERT(this->step > 0) // if step is 0 then there will be infinite loop
 
-			// variable step can be changed from another thread, so copy it here
-			typename std::remove_volatile<decltype(this->step)>::type s = this->step;
+	// variable step can be changed from another thread, so copy it here
+	typename std::remove_volatile<decltype(this->step)>::type s = this->step;
 
 	auto dst = buf.begin();
 
-	if (s > DScale) {//if up-sampling
-		size_t filledFromPrevCall = 0;
+	if(s > no_resample_step){ // if up-sampling
+		size_t filled_from_prev_call = 0;
 		// something has left from previous call
-		for (; this->scale > 0 && dst != buf.end(); scale -= DScale, ++dst, ++filledFromPrevCall) {
-			*dst = this->lastFrameForUpsampling;
+		for(;
+				this->scale > 0 && dst != buf.end();
+				scale -= no_resample_step,
+						++dst, ++filled_from_prev_call
+			)
+		{
+			*dst = this->last_frame_for_upsampling;
 		}
-		if (dst == buf.end()) {
+		if(dst == buf.end()){
 			return false;
 		}
-		this->tmpBuf.resize((buf.size() - filledFromPrevCall) * DScale / s + 1);
-	} else {
-		this->tmpBuf.resize((buf.size()) * DScale / s);
+		this->tmp_buf.resize((buf.size() - filled_from_prev_call) * no_resample_step / s + 1);
+	}else{
+		this->tmp_buf.resize((buf.size()) * no_resample_step / s);
 	}
 
-	bool ret = this->input.fill_sample_buffer(utki::make_span(this->tmpBuf));
+	bool ret = this->input.fill_sample_buffer(utki::make_span(this->tmp_buf));
 
-	auto src = this->tmpBuf.cbegin();
+	auto src = this->tmp_buf.cbegin();
 	for(; dst != buf.end(); ++src){
 		this->scale += s;
-		for(; this->scale > 0 && dst != buf.end(); this->scale -= DScale, ++dst){
+		for(; this->scale > 0 && dst != buf.end(); this->scale -= no_resample_step, ++dst){
 			ASSERT_INFO(dst != buf.end(),
 					"s = " << s <<
 					" buf.size() = " << buf.size() <<
-					" this->tmpBuf.size() = " << this->tmpBuf.size() <<
+					" this->tmp_buf.size() = " << this->tmp_buf.size() <<
 					" this->scale = " << this->scale <<
 					" dst-end = " << (dst - buf.end())
 				)
-			ASSERT_INFO(src != this->tmpBuf.cend(),
+			ASSERT_INFO(src != this->tmp_buf.cend(),
 					"s = " << s <<
 					" buf.size() = " << buf.size() <<
-					" this->tmpBuf.size() = " << this->tmpBuf.size() <<
+					" this->tmp_buf.size() = " << this->tmp_buf.size() <<
 					" this->scale = " << this->scale <<
 					" dst-end = " << (dst - buf.end())
 				)
@@ -76,21 +81,21 @@ bool Resampler::fillSampleBuffer(utki::span<frame> buf) noexcept{
 	}
 	ASSERT(dst == buf.end())
 
-	if(src != this->tmpBuf.cend()){
+	if(src != this->tmp_buf.cend()){
 		// one more sample left in source buffer
-		ASSERT_INFO(src + 1 == this->tmpBuf.cend(),
+		ASSERT_INFO(src + 1 == this->tmp_buf.cend(),
 				"s = " << s <<
 				" buf.size() = " << buf.size() <<
-				" this->tmpBuf.size() = " << this->tmpBuf.size() <<
+				" this->tmp_buf.size() = " << this->tmp_buf.size() <<
 				" this->scale = " << this->scale <<
-				" src-end = " << (src - this->tmpBuf.cend())
+				" src-end = " << (src - this->tmp_buf.cend())
 			)
 		this->scale += s;
 	}
 
 	if(this->scale > 0){
-		ASSERT(s > DScale) // was upsampling
-		this->lastFrameForUpsampling = this->tmpBuf.back();
+		ASSERT(s > no_resample_step) // was upsampling
+		this->last_frame_for_upsampling = this->tmp_buf.back();
 	}
 
 	return ret;

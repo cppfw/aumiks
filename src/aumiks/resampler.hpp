@@ -33,34 +33,33 @@ SOFTWARE.
 
 namespace aumiks{
 
-class Resampler : public SingleInputSource{
-	static const std::uint16_t DScale = 128;
+class resampler : public SingleInputSource{
+	static const uint16_t no_resample_step = 128;
 	
-	std::int32_t scale = 0;
+	int32_t scale = 0;
 	
-	volatile std::uint16_t step = DScale;
-	
+	volatile uint16_t step = no_resample_step;
 	
 public:
-	Resampler(const Resampler&) = delete;
-	Resampler& operator=(const Resampler&) = delete;
+	resampler(const resampler&) = delete;
+	resampler& operator=(const resampler&) = delete;
 	
-	Resampler(){}
+	resampler(){}
 	
-	void setScale(float scale)noexcept{
-		this->step = decltype(step)(scale * float(DScale));
+	void set_scale(float scale)noexcept{
+		this->step = decltype(step)(scale * float(no_resample_step));
 	}
 	
-	void setScale(std::uint32_t fromSamplingRate, std::uint32_t toSamplingRate){
-		if(fromSamplingRate == 0){
+	void set_scale(uint32_t from_sampling_rate, uint32_t to_sampling_rate){
+		if(from_sampling_rate == 0){
 			return;
 		}
-		this->step = toSamplingRate * DScale / fromSamplingRate;
+		this->step = to_sampling_rate * no_resample_step / from_sampling_rate;
 	}
 	
 private:
-	std::vector<frame> tmpBuf;
-	frame lastFrameForUpsampling;
+	std::vector<frame> tmp_buf;
+	frame last_frame_for_upsampling;
 	
 	bool fillSampleBuffer(utki::span<frame> buf)noexcept override;
 };

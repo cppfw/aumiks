@@ -30,7 +30,7 @@ SOFTWARE.
 #include <utki/shared.hpp>
 
 #include "WavSound.hpp"
-#include "Resampler.hpp"
+#include "resampler.hpp"
 
 using namespace aumiks;
 
@@ -95,17 +95,17 @@ template <class TSampleType, audout::frame frame_type>
 	};
 
 private:
-	std::shared_ptr<aumiks::Source> createSource(uint32_t samplingRate = 0)const override{
+	std::shared_ptr<aumiks::Source> createSource(uint32_t sampling_rate = 0)const override{
 		auto src = std::make_shared<Source>(utki::make_shared_from(*this));
-		if(samplingRate == 0 || samplingRate == this->samplingRate){
+		if(samplingRate == 0 || sampling_rate == this->samplingRate){
 			return src;
 		}
 		
-		auto resampler = std::make_shared<Resampler>();
+		auto resampler = std::make_shared<aumiks::resampler>();
 		
 		resampler->input.connect(std::move(src));
 		
-		resampler->setScale(this->samplingRate, samplingRate);
+		resampler->set_scale(this->samplingRate, sampling_rate);
 		
 		return resampler;
 	}
