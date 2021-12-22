@@ -9,7 +9,6 @@
 
 #include <cmath>
 
-
 class SineSource : public aumiks::Source{
 	float t = 0;
 	
