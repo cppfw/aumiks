@@ -1,7 +1,6 @@
 #include "../../src/aumiks/mixer.hpp"
 #include "../../src/aumiks/WavSound.hpp"
 #include "../../src/aumiks/Speakers.hpp"
-#include "../../src/aumiks/NullSource.hpp"
 
 #include <utki/math.hpp>
 

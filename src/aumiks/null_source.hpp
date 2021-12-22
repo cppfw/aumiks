@@ -31,7 +31,7 @@ SOFTWARE.
 
 namespace aumiks{
 
-class NullSource : public Source{
+class null_source : public Source{
 public:
 	bool fillSampleBuffer(utki::span<frame> buf)noexcept override;
 };
