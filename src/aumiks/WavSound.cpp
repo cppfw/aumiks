@@ -29,9 +29,7 @@ SOFTWARE.
 
 #include <utki/shared.hpp>
 
-#include "Exc.hpp"
 #include "WavSound.hpp"
-
 #include "Resampler.hpp"
 
 using namespace aumiks;
@@ -148,9 +146,9 @@ std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 	// Start reading Wav-file header
 	{
 		std::array<std::uint8_t, 4> riff;
-		fi.read(utki::make_span(riff));//Read 'RIFF' signature
+		fi.read(utki::make_span(riff)); // Read 'RIFF' signature
 		if(std::string(reinterpret_cast<char*>(&*riff.begin()), riff.size()) != "RIFF"){
-			throw Exc("WavSound::LoadWAV(): 'RIFF' signature not found");
+			throw std::invalid_argument("WavSound::LoadWAV(): 'RIFF' signature not found");
 		}
 	}
 
@@ -160,7 +158,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 		std::array<std::uint8_t, 4> wave;
 		fi.read(utki::make_span(wave)); // Read 'WAVE' signature
 		if(std::string(reinterpret_cast<char*>(&*wave.begin()), wave.size()) != "WAVE"){
-			throw Exc("WavSound::LoadWAV(): 'WAVE' signature not found");
+			throw std::invalid_argument("WavSound::LoadWAV(): 'WAVE' signature not found");
 		}
 	}
 
@@ -168,7 +166,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 		std::array<std::uint8_t, 4> fmt;
 		fi.read(utki::make_span(fmt)); // Read 'fmt ' signature
 		if(std::string(reinterpret_cast<char*>(&*fmt.begin()), fmt.size()) != "fmt "){
-			throw Exc("WavSound::LoadWAV(): 'fmt ' signature not found");
+			throw std::invalid_argument("WavSound::LoadWAV(): 'fmt ' signature not found");
 		}
 	}
 
@@ -180,13 +178,13 @@ std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 		fi.read(utki::make_span(pcmBuf));
 		std::uint32_t pcm = utki::deserialize32le(&*pcmBuf.begin());
 		if((pcm & 0x0000ffff) != 1){ // Low word indicates whether the file is in PCM format
-			throw Exc("C_PCM_NonStreamedSound::LoadWAV(): not a PCM format, only PCM format is supported");
+			throw std::invalid_argument("C_PCM_NonStreamedSound::LoadWAV(): not a PCM format, only PCM format is supported");
 		}
 
 		chans = unsigned(pcm >> 16); // High word contains the number of channels (1 for mono, 2 for stereo)
 		if(chans != 1 && chans != 2){
 			// only mono or stereo is supported and nothing other
-			throw Exc("WavSound::LoadWAV(): unsupported number of channels");
+			throw std::invalid_argument("WavSound::LoadWAV(): unsupported number of channels");
 		}
 	}
 
@@ -212,7 +210,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 		std::array<std::uint8_t, 4> data;
 		fi.read(utki::make_span(data)); // Read 'data' signature
 		if(std::string(reinterpret_cast<char*>(&*data.begin()), data.size()) != "data"){
-			throw Exc("WavSound::LoadWAV(): 'data' signature not found");
+			throw std::invalid_argument("WavSound::LoadWAV(): 'data' signature not found");
 		}
 	}
 
@@ -229,7 +227,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 		auto bytesRead = fi.read(utki::make_span(data)); // Load Sound data
 
 		if(bytesRead != size_t(dataSize)){
-			throw Exc("WavSound::LoadWAV(): sound data size is incorrect");
+			throw std::invalid_argument("WavSound::LoadWAV(): sound data size is incorrect");
 		}
 	}
 	
@@ -243,7 +241,7 @@ std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 //		for(s8* ptr=r->buf.Buf(); ptr<(r->buf.Buf()+r->buf.SizeOfArray()); ++ptr)
 //			*ptr=s8(int(*ptr)-0x80);
 		// TODO: support it
-		throw Exc("WavSound::LoadWAV(): unsupported bit depth (8 bit) wav file (TODO:)");
+		throw std::invalid_argument("WavSound::LoadWAV(): unsupported bit depth (8 bit) wav file (TODO:)");
 	}else if(bitDepth == 16){
 		// set the format
 		switch(chans){
@@ -254,10 +252,10 @@ std::shared_ptr<WavSound> WavSound::load(papki::file& fi){
 				ret = std::make_shared<WavSoundImpl<std::int16_t, audout::frame::stereo>>(utki::make_span(data), frequency);
 				break;
 			default:
-				throw aumiks::Exc("WavSound::LoadWAV():  unsupported number of channels");
+				throw std::invalid_argument("WavSound::LoadWAV():  unsupported number of channels");
 		}
 	}else{
-		throw Exc("WavSound::LoadWAV(): unsupported bit depth");
+		throw std::invalid_argument("WavSound::LoadWAV(): unsupported bit depth");
 	}
 
 	return ret;

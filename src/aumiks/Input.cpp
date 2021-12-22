@@ -34,12 +34,12 @@ using namespace aumiks;
 void Input::connect(std::shared_ptr<aumiks::Source> source){
 	ASSERT(source)
 
-	if (this->isConnected()) {
-		throw aumiks::Exc("Input already connected");
+	if(this->isConnected()){
+		throw std::logic_error("Input already connected");
 	}
 
-	if (source->isConnected()) {
-		throw aumiks::Exc("Source is already connected");
+	if(source->isConnected()){
+		throw std::logic_error("Source is already connected");
 	}
 	
 	{

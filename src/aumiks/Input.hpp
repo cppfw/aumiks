@@ -33,7 +33,6 @@ SOFTWARE.
 #include <mutex>
 
 #include "config.hpp"
-#include "Exc.hpp"
 #include "Source.hpp"
 #include "Frame.hpp"
 

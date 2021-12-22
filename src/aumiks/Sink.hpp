@@ -28,7 +28,6 @@ SOFTWARE.
 #pragma once
 
 #include "Input.hpp"
-#include "Exc.hpp"
 
 namespace aumiks{
 
@@ -42,7 +41,7 @@ public:
 	virtual void start() = 0;
 	
 	virtual void stop(){
-		throw Exc("Sink::Stop(): unsupported");
+		throw std::invalid_argument("Sink::Stop(): unsupported");
 	}
 	
 	Input input;
