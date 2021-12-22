@@ -51,14 +51,14 @@ void Speakers::fill(utki::span<std::int16_t> playBuf) noexcept{
 		)
 	this->smpBuf.resize(playBuf.size() / audout::num_channels(audout::frame::stereo));
 
-	if (this->input.fillSampleBuffer(utki::make_span(this->smpBuf))) {
+	if(this->input.fill_sample_buffer(utki::make_span(this->smpBuf))){
 		this->input.disconnect();
 	}
 
 	auto src = this->smpBuf.cbegin();
 	auto dst = playBuf.begin();
-	for (; src != this->smpBuf.cend(); ++src) {
-		for (unsigned i = 0; i != src->channel.size(); ++i, ++dst) {
+	for(; src != this->smpBuf.cend(); ++src){
+		for(unsigned i = 0; i != src->channel.size(); ++i, ++dst){
 			ASSERT(playBuf.overlaps(dst))
 			using std::min;
 			using std::max;

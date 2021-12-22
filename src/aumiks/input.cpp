@@ -25,17 +25,15 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#include "Input.hpp"
+#include "input.hpp"
 
 using namespace aumiks;
 
-
-
-void Input::connect(std::shared_ptr<aumiks::Source> source){
+void input::connect(std::shared_ptr<aumiks::Source> source){
 	ASSERT(source)
 
-	if(this->isConnected()){
-		throw std::logic_error("Input already connected");
+	if(this->is_connected()){
+		throw std::logic_error("input already connected");
 	}
 
 	if(source->isConnected()){
@@ -49,30 +47,29 @@ void Input::connect(std::shared_ptr<aumiks::Source> source){
 	}
 }
 
-void Input::disconnect()noexcept {
-	std::lock_guard<decltype(this->mutex) > guard(this->mutex);
+void input::disconnect()noexcept{
+	std::lock_guard<decltype(this->mutex)> guard(this->mutex);
 
-	if (this->src) {
+	if(this->src){
 		this->src->isConnected_v = false;
 		this->src.reset();
 	}
 }
 
-
-bool Input::fillSampleBuffer(utki::span<frame> buf) noexcept{
+bool input::fill_sample_buffer(utki::span<frame> buf)noexcept{
 	{
-		std::lock_guard<decltype(this->mutex) > guard(this->mutex);
-		if (this->src != this->srcInUse) {
-			this->srcInUse = this->src;
+		std::lock_guard<decltype(this->mutex)> guard(this->mutex);
+		if(this->src != this->src_in_use){
+			this->src_in_use = this->src;
 		}
 	}
-	if (!this->srcInUse) {
-		for (auto& b : buf) {
-			for (auto& c : b.channel) {
+	if(!this->src_in_use){
+		for(auto& b : buf){
+			for(auto& c : b.channel){
 				c = 0;
 			}
 		}
 		return false;
 	}
-	return this->srcInUse->fillSampleBuffer(buf);
+	return this->src_in_use->fillSampleBuffer(buf);
 }

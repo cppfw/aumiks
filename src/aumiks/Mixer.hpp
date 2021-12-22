@@ -28,7 +28,7 @@ SOFTWARE.
 #pragma once
 
 #include "Source.hpp"
-#include "Input.hpp"
+#include "input.hpp"
 
 #include <list>
 
@@ -41,7 +41,7 @@ class Mixer : virtual public Source{
 	
 	utki::spin_lock spinLock;
 	
-	std::list<Input> inputs;
+	std::list<aumiks::input> inputs;
 	
 	decltype(inputs) inputsToAdd;
 	

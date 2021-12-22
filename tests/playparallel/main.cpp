@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
 		
 		sink.input.connect(mixer);
 		
-		while(sink.input.isConnected()){
+		while(sink.input.is_connected()){
 			std::this_thread::sleep_for(std::chrono::milliseconds(333));
 		}
 	}

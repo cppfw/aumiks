@@ -51,7 +51,7 @@ bool Resampler::fillSampleBuffer(utki::span<frame> buf) noexcept{
 		this->tmpBuf.resize((buf.size()) * DScale / s);
 	}
 
-	bool ret = this->input.fillSampleBuffer(utki::make_span(this->tmpBuf));
+	bool ret = this->input.fill_sample_buffer(utki::make_span(this->tmpBuf));
 
 	auto src = this->tmpBuf.cbegin();
 	for (; dst != buf.end(); ++src) {

@@ -27,7 +27,7 @@ SOFTWARE.
 
 #pragma once
 
-#include "Input.hpp"
+#include "input.hpp"
 
 namespace aumiks{
 
@@ -44,7 +44,7 @@ public:
 		throw std::invalid_argument("Sink::Stop(): unsupported");
 	}
 	
-	Input input;
+	aumiks::input input;
 };
 
 }

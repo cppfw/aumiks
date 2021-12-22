@@ -28,7 +28,7 @@ SOFTWARE.
 #pragma once
 
 #include "Source.hpp"
-#include "Input.hpp"
+#include "input.hpp"
 #include "SingleInputSource.hpp"
 
 namespace aumiks{

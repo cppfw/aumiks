@@ -38,7 +38,7 @@ namespace aumiks{
 
 //TODO: doxygen
 class Source : virtual public utki::shared{
-	friend class Input;
+	friend class input;
 	
 	bool isConnected_v = false;
 	

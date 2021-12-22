@@ -37,38 +37,42 @@ void Mixer::connect(std::shared_ptr<Source> source) {
 
 bool Mixer::fillSampleBuffer(utki::span<frame> buf) noexcept{
 	{
-		std::lock_guard<decltype(this->spinLock) > guard(this->spinLock);
+		std::lock_guard<decltype(this->spinLock)> guard(this->spinLock);
 		this->inputs.splice(this->inputs.end(), this->inputsToAdd);
 	}
 
 	this->tmpBuf.resize(buf.size());
 
-	for (auto& f : buf) {
-		for (auto& c : f.channel) {
+	for(auto& f : buf){
+		for(auto& c : f.channel){
 			c = 0;
 		}
 	}
 
-	for (auto i = this->inputs.begin(); i != this->inputs.end();) {
-		if (i->fillSampleBuffer(utki::make_span(this->tmpBuf))) {
+	for(auto i = this->inputs.begin(); i != this->inputs.end();){
+		if(i->fill_sample_buffer(utki::make_span(this->tmpBuf))){
 			i = this->inputs.erase(i);
-		} else {
+		}else{
 			++i;
 		}
 
 		auto src = this->tmpBuf.cbegin();
-		for (auto dst = buf.begin(), end = buf.end();
+		for(
+				auto dst = buf.begin(),
+						end = buf.end();
 				dst != end;
-				++dst, ++src
-				) {
+				++dst,
+						++src
+			)
+		{
 			ASSERT(src != this->tmpBuf.cend())
 			dst->add(*src);
 		}
 	}
 
-	if (this->isFinite()) {
+	if(this->isFinite()){
 		return this->inputs.size() == 0;
-	} else {
+	}else{
 		return false;
 	}
 }

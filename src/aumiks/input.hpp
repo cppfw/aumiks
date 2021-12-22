@@ -38,28 +38,28 @@ SOFTWARE.
 
 namespace aumiks{
 
-class Input{
+class input{
 protected:
 	std::shared_ptr<Source> src;
 	
-	std::shared_ptr<Source> srcInUse;
+	std::shared_ptr<Source> src_in_use;
 	
 	utki::spin_lock mutex;
 	
 public:
-	Input(){}
+	input(){}
 	
-	virtual ~Input()noexcept{}
+	virtual ~input()noexcept{}
 	
 	void disconnect()noexcept;
 	
 	void connect(std::shared_ptr<Source> source);
 	
-	bool isConnected()const{
+	bool is_connected()const{
 		return this->src.get() != nullptr;
 	}
 
-	bool fillSampleBuffer(utki::span<frame> buf)noexcept;	
+	bool fill_sample_buffer(utki::span<frame> buf)noexcept;	
 };
 
 }

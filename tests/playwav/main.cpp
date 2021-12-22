@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
 //		sink.input.disconnect();
 		sink.input.connect(src);
 		
-		while(sink.input.isConnected()){
+		while(sink.input.is_connected()){
 			std::this_thread::sleep_for(std::chrono::milliseconds(333));
 		}
 	}
@@ -50,8 +50,7 @@ int main(int argc, char *argv[]){
 		
 		sink.input.connect(snd->createSource(sink.samplingRate));
 		
-		
-		while(sink.input.isConnected()){
+		while(sink.input.is_connected()){
 			std::this_thread::sleep_for(std::chrono::milliseconds(333));
 		}
 	}
