@@ -95,7 +95,7 @@ template <class TSampleType, audout::frame frame_type>
 	};
 
 private:
-	std::shared_ptr<aumiks::Source> createSource(uint32_t sampling_rate = 0)const override{
+	std::shared_ptr<aumiks::Source> create_source(uint32_t sampling_rate = 0)const override{
 		auto src = std::make_shared<Source>(utki::make_shared_from(*this));
 		if(samplingRate == 0 || sampling_rate == this->samplingRate){
 			return src;

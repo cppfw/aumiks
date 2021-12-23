@@ -27,30 +27,25 @@ SOFTWARE.
 
 #pragma once
 
-
 #include "Source.hpp"
 
-
-
 namespace aumiks{
-
-
 
 /**
  * @brief Base class for sounds.
  * A sound object is an object which holds all the initial data required to play a particular sound.
- * Sound object is normally used to create instances of a source to play that sound.
+ * The sound object is normally used to create instances of a source to play that sound.
  */
-class Sound : virtual public utki::shared{
+class sound : virtual public utki::shared{
 protected:
-	Sound() = default;
+	sound() = default;
 public:
 	
-	virtual ~Sound() = default;
+	virtual ~sound() = default;
 
 	//TODO: doxygen
 	//TODO: make frequency real?
-	virtual std::shared_ptr<aumiks::Source> createSource(std::uint32_t frequency = 0)const = 0;
+	virtual std::shared_ptr<aumiks::Source> create_source(uint32_t frequency = 0)const = 0;
 };
 
 }

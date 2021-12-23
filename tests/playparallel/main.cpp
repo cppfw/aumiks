@@ -37,14 +37,14 @@ int main(int argc, char *argv[]){
 		
 		auto mixer = std::make_shared<aumiks::mixer>();
 		
-		std::shared_ptr<aumiks::Sound> snd1 = aumiks::WavSound::load("../samples/sample44100mono16.wav");
-		std::shared_ptr<aumiks::Sound> snd2 = aumiks::WavSound::load("../samples/ice_break.wav");
+		auto snd1 = aumiks::WavSound::load("../samples/sample44100mono16.wav");
+		auto snd2 = aumiks::WavSound::load("../samples/ice_break.wav");
 
 		ASSERT(snd1)
 		ASSERT(snd2)
 
-		mixer->connect(snd1->createSource(sink.samplingRate));
-		mixer->connect(snd2->createSource(sink.samplingRate));
+		mixer->connect(snd1->create_source(sink.samplingRate));
+		mixer->connect(snd2->create_source(sink.samplingRate));
 		mixer->connect(std::make_shared<SineSource>(6.0f, 440.0f));
 		mixer->connect(std::make_shared<SineSource>(10.0f, 220.0f));
 		

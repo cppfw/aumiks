@@ -27,9 +27,9 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		std::shared_ptr<aumiks::Sound> snd = aumiks::WavSound::load("../samples/sample44100stereo16.wav");
+		auto snd = aumiks::WavSound::load("../samples/sample44100stereo16.wav");
 		
-		auto src = snd->createSource(sink.samplingRate);
+		auto src = snd->create_source(sink.samplingRate);
 		
 		//test disconnect and connect again
 //		sink.input.connect(src);
@@ -46,9 +46,9 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		std::shared_ptr<aumiks::Sound> snd = aumiks::WavSound::load("../samples/sample11025stereo16.wav");
+		auto snd = aumiks::WavSound::load("../samples/sample11025stereo16.wav");
 		
-		sink.input.connect(snd->createSource(sink.samplingRate));
+		sink.input.connect(snd->create_source(sink.samplingRate));
 		
 		while(sink.input.is_connected()){
 			std::this_thread::sleep_for(std::chrono::milliseconds(333));

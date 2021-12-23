@@ -30,11 +30,11 @@ SOFTWARE.
 
 #include <papki/file.hpp>
 
-#include "Sound.hpp"
+#include "sound.hpp"
 
 namespace aumiks{
 
-class WavSound : public aumiks::Sound{
+class WavSound : public aumiks::sound{
 public:
 	const std::uint8_t numChannels;
 	const std::uint32_t samplingRate;
