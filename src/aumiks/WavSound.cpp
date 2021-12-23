@@ -40,20 +40,20 @@ template <class TSampleType, audout::frame frame_type>
 {
 	std::vector<TSampleType> data;
 	
-	class Source : public aumiks::Source{
+	class source : public aumiks::source{
 		const std::shared_ptr<const WavSoundImpl> wavSound;
 		
 		size_t curSmp = 0;
 	
 	public:
-		Source(std::shared_ptr<const WavSoundImpl> sound) :
+		source(std::shared_ptr<const WavSoundImpl> sound) :
 				wavSound(std::move(sound))
 		{
 			ASSERT(this->wavSound)
 		}
 
 	private:
-		bool fillSampleBuffer(utki::span<frame> buf)noexcept override{
+		bool fill_sample_buffer(utki::span<frame> buf)noexcept override{
 			ASSERT(this->wavSound->data.size() % audout::num_channels(frame_type) == 0)
 			ASSERT(this->curSmp % audout::num_channels(frame_type) == 0)
 			
@@ -95,8 +95,8 @@ template <class TSampleType, audout::frame frame_type>
 	};
 
 private:
-	std::shared_ptr<aumiks::Source> create_source(uint32_t sampling_rate = 0)const override{
-		auto src = std::make_shared<Source>(utki::make_shared_from(*this));
+	std::shared_ptr<aumiks::source> create_source(uint32_t sampling_rate = 0)const override{
+		auto src = std::make_shared<source>(utki::make_shared_from(*this));
 		if(samplingRate == 0 || sampling_rate == this->samplingRate){
 			return src;
 		}

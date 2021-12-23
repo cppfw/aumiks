@@ -29,20 +29,20 @@ SOFTWARE.
 
 using namespace aumiks;
 
-void input::connect(std::shared_ptr<aumiks::Source> source){
+void input::connect(std::shared_ptr<aumiks::source> source){
 	ASSERT(source)
 
 	if(this->is_connected()){
-		throw std::logic_error("input already connected");
+		throw std::logic_error("the input already connected");
 	}
 
-	if(source->isConnected()){
-		throw std::logic_error("Source is already connected");
+	if(source->is_connected()){
+		throw std::logic_error("the source is already connected");
 	}
 	
 	{
 		std::lock_guard<decltype(this->mutex)> guard(this->mutex);
-		source->isConnected_v = true;
+		source->is_source_connected = true;
 		this->src = std::move(source);
 	}
 }
@@ -51,7 +51,7 @@ void input::disconnect()noexcept{
 	std::lock_guard<decltype(this->mutex)> guard(this->mutex);
 
 	if(this->src){
-		this->src->isConnected_v = false;
+		this->src->is_source_connected = false;
 		this->src.reset();
 	}
 }
@@ -71,5 +71,5 @@ bool input::fill_sample_buffer(utki::span<frame> buf)noexcept{
 		}
 		return false;
 	}
-	return this->src_in_use->fillSampleBuffer(buf);
+	return this->src_in_use->fill_sample_buffer(buf);
 }

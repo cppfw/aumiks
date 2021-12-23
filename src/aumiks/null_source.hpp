@@ -27,13 +27,13 @@ SOFTWARE.
 
 #pragma once
 
-#include "Source.hpp"
+#include "source.hpp"
 
 namespace aumiks{
 
-class null_source : public Source{
+class null_source : public source{
 public:
-	bool fillSampleBuffer(utki::span<frame> buf)noexcept override;
+	bool fill_sample_buffer(utki::span<frame> buf)noexcept override;
 };
 
 }

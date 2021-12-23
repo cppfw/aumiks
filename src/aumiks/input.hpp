@@ -33,16 +33,16 @@ SOFTWARE.
 #include <mutex>
 
 #include "config.hpp"
-#include "Source.hpp"
+#include "source.hpp"
 #include "frame.hpp"
 
 namespace aumiks{
 
 class input{
 protected:
-	std::shared_ptr<Source> src;
+	std::shared_ptr<source> src;
 	
-	std::shared_ptr<Source> src_in_use;
+	std::shared_ptr<source> src_in_use;
 	
 	utki::spin_lock mutex;
 	
@@ -53,7 +53,7 @@ public:
 	
 	void disconnect()noexcept;
 	
-	void connect(std::shared_ptr<Source> source);
+	void connect(std::shared_ptr<aumiks::source> source);
 	
 	bool is_connected()const{
 		return this->src.get() != nullptr;

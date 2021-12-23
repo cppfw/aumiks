@@ -27,7 +27,7 @@ SOFTWARE.
 
 #pragma once
 
-#include "Source.hpp"
+#include "source.hpp"
 
 namespace aumiks{
 
@@ -45,7 +45,7 @@ public:
 
 	//TODO: doxygen
 	//TODO: make frequency real?
-	virtual std::shared_ptr<aumiks::Source> create_source(uint32_t frequency = 0)const = 0;
+	virtual std::shared_ptr<aumiks::source> create_source(uint32_t frequency = 0)const = 0;
 };
 
 }

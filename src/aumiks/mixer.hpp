@@ -27,7 +27,7 @@ SOFTWARE.
 
 #pragma once
 
-#include "Source.hpp"
+#include "source.hpp"
 #include "input.hpp"
 
 #include <list>
@@ -36,7 +36,7 @@ SOFTWARE.
 
 namespace aumiks{
 
-class mixer : virtual public Source{
+class mixer : virtual public source{
 	volatile bool is_mixer_finite = true;
 	
 	utki::spin_lock spin_lock;
@@ -48,7 +48,7 @@ class mixer : virtual public Source{
 	std::vector<frame> tmp_buf;
 	
 public:
-	void connect(std::shared_ptr<Source> source);
+	void connect(std::shared_ptr<aumiks::source> source);
 	
 	void set_finite(bool finite)noexcept{
 		this->is_mixer_finite = finite;
@@ -59,7 +59,7 @@ public:
 	}
 	
 protected:
-	bool fillSampleBuffer(utki::span<frame> buf)noexcept override;
+	bool fill_sample_buffer(utki::span<frame> buf)noexcept override;
 };
 
 }

@@ -27,7 +27,7 @@ SOFTWARE.
 
 #pragma once
 
-#include "Source.hpp"
+#include "source.hpp"
 #include "input.hpp"
 #include "single_input_source.hpp"
 
@@ -61,7 +61,7 @@ private:
 	std::vector<frame> tmp_buf;
 	frame last_frame_for_upsampling;
 	
-	bool fillSampleBuffer(utki::span<frame> buf)noexcept override;
+	bool fill_sample_buffer(utki::span<frame> buf)noexcept override;
 };
 
 }

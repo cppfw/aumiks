@@ -29,13 +29,13 @@ SOFTWARE.
 
 using namespace aumiks;
 
-void mixer::connect(std::shared_ptr<Source> source){
+void mixer::connect(std::shared_ptr<aumiks::source> source){
 	std::lock_guard<decltype(this->spin_lock)> guard(this->spin_lock);
 	this->inputs_to_add.emplace_back();
 	this->inputs_to_add.back().connect(std::move(source));
 }
 
-bool mixer::fillSampleBuffer(utki::span<frame> buf)noexcept{
+bool mixer::fill_sample_buffer(utki::span<frame> buf)noexcept{
 	{
 		std::lock_guard<decltype(this->spin_lock)> guard(this->spin_lock);
 		this->inputs.splice(this->inputs.end(), this->inputs_to_add);
