@@ -1,4 +1,4 @@
-#include "../../src/aumiks/WavSound.hpp"
+#include "../../src/aumiks/wav_sound.hpp"
 #include "../../src/aumiks/speakers.hpp"
 
 #include <papki/fs_file.hpp>
@@ -7,7 +7,7 @@
 
 //void Play(const std::string& fileName){
 //	TRACE_ALWAYS(<< "Playing " << fileName << std::endl)
-//	std::shared_ptr<aumiks::WavSound> snd = aumiks::WavSound::Load(fileName);
+//	std::shared_ptr<aumiks::wav_sound> snd = aumiks::wav_sound::Load(fileName);
 //
 //	ASSERT(snd)
 //	
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		auto snd = aumiks::WavSound::load("../samples/sample44100stereo16.wav");
+		auto snd = aumiks::wav_sound::load("../samples/sample44100stereo16.wav");
 		
 		auto src = snd->create_source(sink.sampling_rate);
 		
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]){
 		
 		sink.start();
 		
-		auto snd = aumiks::WavSound::load("../samples/sample11025stereo16.wav");
+		auto snd = aumiks::wav_sound::load("../samples/sample11025stereo16.wav");
 		
 		sink.input.connect(snd->create_source(sink.sampling_rate));
 		

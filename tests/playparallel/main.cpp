@@ -1,5 +1,5 @@
 #include "../../src/aumiks/mixer.hpp"
-#include "../../src/aumiks/WavSound.hpp"
+#include "../../src/aumiks/wav_sound.hpp"
 #include "../../src/aumiks/speakers.hpp"
 
 #include <utki/math.hpp>
@@ -37,8 +37,8 @@ int main(int argc, char *argv[]){
 		
 		auto mixer = std::make_shared<aumiks::mixer>();
 		
-		auto snd1 = aumiks::WavSound::load("../samples/sample44100mono16.wav");
-		auto snd2 = aumiks::WavSound::load("../samples/ice_break.wav");
+		auto snd1 = aumiks::wav_sound::load("../samples/sample44100mono16.wav");
+		auto snd2 = aumiks::wav_sound::load("../samples/ice_break.wav");
 
 		ASSERT(snd1)
 		ASSERT(snd2)

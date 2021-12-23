@@ -27,27 +27,26 @@ SOFTWARE.
 
 #pragma once
 
-
 #include <papki/file.hpp>
 
 #include "sound.hpp"
 
 namespace aumiks{
 
-class WavSound : public aumiks::sound{
+class wav_sound : public aumiks::sound{
 public:
-	const std::uint8_t numChannels;
-	const std::uint32_t samplingRate;
+	const uint8_t num_channels;
+	const uint32_t sampling_rate;
 	
 protected:
-	WavSound(std::uint8_t chans, std::int32_t freq) :
-			numChannels(chans),
-			samplingRate(freq)
+	wav_sound(uint8_t chans, int32_t freq) :
+			num_channels(chans),
+			sampling_rate(freq)
 	{}
 
 public:
-	static std::shared_ptr<WavSound> load(const std::string& fileName);
-	static std::shared_ptr<WavSound> load(papki::file& fi);
+	static std::shared_ptr<wav_sound> load(const std::string& fileName); // TODO: changeto string_view
+	static std::shared_ptr<wav_sound> load(papki::file& fi);
 };
 
 }
