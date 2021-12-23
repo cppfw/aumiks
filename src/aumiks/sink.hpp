@@ -32,16 +32,16 @@ SOFTWARE.
 namespace aumiks{
 
 //TODO: doxygen
-class Sink{
+class sink{
 protected:	
-	Sink(){}
+	sink() = default;
 public:
-	virtual ~Sink()noexcept{}
+	virtual ~sink() = default;
 	
 	virtual void start() = 0;
 	
 	virtual void stop(){
-		throw std::invalid_argument("Sink::Stop(): unsupported");
+		throw std::invalid_argument("sink::stop(): unsupported");
 	}
 	
 	aumiks::input input;

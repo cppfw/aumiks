@@ -43,10 +43,10 @@ namespace aumiks{
  */
 class Sound : virtual public utki::shared{
 protected:
-	Sound(){}
+	Sound() = default;
 public:
 	
-	virtual ~Sound()noexcept{}
+	virtual ~Sound() = default;
 
 	//TODO: doxygen
 	//TODO: make frequency real?

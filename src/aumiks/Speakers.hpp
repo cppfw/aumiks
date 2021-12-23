@@ -29,13 +29,13 @@ SOFTWARE.
 
 #include <audout/player.hpp>
 
-#include "Sink.hpp"
+#include "sink.hpp"
 
 namespace aumiks{
 
 //TODO: make singleton
 class Speakers :
-		public aumiks::Sink,
+		public aumiks::sink,
 		private audout::listener
 {
 	std::vector<frame> smpBuf;

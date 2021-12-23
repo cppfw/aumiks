@@ -47,9 +47,9 @@ protected:
 	utki::spin_lock mutex;
 	
 public:
-	input(){}
+	input() = default;
 	
-	virtual ~input()noexcept{}
+	virtual ~input() = default;
 	
 	void disconnect()noexcept;
 	

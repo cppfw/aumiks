@@ -46,11 +46,11 @@ protected:
 	Source(const Source&) = delete;
 	Source& operator=(const Source&) = delete;
 	
-	Source(){}
+	Source() = default;
 	
 	virtual bool fillSampleBuffer(utki::span<frame> buf)noexcept = 0;
 public:	
-	virtual ~Source()noexcept{}
+	virtual ~Source() = default;
 	
 	// thread safe
 	bool isConnected()const noexcept{
