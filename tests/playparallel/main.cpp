@@ -1,6 +1,6 @@
 #include "../../src/aumiks/mixer.hpp"
 #include "../../src/aumiks/WavSound.hpp"
-#include "../../src/aumiks/Speakers.hpp"
+#include "../../src/aumiks/speakers.hpp"
 
 #include <utki/math.hpp>
 
@@ -31,7 +31,7 @@ public:
 int main(int argc, char *argv[]){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: mono 44100" << std::endl)
-		aumiks::Speakers sink(audout::rate::hz44100);
+		aumiks::speakers sink(audout::rate::hz44100);
 		
 		sink.start();
 		
@@ -43,8 +43,8 @@ int main(int argc, char *argv[]){
 		ASSERT(snd1)
 		ASSERT(snd2)
 
-		mixer->connect(snd1->create_source(sink.samplingRate));
-		mixer->connect(snd2->create_source(sink.samplingRate));
+		mixer->connect(snd1->create_source(sink.sampling_rate));
+		mixer->connect(snd2->create_source(sink.sampling_rate));
 		mixer->connect(std::make_shared<SineSource>(6.0f, 440.0f));
 		mixer->connect(std::make_shared<SineSource>(10.0f, 220.0f));
 		

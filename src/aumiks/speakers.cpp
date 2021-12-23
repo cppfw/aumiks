@@ -25,45 +25,44 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#include "Speakers.hpp"
+#include "speakers.hpp"
 
 using namespace aumiks;
 
-void Speakers::start() {
+void speakers::start() {
 	this->player.set_paused(false);
 }
 
-void Speakers::stop() {
+void speakers::stop() {
 	this->player.set_paused(true);
 }
 
-Speakers::Speakers(audout::rate samplingRate, uint16_t bufferSizeMillis) :
-		samplingRate(audout::format(audout::frame::stereo, samplingRate).frequency()),
-		player(audout::format(audout::frame::stereo, samplingRate), (this->samplingRate * bufferSizeMillis / 1000), this)
+speakers::speakers(audout::rate sampling_rate, uint16_t buffer_size_millis) :
+		sampling_rate(audout::format(audout::frame::stereo, sampling_rate).frequency()),
+		player(audout::format(audout::frame::stereo, sampling_rate), (this->sampling_rate * buffer_size_millis / 1000), this)
 {}
 
-
-void Speakers::fill(utki::span<std::int16_t> playBuf) noexcept{
+void speakers::fill(utki::span<std::int16_t> play_buf)noexcept{
 	ASSERT_INFO(
-			playBuf.size() % audout::num_channels(audout::frame::stereo) == 0,
-			"playBuf.size = " << playBuf.size()
-			<< "numChannels = " << audout::num_channels(audout::frame::stereo)
+			play_buf.size() % audout::num_channels(audout::frame::stereo) == 0,
+			"play_buf.size() = " << play_buf.size()
+			<< "num_channels = " << audout::num_channels(audout::frame::stereo)
 		)
-	this->smpBuf.resize(playBuf.size() / audout::num_channels(audout::frame::stereo));
+	this->smp_buf.resize(play_buf.size() / audout::num_channels(audout::frame::stereo));
 
-	if(this->input.fill_sample_buffer(utki::make_span(this->smpBuf))){
+	if(this->input.fill_sample_buffer(utki::make_span(this->smp_buf))){
 		this->input.disconnect();
 	}
 
-	auto src = this->smpBuf.cbegin();
-	auto dst = playBuf.begin();
-	for(; src != this->smpBuf.cend(); ++src){
+	auto src = this->smp_buf.cbegin();
+	auto dst = play_buf.begin();
+	for(; src != this->smp_buf.cend(); ++src){
 		for(unsigned i = 0; i != src->channel.size(); ++i, ++dst){
-			ASSERT(playBuf.overlaps(dst))
+			ASSERT(play_buf.overlaps(dst))
 			using std::min;
 			using std::max;
 			*dst = int16_t(max(-0x7fff, min(int32_t(src->channel[i]), 0x7fff)));
 		}
 	}
-	ASSERT(dst == playBuf.end())
+	ASSERT(dst == play_buf.end())
 }

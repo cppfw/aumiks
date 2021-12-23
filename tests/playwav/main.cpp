@@ -1,5 +1,5 @@
 #include "../../src/aumiks/WavSound.hpp"
-#include "../../src/aumiks/Speakers.hpp"
+#include "../../src/aumiks/speakers.hpp"
 
 #include <papki/fs_file.hpp>
 #include <nitki/thread.hpp>
@@ -23,13 +23,13 @@
 
 int main(int argc, char *argv[]){
 	{
-		aumiks::Speakers sink(audout::rate::hz22050);
+		aumiks::speakers sink(audout::rate::hz22050);
 		
 		sink.start();
 		
 		auto snd = aumiks::WavSound::load("../samples/sample44100stereo16.wav");
 		
-		auto src = snd->create_source(sink.samplingRate);
+		auto src = snd->create_source(sink.sampling_rate);
 		
 		//test disconnect and connect again
 //		sink.input.connect(src);
@@ -42,13 +42,13 @@ int main(int argc, char *argv[]){
 	}
 	
 	{
-		aumiks::Speakers sink(audout::rate::hz22050);
+		aumiks::speakers sink(audout::rate::hz22050);
 		
 		sink.start();
 		
 		auto snd = aumiks::WavSound::load("../samples/sample11025stereo16.wav");
 		
-		sink.input.connect(snd->create_source(sink.samplingRate));
+		sink.input.connect(snd->create_source(sink.sampling_rate));
 		
 		while(sink.input.is_connected()){
 			std::this_thread::sleep_for(std::chrono::milliseconds(333));
