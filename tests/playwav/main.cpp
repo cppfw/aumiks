@@ -23,7 +23,7 @@
 
 int main(int argc, char *argv[]){
 	{
-		aumiks::speakers sink(audout::rate::hz22050);
+		aumiks::speakers sink(audout::rate::hz_22050);
 		
 		sink.start();
 		
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
 	}
 	
 	{
-		aumiks::speakers sink(audout::rate::hz22050);
+		aumiks::speakers sink(audout::rate::hz_22050);
 		
 		sink.start();
 		

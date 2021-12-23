@@ -31,7 +31,7 @@ public:
 int main(int argc, char *argv[]){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: mono 44100" << std::endl)
-		aumiks::speakers sink(audout::rate::hz44100);
+		aumiks::speakers sink(audout::rate::hz_44100);
 		
 		sink.start();
 		
