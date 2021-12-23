@@ -29,11 +29,11 @@ SOFTWARE.
 
 #include "Source.hpp"
 #include "input.hpp"
-#include "SingleInputSource.hpp"
+#include "single_input_source.hpp"
 
 namespace aumiks{
 
-class resampler : public SingleInputSource{
+class resampler : public single_input_source{
 	static const uint16_t no_resample_step = 128;
 	
 	int32_t scale = 0;

@@ -32,7 +32,7 @@ SOFTWARE.
 
 namespace aumiks{
 
-class SingleInputSource : public Source{
+class single_input_source : public Source{
 public:
 	aumiks::input input;
 };
