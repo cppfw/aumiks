@@ -30,7 +30,7 @@ public:
 
 int main(int argc, char *argv[]){
 	{
-		TRACE_ALWAYS(<< "Opening audio playback device: mono 44100" << std::endl)
+		utki::log([&](auto&o){o << "Opening audio playback device: mono 44100" << std::endl;});
 		aumiks::speakers sink(audout::rate::hz_44100);
 		
 		sink.start();
