@@ -43,11 +43,13 @@ speakers::speakers(audout::rate sampling_rate, uint16_t buffer_size_millis) :
 {}
 
 void speakers::fill(utki::span<std::int16_t> play_buf)noexcept{
-	ASSERT_INFO(
-			play_buf.size() % audout::num_channels(audout::frame::stereo) == 0,
-			"play_buf.size() = " << play_buf.size()
-			<< "num_channels = " << audout::num_channels(audout::frame::stereo)
-		)
+	ASSERT(
+		play_buf.size() % audout::num_channels(audout::frame::stereo) == 0,
+		[&](auto&o){
+			o << "play_buf.size() = " << play_buf.size()
+			<< "num_channels = " << audout::num_channels(audout::frame::stereo);
+		}
+	)
 	this->smp_buf.resize(play_buf.size() / audout::num_channels(audout::frame::stereo));
 
 	if(this->input.fill_sample_buffer(utki::make_span(this->smp_buf))){

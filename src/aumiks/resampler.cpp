@@ -62,20 +62,26 @@ bool resampler::fill_sample_buffer(utki::span<frame> buf) noexcept{
 	for(; dst != buf.end(); ++src){
 		this->scale += s;
 		for(; this->scale > 0 && dst != buf.end(); this->scale -= no_resample_step, ++dst){
-			ASSERT_INFO(dst != buf.end(),
-					"s = " << s <<
+			ASSERT(
+				dst != buf.end(),
+				[&](auto&o){
+					o << "s = " << s <<
 					" buf.size() = " << buf.size() <<
 					" this->tmp_buf.size() = " << this->tmp_buf.size() <<
 					" this->scale = " << this->scale <<
-					" dst-end = " << (dst - buf.end())
-				)
-			ASSERT_INFO(src != this->tmp_buf.cend(),
-					"s = " << s <<
+					" dst-end = " << (dst - buf.end());
+				}
+			)
+			ASSERT(
+				src != this->tmp_buf.cend(),
+				[&](auto&o){
+					o << "s = " << s <<
 					" buf.size() = " << buf.size() <<
 					" this->tmp_buf.size() = " << this->tmp_buf.size() <<
 					" this->scale = " << this->scale <<
-					" dst-end = " << (dst - buf.end())
-				)
+					" dst-end = " << (dst - buf.end());
+				}
+			)
 			*dst = *src;
 		}
 	}
@@ -83,13 +89,16 @@ bool resampler::fill_sample_buffer(utki::span<frame> buf) noexcept{
 
 	if(src != this->tmp_buf.cend()){
 		// one more sample left in source buffer
-		ASSERT_INFO(src + 1 == this->tmp_buf.cend(),
-				"s = " << s <<
+		ASSERT(
+			src + 1 == this->tmp_buf.cend(),
+			[&](auto&o){
+				o << "s = " << s <<
 				" buf.size() = " << buf.size() <<
 				" this->tmp_buf.size() = " << this->tmp_buf.size() <<
 				" this->scale = " << this->scale <<
-				" src-end = " << (src - this->tmp_buf.cend())
-			)
+				" src-end = " << (src - this->tmp_buf.cend());
+			}
+		)
 		this->scale += s;
 	}
 
