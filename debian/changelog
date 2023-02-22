@@ -1,3 +1,9 @@
+libaumiks (0.3.34) unstable; urgency=medium
+
+  * relink
+
+ -- Ivan Gagis <igagis@gmail.com>  Wed, 22 Feb 2023 16:13:14 +0200
+
 libaumiks (0.3.33) unstable; urgency=medium
 
   * renamings
