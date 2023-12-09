@@ -21,7 +21,7 @@ public:
 	
 	bool fill_sample_buffer(utki::span<aumiks::frame> buf)noexcept override{
 		for(auto d = buf.begin(), e = buf.end(); d != e; ++d){
-			d->channel[0] = 0xfff * std::sin(2 * utki::pi<float>() * this->t * this->freq);
+			d->channel[0] = 0xfff * std::sin(2 * utki::pi * this->t * this->freq);
 			this->t += 1 / 44100.0f;
 		}
 		return this->t > this->limit;

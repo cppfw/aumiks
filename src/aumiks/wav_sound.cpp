@@ -29,6 +29,7 @@ SOFTWARE.
 
 #include <utki/shared.hpp>
 #include <utki/string.hpp>
+#include <utki/util.hpp>
 
 #include "wav_sound.hpp"
 #include "resampler.hpp"
@@ -45,23 +46,21 @@ class wav_sound_impl : public wav_sound
 	std::vector<TSampleType> data;
 	
 	class source : public aumiks::source{
-		const std::shared_ptr<const wav_sound_impl> sound;
+		const utki::shared_ref<const wav_sound_impl> sound;
 		
 		size_t cur_sample = 0;
 	
 	public:
-		source(std::shared_ptr<const wav_sound_impl> sound) :
-				sound(std::move(sound))
-		{
-			ASSERT(this->sound)
-		}
+		source(const utki::shared_ref<const wav_sound_impl>& sound) :
+				sound(sound)
+		{}
 
 	private:
 		bool fill_sample_buffer(utki::span<frame> buf)noexcept override{
-			ASSERT(this->sound->data.size() % audout::num_channels(frame_type) == 0)
+			ASSERT(this->sound.get().data.size() % audout::num_channels(frame_type) == 0)
 			ASSERT(this->cur_sample % audout::num_channels(frame_type) == 0)
 			
-			size_t frames_to_copy = (this->sound->data.size() - this->cur_sample) / audout::num_channels(frame_type);
+			size_t frames_to_copy = (this->sound.get().data.size() - this->cur_sample) / audout::num_channels(frame_type);
 			using std::min;
 			frames_to_copy = min(frames_to_copy, buf.size()); // clamp top
 
@@ -72,8 +71,8 @@ class wav_sound_impl : public wav_sound
 				return true;
 			}
 
-			ASSERT(this->cur_sample <= this->sound->data.size())			
-			const TSampleType *start_sample = &this->sound->data[this->cur_sample];
+			ASSERT(this->cur_sample <= this->sound.get().data.size())			
+			const TSampleType *start_sample = &this->sound.get().data[this->cur_sample];
 			
 			this->cur_sample += frames_to_copy * audout::num_channels(frame_type);
 			
