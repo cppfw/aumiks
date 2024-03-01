@@ -25,7 +25,7 @@ Description: debugging symbols for libaumiks$(soname) package.
 
 Package: libaumiks-dev
 Section: devel
-Architecture: all
+Architecture: any
 Depends: libaumiks$(soname) (= ${binary:Version}), libaumiks$(soname)-dbg (= ${binary:Version}), ${misc:Depends},
 		libpapki-dev, libaudout-dev
 Suggests: libaumiks-doc
