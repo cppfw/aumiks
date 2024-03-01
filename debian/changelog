@@ -1,3 +1,9 @@
+libaumiks (0.3.38) unstable; urgency=medium
+
+  * fix dev package arch
+
+ -- Ivan Gagis <igagis@gmail.com>  Fri, 01 Mar 2024 15:48:03 +0200
+
 libaumiks (0.3.37) unstable; urgency=medium
 
   * aptian
