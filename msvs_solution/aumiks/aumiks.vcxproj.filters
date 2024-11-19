@@ -18,63 +18,60 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\aumiks\Input.cpp">
+    <ClCompile Include="..\..\src\**\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\aumiks\Mixer.cpp">
+    <ClCompile Include="..\..\src\**\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\aumiks\NullSource.cpp">
+    <ClCompile Include="..\..\src\**\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\aumiks\Resampler.cpp">
+    <ClCompile Include="..\..\src\**\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\aumiks\Speakers.cpp">
+    <ClCompile Include="..\..\src\**\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\aumiks\WavSound.cpp">
+    <ClCompile Include="..\..\src\**\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\aumiks\config.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\Exc.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\Frame.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\Input.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\Mixer.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\NullSource.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\Resampler.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\SingleInputSource.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\Sink.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\Sound.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\Source.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\Speakers.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\aumiks\WavSound.hpp">
+    <ClInclude Include="..\..\src\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

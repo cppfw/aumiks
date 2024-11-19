@@ -2,7 +2,7 @@ configurations {
 	UserPlatformToolset {
 		// Needed because autopackage lacks VS2015+ support
 		key = "PlatformToolset";
-		choices: "v140,v141,v142";
+		choices: "v140,v141,v142,v143";
 	};
 
 	RuntimeLibrary {
@@ -88,6 +88,7 @@ nuget{
 			lib: ..\msvs_solution\x64\v142_Debug_MT\aumiks.lib;
 		}
 */
+/*
 		[x86,v142,release,MultiThreadedDLL] {
 			lib: ..\msvs_solution\v142_Release_MD\aumiks.lib;
 		}
@@ -100,5 +101,21 @@ nuget{
 		[x64,v142,debug,MultiThreadedDebugDLL] {
 			lib: ..\msvs_solution\x64\v142_Debug_MD\aumiks.lib;
 		}
+*/
+                // ======== v142 ========
+
+                [x86,v143,release,MultiThreadedDLL] {
+                        lib: ..\msvs_solution\v143_Release_MD\aumiks.lib;
+                }
+                [x86,v143,debug,MultiThreadedDebugDLL] {
+                        lib: ..\msvs_solution\v143_Debug_MD\aumiks.lib;
+                }
+                [x64,v143,release,MultiThreadedDLL] {
+                        lib: ..\msvs_solution\x64\v143_Release_MD\aumiks.lib;
+                }
+                [x64,v143,debug,MultiThreadedDebugDLL] {
+                        lib: ..\msvs_solution\x64\v143_Debug_MD\aumiks.lib;
+                }
+
 	}
 }
