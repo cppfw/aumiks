@@ -60,7 +60,7 @@ void speakers::fill(utki::span<std::int16_t> play_buf)noexcept{
 	auto dst = play_buf.begin();
 	for(; src != this->smp_buf.cend(); ++src){
 		for(unsigned i = 0; i != src->channel.size(); ++i, ++dst){
-			ASSERT(play_buf.overlaps(dst))
+			ASSERT(utki::overlaps(play_buf, dst))
 			using std::min;
 			using std::max;
 			*dst = int16_t(max(-0x7fff, min(int32_t(src->channel[i]), 0x7fff)));
