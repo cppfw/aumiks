@@ -1,3 +1,9 @@
+libaumiks (0.3.40) unstable; urgency=medium
+
+  * ubuntu noble build
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 19 Nov 2024 23:58:08 +0200
+
 libaumiks (0.3.39) unstable; urgency=medium
 
   * fix homebrew packaging
