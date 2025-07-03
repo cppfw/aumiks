@@ -99,24 +99,24 @@ tasks.whenTaskAdded { task ->
 
 def aarName = name
 
-task copyNdkLibsToAAR(type: Zip) {
-    baseName = aarName
-    version = "\$(version)"
-    extension = 'aar.in'
-    destinationDir = file('..') //put resulting AAR file to upper level directory
-
-    from zipTree("build/outputs/aar/" + aarName + "-release.aar")
-    exclude('**/*.so') //do not include shared libraries into final AAR
-    from("../../src") {
-        include('**/*.hpp')
-        include('**/*.h')
-        into('ndkLibs/include')
-    }
-    from("build/intermediates/cmake/debug/obj"){
-        include('**/*.a')
-        into('ndkLibs')
-    }
-}
+//task copyNdkLibsToAAR(type: Zip) {
+//    baseName = aarName
+//    version = "\$(version)"
+//    extension = 'aar.in'
+//    destinationDir = file('..') //put resulting AAR file to upper level directory
+//
+//    from zipTree("build/outputs/aar/" + aarName + "-release.aar")
+//    exclude('**/*.so') //do not include shared libraries into final AAR
+//    from("../../src") {
+//        include('**/*.hpp')
+//        include('**/*.h')
+//        into('ndkLibs/include')
+//    }
+//    from("build/intermediates/cmake/debug/obj"){
+//        include('**/*.a')
+//        into('ndkLibs')
+//    }
+//}
 
 // This is only needed for libraries
 //afterEvaluate {
