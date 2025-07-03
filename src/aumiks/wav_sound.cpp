@@ -144,7 +144,7 @@ std::shared_ptr<wav_sound> wav_sound::load(const std::string& file_name){
 }
 
 std::shared_ptr<wav_sound> wav_sound::load(papki::file& fi){
-	papki::file::guard file_guard(fi, papki::file::mode::read); // make sure we close the file even in case of exception is thrown
+	papki::file::guard file_guard(fi, papki::mode::read); // make sure we close the file even in case of exception is thrown
 
 	// Start reading Wav-file header
 	{

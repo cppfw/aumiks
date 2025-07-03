@@ -7,27 +7,29 @@ this_name := tests
 
 this_srcs := $(call prorab-src-dir, .)
 
-this_libaumiks := ../../src/out/$(c)/libaumiks$(dot_so)
-
 ifeq ($(os),macosx)
     this_ldlibs += -framework AudioUnit
 else ifeq ($(os),linux)
-    this_ldlibs += -lpthread -lpulse-simple -lpulse
+    this_ldlibs += -l pthread
+    this_ldlibs += -l pulse-simple
+    this_ldlibs += -l pulse
 endif
 
-this_ldlibs += $(this_libaumiks)
+this_ldlibs += -l audout$(this_dbg)
+this_ldlibs += -l papki$(this_dbg)
+this_ldlibs += -l utki$(this_dbg)
 
-this_ldlibs += -laudout -lpapki -lm -lutki
+this_ldlibs += -l m
+
+this_ldlibs += ../../src/out/$(c)/libaumiks$(this_dbg)$(dot_so)
 
 this_no_install := true
 
 $(eval $(prorab-build-app))
 
-$(eval $(call prorab-depend, $(prorab_this_name), $(this_libaumiks)))
-
 this_test_cmd := $(prorab_this_name)
 this_test_deps := $(prorab_this_name)
-this_test_ld_path := $(dir $(this_libaumiks))
+this_test_ld_path := ../../src/out/$(c)
 this_run_name := $(notdir $(abspath $(d)))
 $(eval $(prorab-run))
 

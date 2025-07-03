@@ -1,0 +1,65 @@
+Source: libaumiks
+Section: misc
+Priority: extra
+Maintainer: Ivan Gagis <igagis@gmail.com>
+Build-Depends:
+	debhelper (>= 9),
+	prorab,
+	prorab-extra,
+	myci,
+	libc6-dev,
+	libutki-dev,
+	libpapki-dev,
+	libaudout-dev,
+	clang-format,
+	clang-tidy
+Build-Depends-Indep: doxygen
+Standards-Version: 3.9.2
+
+Package: libaumiks$(soname)
+Section: libs
+Architecture: any
+Depends:
+	${shlibs:Depends},
+	${misc:Depends}
+Description: cross-platform audio mixing C++ library.
+	Audio mixing library in C++.
+
+Package: libaumiks-dbg$(soname)
+Section: libs
+Architecture: any
+Depends:
+	${shlibs:Depends},
+	${misc:Depends}
+Description: cross-platform audio mixing C++ library.
+	Debug version of libaumiks.
+
+Package: libaumiks-dev
+Section: devel
+Architecture: any
+Depends:
+	libaumiks$(soname) (= ${binary:Version}),
+	libaumiks-dbg$(soname) (= ${binary:Version}),
+	${misc:Depends},
+	libpapki-dev,
+	libaudout-dev
+Suggests: libaumiks-doc
+Description: Audio mixing and playback engine in C++.
+	libaumiks is a library written in C++ which allows easy audio playback.
+	It has sound mixer for playing several sounds simultaneously.
+
+Package: libaumiks$(soname)-dbgsrc
+Section: debug
+Architecture: all
+Depends:
+	libaumiks$(soname)-dbgsym (= ${binary:Version}),
+	libaumiks-dbg$(soname)-dbgsym (= ${binary:Version}),
+	${misc:Depends}
+Description: debugging sources for libaumiks$(soname) package.
+
+Package: libaumiks-doc
+Section: devel
+Architecture: all
+Depends: ${misc:Depends}
+Description: documentation for libaumiks library.
+	For more details see description to libaumiks-dev package.
