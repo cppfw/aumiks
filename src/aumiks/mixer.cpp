@@ -29,13 +29,15 @@ SOFTWARE.
 
 using namespace aumiks;
 
-void mixer::connect(std::shared_ptr<aumiks::source> source){
+void mixer::connect(std::shared_ptr<aumiks::source> source)
+{
 	std::lock_guard<decltype(this->spin_lock)> guard(this->spin_lock);
 	this->inputs_to_add.emplace_back();
 	this->inputs_to_add.back().connect(std::move(source));
 }
 
-bool mixer::fill_sample_buffer(utki::span<frame> buf)noexcept{
+bool mixer::fill_sample_buffer(utki::span<frame> buf) noexcept
+{
 	{
 		std::lock_guard<decltype(this->spin_lock)> guard(this->spin_lock);
 		this->inputs.splice(this->inputs.end(), this->inputs_to_add);
@@ -43,36 +45,29 @@ bool mixer::fill_sample_buffer(utki::span<frame> buf)noexcept{
 
 	this->tmp_buf.resize(buf.size());
 
-	for(auto& f : buf){
-		for(auto& c : f.channel){
+	for (auto& f : buf) {
+		for (auto& c : f.channel) {
 			c = 0;
 		}
 	}
 
-	for(auto i = this->inputs.begin(); i != this->inputs.end();){
-		if(i->fill_sample_buffer(utki::make_span(this->tmp_buf))){
+	for (auto i = this->inputs.begin(); i != this->inputs.end();) {
+		if (i->fill_sample_buffer(utki::make_span(this->tmp_buf))) {
 			i = this->inputs.erase(i);
-		}else{
+		} else {
 			++i;
 		}
 
 		auto src = this->tmp_buf.cbegin();
-		for(
-				auto dst = buf.begin(),
-						end = buf.end();
-				dst != end;
-				++dst,
-						++src
-			)
-		{
+		for (auto dst = buf.begin(), end = buf.end(); dst != end; ++dst, ++src) {
 			ASSERT(src != this->tmp_buf.cend())
 			dst->add(*src);
 		}
 	}
 
-	if(this->is_finite()){
+	if (this->is_finite()) {
 		return this->inputs.size() == 0;
-	}else{
+	} else {
 		return false;
 	}
 }

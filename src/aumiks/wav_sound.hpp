@@ -31,17 +31,18 @@ SOFTWARE.
 
 #include "sound.hpp"
 
-namespace aumiks{
+namespace aumiks {
 
-class wav_sound : public aumiks::sound{
+class wav_sound : public aumiks::sound
+{
 public:
 	const uint8_t num_channels;
 	const uint32_t sampling_rate;
-	
+
 protected:
 	wav_sound(uint8_t chans, int32_t freq) :
-			num_channels(chans),
-			sampling_rate(freq)
+		num_channels(chans),
+		sampling_rate(freq)
 	{}
 
 public:
@@ -49,4 +50,4 @@ public:
 	static std::shared_ptr<wav_sound> load(papki::file& fi);
 };
 
-}
+} // namespace aumiks

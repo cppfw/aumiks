@@ -27,37 +27,39 @@ SOFTWARE.
 
 #pragma once
 
+#include <audout/format.hpp>
 #include <utki/shared.hpp>
 #include <utki/span.hpp>
 
-#include <audout/format.hpp>
-
 #include "frame.hpp"
 
-namespace aumiks{
+namespace aumiks {
 
 //TODO: doxygen
-class source : virtual public utki::shared{
+class source : virtual public utki::shared
+{
 	friend class input;
-	
+
 	bool is_source_connected = false;
-	
+
 protected:
 	source(const source&) = delete;
 	source& operator=(const source&) = delete;
-	
+
 	source() = default;
-	
-	virtual bool fill_sample_buffer(utki::span<frame> buf)noexcept = 0;
-public:	
+
+	virtual bool fill_sample_buffer(utki::span<frame> buf) noexcept = 0;
+
+public:
 	virtual ~source() = default;
-	
+
 	// thread safe
-	bool is_connected()const noexcept{
+	bool is_connected() const noexcept
+	{
 		return this->is_source_connected;
 	}
-private:
 
+private:
 };
 
-}
+} // namespace aumiks

@@ -27,39 +27,41 @@ SOFTWARE.
 
 #pragma once
 
+#include <mutex>
+#include <type_traits>
+
 #include <utki/spin_lock.hpp>
 
-#include <type_traits>
-#include <mutex>
-
 #include "config.hpp"
-#include "source.hpp"
 #include "frame.hpp"
+#include "source.hpp"
 
-namespace aumiks{
+namespace aumiks {
 
-class input{
+class input
+{
 protected:
 	std::shared_ptr<source> src;
-	
+
 	std::shared_ptr<source> src_in_use;
-	
+
 	utki::spin_lock mutex;
-	
+
 public:
 	input() = default;
-	
+
 	virtual ~input() = default;
-	
-	void disconnect()noexcept;
-	
+
+	void disconnect() noexcept;
+
 	void connect(std::shared_ptr<aumiks::source> source);
-	
-	bool is_connected()const{
+
+	bool is_connected() const
+	{
 		return this->src.get() != nullptr;
 	}
 
-	bool fill_sample_buffer(utki::span<frame> buf)noexcept;	
+	bool fill_sample_buffer(utki::span<frame> buf) noexcept;
 };
 
-}
+} // namespace aumiks

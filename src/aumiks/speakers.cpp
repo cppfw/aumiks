@@ -29,37 +29,41 @@ SOFTWARE.
 
 using namespace aumiks;
 
-void speakers::start() {
+void speakers::start()
+{
 	this->player.set_paused(false);
 }
 
-void speakers::stop() {
+void speakers::stop()
+{
 	this->player.set_paused(true);
 }
 
 speakers::speakers(audout::rate sampling_rate, uint16_t buffer_size_millis) :
-		sampling_rate(audout::format(audout::frame::stereo, sampling_rate).frequency()),
-		player(audout::format(audout::frame::stereo, sampling_rate), (this->sampling_rate * buffer_size_millis / 1000), this)
+	sampling_rate(audout::format(audout::frame::stereo, sampling_rate).frequency()),
+	player(
+		audout::format(audout::frame::stereo, sampling_rate),
+		(this->sampling_rate * buffer_size_millis / 1000),
+		this
+	)
 {}
 
-void speakers::fill(utki::span<std::int16_t> play_buf)noexcept{
-	ASSERT(
-		play_buf.size() % audout::num_channels(audout::frame::stereo) == 0,
-		[&](auto&o){
-			o << "play_buf.size() = " << play_buf.size()
-			<< "num_channels = " << audout::num_channels(audout::frame::stereo);
-		}
-	)
+void speakers::fill(utki::span<std::int16_t> play_buf) noexcept
+{
+	ASSERT(play_buf.size() % audout::num_channels(audout::frame::stereo) == 0, [&](auto& o) {
+		o << "play_buf.size() = " << play_buf.size()
+		  << "num_channels = " << audout::num_channels(audout::frame::stereo);
+	})
 	this->smp_buf.resize(play_buf.size() / audout::num_channels(audout::frame::stereo));
 
-	if(this->input.fill_sample_buffer(utki::make_span(this->smp_buf))){
+	if (this->input.fill_sample_buffer(utki::make_span(this->smp_buf))) {
 		this->input.disconnect();
 	}
 
 	auto src = this->smp_buf.cbegin();
 	auto dst = play_buf.begin();
-	for(; src != this->smp_buf.cend(); ++src){
-		for(unsigned i = 0; i != src->channel.size(); ++i, ++dst){
+	for (; src != this->smp_buf.cend(); ++src) {
+		for (unsigned i = 0; i != src->channel.size(); ++i, ++dst) {
 			ASSERT(utki::overlaps(play_buf, dst))
 			using std::min;
 			using std::max;

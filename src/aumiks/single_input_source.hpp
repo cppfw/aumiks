@@ -27,14 +27,15 @@ SOFTWARE.
 
 #pragma once
 
-#include "source.hpp"
 #include "input.hpp"
+#include "source.hpp"
 
-namespace aumiks{
+namespace aumiks {
 
-class single_input_source : public source{
+class single_input_source : public source
+{
 public:
 	aumiks::input input;
 };
 
-}
+} // namespace aumiks

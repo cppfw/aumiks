@@ -29,11 +29,12 @@ SOFTWARE.
 
 #include "source.hpp"
 
-namespace aumiks{
+namespace aumiks {
 
-class null_source : public source{
+class null_source : public source
+{
 public:
-	bool fill_sample_buffer(utki::span<frame> buf)noexcept override;
+	bool fill_sample_buffer(utki::span<frame> buf) noexcept override;
 };
 
-}
+} // namespace aumiks

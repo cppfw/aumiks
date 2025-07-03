@@ -27,8 +27,8 @@ SOFTWARE.
 
 #pragma once
 
-namespace aumiks{
+namespace aumiks {
 
 typedef float real;
 
-}
+} // namespace aumiks

@@ -27,25 +27,25 @@ SOFTWARE.
 
 #pragma once
 
-#include <audout/format.hpp>
-
 #include <array>
 
+#include <audout/format.hpp>
 #include <utki/debug.hpp>
 
 #include "config.hpp"
 
-namespace aumiks{
+namespace aumiks {
 
-struct frame{
+struct frame {
 	std::array<real, audout::num_channels(audout::frame::stereo)> channel;
-	
-	void add(const frame& f){
+
+	void add(const frame& f)
+	{
 		ASSERT(this->channel.size() == f.channel.size())
-		for(unsigned i = 0; i != this->channel.size(); ++i){
+		for (unsigned i = 0; i != this->channel.size(); ++i) {
 			this->channel[i] += f.channel[i];
 		}
 	}
 };
 
-}
+} // namespace aumiks

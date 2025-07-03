@@ -27,39 +27,42 @@ SOFTWARE.
 
 #pragma once
 
-#include "source.hpp"
-#include "input.hpp"
-
 #include <list>
 
 #include <utki/spin_lock.hpp>
 
-namespace aumiks{
+#include "input.hpp"
+#include "source.hpp"
 
-class mixer : virtual public source{
+namespace aumiks {
+
+class mixer : virtual public source
+{
 	volatile bool is_mixer_finite = true;
-	
+
 	utki::spin_lock spin_lock;
-	
+
 	std::list<aumiks::input> inputs;
-	
+
 	decltype(inputs) inputs_to_add;
-	
+
 	std::vector<frame> tmp_buf;
-	
+
 public:
 	void connect(std::shared_ptr<aumiks::source> source);
-	
-	void set_finite(bool finite)noexcept{
+
+	void set_finite(bool finite) noexcept
+	{
 		this->is_mixer_finite = finite;
 	}
-	
-	bool is_finite()const noexcept{
+
+	bool is_finite() const noexcept
+	{
 		return this->is_mixer_finite;
 	}
-	
+
 protected:
-	bool fill_sample_buffer(utki::span<frame> buf)noexcept override;
+	bool fill_sample_buffer(utki::span<frame> buf) noexcept override;
 };
 
-}
+} // namespace aumiks

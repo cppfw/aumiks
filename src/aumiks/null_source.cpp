@@ -29,9 +29,10 @@ SOFTWARE.
 
 using namespace aumiks;
 
-bool null_source::fill_sample_buffer(utki::span<frame> buf)noexcept{
-	for(auto& f : buf){
-		for(auto& c : f.channel){
+bool null_source::fill_sample_buffer(utki::span<frame> buf) noexcept
+{
+	for (auto& f : buf) {
+		for (auto& c : f.channel) {
 			c = real(0);
 		}
 	}

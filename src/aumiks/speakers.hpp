@@ -31,33 +31,31 @@ SOFTWARE.
 
 #include "sink.hpp"
 
-namespace aumiks{
+namespace aumiks {
 
 //TODO: make singleton
-class speakers :
-		public aumiks::sink,
-		private audout::listener
+class speakers : public aumiks::sink, private audout::listener
 {
 	std::vector<frame> smp_buf;
 
 	// this function is not thread-safe, but it is supposed to be called from special audio thread
-	void fill(utki::span<std::int16_t> play_buf)noexcept override;
-	
+	void fill(utki::span<std::int16_t> play_buf) noexcept override;
+
 public:
 	const uint32_t sampling_rate;
-	
+
 private:
 	audout::player player;
-	
+
 public:
 	speakers(audout::rate sampling_rate, uint16_t buffer_size_millis = 100);
 
 	speakers(const speakers&) = delete;
 	speakers& operator=(const speakers&) = delete;
-	
-	void start()override;
 
-	void stop()override;
+	void start() override;
+
+	void stop() override;
 };
 
-}
+} // namespace aumiks

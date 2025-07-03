@@ -29,22 +29,25 @@ SOFTWARE.
 
 #include "input.hpp"
 
-namespace aumiks{
+namespace aumiks {
 
 //TODO: doxygen
-class sink{
-protected:	
+class sink
+{
+protected:
 	sink() = default;
+
 public:
 	virtual ~sink() = default;
-	
+
 	virtual void start() = 0;
-	
-	virtual void stop(){
+
+	virtual void stop()
+	{
 		throw std::invalid_argument("sink::stop(): unsupported");
 	}
-	
+
 	aumiks::input input;
 };
 
-}
+} // namespace aumiks

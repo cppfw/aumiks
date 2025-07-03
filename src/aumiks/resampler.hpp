@@ -27,41 +27,44 @@ SOFTWARE.
 
 #pragma once
 
-#include "source.hpp"
 #include "input.hpp"
 #include "single_input_source.hpp"
+#include "source.hpp"
 
-namespace aumiks{
+namespace aumiks {
 
-class resampler : public single_input_source{
+class resampler : public single_input_source
+{
 	static const uint16_t no_resample_step = 128;
-	
+
 	int32_t scale = 0;
-	
+
 	volatile uint16_t step = no_resample_step;
-	
+
 public:
 	resampler(const resampler&) = delete;
 	resampler& operator=(const resampler&) = delete;
-	
-	resampler(){}
-	
-	void set_scale(float scale)noexcept{
+
+	resampler() {}
+
+	void set_scale(float scale) noexcept
+	{
 		this->step = decltype(step)(scale * float(no_resample_step));
 	}
-	
-	void set_scale(uint32_t from_sampling_rate, uint32_t to_sampling_rate){
-		if(from_sampling_rate == 0){
+
+	void set_scale(uint32_t from_sampling_rate, uint32_t to_sampling_rate)
+	{
+		if (from_sampling_rate == 0) {
 			return;
 		}
 		this->step = to_sampling_rate * no_resample_step / from_sampling_rate;
 	}
-	
+
 private:
 	std::vector<frame> tmp_buf;
 	frame last_frame_for_upsampling;
-	
-	bool fill_sample_buffer(utki::span<frame> buf)noexcept override;
+
+	bool fill_sample_buffer(utki::span<frame> buf) noexcept override;
 };
 
-}
+} // namespace aumiks
