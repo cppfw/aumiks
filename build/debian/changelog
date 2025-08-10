@@ -1,3 +1,9 @@
+libaumiks (0.3.43) unstable; urgency=medium
+
+  * test
+
+ -- Ivan Gagis <igagis@gmail.com>  Mon, 11 Aug 2025 02:51:29 +0300
+
 libaumiks (0.3.42) unstable; urgency=medium
 
   * debian trixie build
