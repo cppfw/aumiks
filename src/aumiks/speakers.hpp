@@ -34,7 +34,9 @@ SOFTWARE.
 namespace aumiks {
 
 //TODO: make singleton
-class speakers : public aumiks::sink, private audout::listener
+class speakers :
+	public aumiks::sink, //
+	private audout::listener
 {
 	std::vector<frame> smp_buf;
 
@@ -48,10 +50,19 @@ private:
 	audout::player player;
 
 public:
-	speakers(audout::rate sampling_rate, uint16_t buffer_size_millis = 100);
+	constexpr static const auto default_buffer_size_ms = 100;
+	speakers(
+		audout::rate sampling_rate, //
+		uint16_t buffer_size_millis = default_buffer_size_ms
+	);
 
 	speakers(const speakers&) = delete;
 	speakers& operator=(const speakers&) = delete;
+
+	speakers(speakers&&) = delete;
+	speakers& operator=(speakers&&) = delete;
+
+	~speakers() override = default;
 
 	void start() override;
 

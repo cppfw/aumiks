@@ -42,10 +42,15 @@ class resampler : public single_input_source
 	volatile uint16_t step = no_resample_step;
 
 public:
+	resampler() = default;
+
 	resampler(const resampler&) = delete;
 	resampler& operator=(const resampler&) = delete;
 
-	resampler() {}
+	resampler(resampler&&) = delete;
+	resampler& operator=(resampler&&) = delete;
+
+	~resampler() override = default;
 
 	void set_scale(float scale) noexcept
 	{
@@ -62,7 +67,7 @@ public:
 
 private:
 	std::vector<frame> tmp_buf;
-	frame last_frame_for_upsampling;
+	frame last_frame_for_upsampling{};
 
 	bool fill_sample_buffer(utki::span<frame> buf) noexcept override;
 };

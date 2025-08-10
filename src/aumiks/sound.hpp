@@ -42,7 +42,13 @@ protected:
 	sound() = default;
 
 public:
-	virtual ~sound() = default;
+	sound(const sound&) = delete;
+	sound& operator=(const sound&) = delete;
+
+	sound(sound&&) = delete;
+	sound& operator=(sound&&) = delete;
+
+	~sound() override = default;
 
 	//TODO: doxygen
 	//TODO: make frequency real?

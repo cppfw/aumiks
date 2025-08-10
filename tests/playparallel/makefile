@@ -1,5 +1,6 @@
 include prorab.mk
 include prorab-test.mk
+include prorab-clang-format.mk
 
 $(eval $(call prorab-config, ../../config))
 
@@ -32,5 +33,8 @@ this_test_deps := $(prorab_this_name)
 this_test_ld_path := ../../src/out/$(c)
 this_run_name := $(notdir $(abspath $(d)))
 $(eval $(prorab-run))
+
+this_src_dir := .
+$(eval $(prorab-clang-format))
 
 $(eval $(call prorab-include, ../../src/makefile))

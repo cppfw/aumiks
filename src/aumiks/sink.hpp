@@ -38,6 +38,12 @@ protected:
 	sink() = default;
 
 public:
+	sink(const sink&) = delete;
+	sink& operator=(const sink&) = delete;
+
+	sink(sink&&) = delete;
+	sink& operator=(sink&&) = delete;
+
 	virtual ~sink() = default;
 
 	virtual void start() = 0;

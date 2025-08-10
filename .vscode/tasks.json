@@ -13,9 +13,9 @@
 			"group": "build"
 		},
 		{
-			"label": "build_dbg",
+			"label": "build-dev",
 			"type": "shell",
-			"command": "make config=dbg",
+			"command": "make config=dev",
 			"problemMatcher": [
 				"$gcc"
 			],
@@ -38,6 +38,24 @@
 				"$gcc"
 			],
 			"dependsOn": "build",
+			"group": "build"
+		}
+		,{
+			"label": "format",
+			"type": "shell",
+			"command": "make format",
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		}
+		,{
+			"label": "lint",
+			"type": "shell",
+			"command": "make config=lint && make config=lint test",
+			"problemMatcher": [
+				"$gcc"
+			],
 			"group": "build"
 		}
 	]

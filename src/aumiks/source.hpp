@@ -35,7 +35,7 @@ SOFTWARE.
 
 namespace aumiks {
 
-//TODO: doxygen
+// TODO: doxygen
 class source : virtual public utki::shared
 {
 	friend class input;
@@ -43,15 +43,18 @@ class source : virtual public utki::shared
 	bool is_source_connected = false;
 
 protected:
-	source(const source&) = delete;
-	source& operator=(const source&) = delete;
-
 	source() = default;
 
 	virtual bool fill_sample_buffer(utki::span<frame> buf) noexcept = 0;
 
 public:
-	virtual ~source() = default;
+	source(const source&) = delete;
+	source& operator=(const source&) = delete;
+
+	source(source&&) = delete;
+	source& operator=(source&&) = delete;
+
+	~source() override = default;
 
 	// thread safe
 	bool is_connected() const noexcept

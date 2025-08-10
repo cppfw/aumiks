@@ -27,6 +27,8 @@ SOFTWARE.
 
 #include "speakers.hpp"
 
+#include <ratio>
+
 using namespace aumiks;
 
 void speakers::start()
@@ -43,7 +45,7 @@ speakers::speakers(audout::rate sampling_rate, uint16_t buffer_size_millis) :
 	sampling_rate(audout::format(audout::frame::stereo, sampling_rate).frequency()),
 	player(
 		audout::format(audout::frame::stereo, sampling_rate),
-		(this->sampling_rate * buffer_size_millis / 1000),
+		this->sampling_rate * buffer_size_millis / uint32_t(std::milli::den),
 		this
 	)
 {}
@@ -67,7 +69,15 @@ void speakers::fill(utki::span<std::int16_t> play_buf) noexcept
 			ASSERT(utki::overlaps(play_buf, dst))
 			using std::min;
 			using std::max;
-			*dst = int16_t(max(-0x7fff, min(int32_t(src->channel[i]), 0x7fff)));
+			*dst = int16_t( //
+				max( //
+					int32_t(std::numeric_limits<int16_t>::min()), //
+					min( //
+						int32_t(src->channel[i]), //
+						int32_t(std::numeric_limits<int16_t>::max())
+					)
+				)
+			);
 		}
 	}
 	ASSERT(dst == play_buf.end())

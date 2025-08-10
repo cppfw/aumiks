@@ -46,7 +46,7 @@ protected:
 	{}
 
 public:
-	static std::shared_ptr<wav_sound> load(const std::string& fileName); // TODO: changeto string_view
+	static std::shared_ptr<wav_sound> load(std::string_view filename); // TODO: change to string_view
 	static std::shared_ptr<wav_sound> load(papki::file& fi);
 };
 

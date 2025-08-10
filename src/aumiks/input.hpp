@@ -50,6 +50,12 @@ protected:
 public:
 	input() = default;
 
+	input(const input&) = delete;
+	input& operator=(const input&) = delete;
+
+	input(input&&) = delete;
+	input& operator=(input&&) = delete;
+
 	virtual ~input() = default;
 
 	void disconnect() noexcept;

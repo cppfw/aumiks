@@ -31,10 +31,10 @@ using namespace aumiks;
 
 bool resampler::fill_sample_buffer(utki::span<frame> buf) noexcept
 {
-	ASSERT(this->step > 0) // if step is 0 then there will be infinite loop
+	utki::assert(this->step > 0, SL); // if step is 0 then there will be infinite loop
 
 	// variable step can be changed from another thread, so copy it here
-	typename std::remove_volatile<decltype(this->step)>::type s = this->step;
+	typename std::remove_volatile_t<decltype(this->step)> s = this->step;
 
 	auto dst = buf.begin();
 

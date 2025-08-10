@@ -29,6 +29,6 @@ SOFTWARE.
 
 namespace aumiks {
 
-typedef float real;
+using real = float;
 
 } // namespace aumiks
