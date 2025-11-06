@@ -22,4 +22,5 @@ myci_declare_library(${PROJECT_NAME}
         ../../src/${PROJECT_NAME}
     DEPENDENCIES
         audout
+        fsif
 )

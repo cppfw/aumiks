@@ -17,6 +17,7 @@
         "name": "myci",
         "host": false
       },
-      "audout"
+      "audout",
+      "fsif"
     ]
   }
