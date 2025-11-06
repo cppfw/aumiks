@@ -1,3 +1,9 @@
+libaumiks (0.3.44) unstable; urgency=medium
+
+  * debian: fix dbgsrc path
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 06 Nov 2025 15:19:43 +0200
+
 libaumiks (0.3.43) unstable; urgency=medium
 
   * test
