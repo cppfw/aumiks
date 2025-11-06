@@ -1,0 +1,5 @@
+aumiks provides CMake targets:
+
+find_package(aumiks CONFIG REQUIRED)
+
+target_link_libraries(main PRIVATE aumiks::aumiks)
