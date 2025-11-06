@@ -27,7 +27,7 @@ SOFTWARE.
 
 #pragma once
 
-#include <papki/file.hpp>
+#include <fsif/file.hpp>
 
 #include "sound.hpp"
 
@@ -47,7 +47,7 @@ protected:
 
 public:
 	static std::shared_ptr<wav_sound> load(std::string_view filename); // TODO: change to string_view
-	static std::shared_ptr<wav_sound> load(papki::file& fi);
+	static std::shared_ptr<wav_sound> load(fsif::file& fi);
 };
 
 } // namespace aumiks

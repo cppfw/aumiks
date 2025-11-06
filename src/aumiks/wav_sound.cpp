@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include "wav_sound.hpp"
 
-#include <papki/fs_file.hpp>
+#include <fsif/native_file.hpp>
 #include <utki/shared.hpp>
 #include <utki/string.hpp>
 #include <utki/util.hpp>
@@ -142,15 +142,15 @@ public:
 
 std::shared_ptr<wav_sound> wav_sound::load(std::string_view filename)
 {
-	papki::fs_file fi(filename);
+	fsif::native_file fi(filename);
 	return wav_sound::load(fi);
 }
 
-std::shared_ptr<wav_sound> wav_sound::load(papki::file& fi)
+std::shared_ptr<wav_sound> wav_sound::load(fsif::file& fi)
 {
-	papki::file::guard file_guard(
+	fsif::file::guard file_guard(
 		fi,
-		papki::mode::read
+		fsif::mode::read
 	); // make sure we close the file even in case of exception is thrown
 
 	// TODO: refactor using utki::deserializer

@@ -8,7 +8,7 @@ class Libaumiks < Formula
   depends_on "prorab-extra" => :build
   depends_on "myci" => :build
   depends_on "libaudout"
-  depends_on "libpapki"
+  depends_on "libfsif"
 
   # use gmake here because otherwise homebrew uses default Mac's make which is of too old version 3.81
   def install

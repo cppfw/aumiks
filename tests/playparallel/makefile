@@ -17,7 +17,7 @@ else ifeq ($(os),linux)
 endif
 
 this_ldlibs += -l audout$(this_dbg)
-this_ldlibs += -l papki$(this_dbg)
+this_ldlibs += -l fsif$(this_dbg)
 this_ldlibs += -l utki$(this_dbg)
 
 this_ldlibs += -l m

@@ -9,7 +9,7 @@ Build-Depends:
 	myci,
 	libc6-dev,
 	libutki-dev,
-	libpapki-dev,
+	libfsif-dev,
 	libaudout-dev,
 	clang-format,
 	clang-tidy
@@ -41,7 +41,7 @@ Depends:
 	libaumiks$(soname) (= ${binary:Version}),
 	libaumiks-dbg$(soname) (= ${binary:Version}),
 	${misc:Depends},
-	libpapki-dev,
+	libfsif-dev,
 	libaudout-dev
 Suggests: libaumiks-doc
 Description: Audio mixing and playback engine in C++.

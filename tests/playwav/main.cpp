@@ -1,5 +1,5 @@
 #include <nitki/thread.hpp>
-#include <papki/fs_file.hpp>
+#include <fsif/native_file.hpp>
 
 #include "../../src/aumiks/speakers.hpp"
 #include "../../src/aumiks/wav_sound.hpp"
