@@ -87,3 +87,14 @@ bool resampler::fill_sample_buffer(utki::span<frame> buf) noexcept
 
 	return ret;
 }
+
+void resampler::set_scale(
+	uint32_t from_sampling_rate, //
+	uint32_t to_sampling_rate
+)
+{
+	if (from_sampling_rate == 0) {
+		return;
+	}
+	this->step = uint16_t(to_sampling_rate * no_resample_step / from_sampling_rate);
+}

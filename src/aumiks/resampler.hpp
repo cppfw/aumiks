@@ -57,13 +57,10 @@ public:
 		this->step = decltype(step)(scale * float(no_resample_step));
 	}
 
-	void set_scale(uint32_t from_sampling_rate, uint32_t to_sampling_rate)
-	{
-		if (from_sampling_rate == 0) {
-			return;
-		}
-		this->step = to_sampling_rate * no_resample_step / from_sampling_rate;
-	}
+	void set_scale(
+		uint32_t from_sampling_rate, //
+		uint32_t to_sampling_rate
+	);
 
 private:
 	std::vector<frame> tmp_buf;
