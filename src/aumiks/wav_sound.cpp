@@ -118,9 +118,12 @@ private:
 public:
 	// assume that data in d is little-endian
 	wav_sound_impl(utki::span<const uint8_t> wav_data, uint32_t frequency) :
-		wav_sound(audout::num_channels(audout::frame::stereo), frequency)
+		wav_sound(
+			audout::num_channels(audout::frame::stereo), //
+			frequency
+		)
 	{
-		ASSERT(wav_data.size() % (this->num_channels * sizeof(sample_type)) == 0)
+		utki::assert(wav_data.size() % (this->num_channels * sizeof(sample_type)) == 0, SL);
 
 		this->data.resize(wav_data.size() / sizeof(sample_type));
 
@@ -129,11 +132,21 @@ public:
 		for (; src != wav_data.end(); ++dst) {
 			sample_type tmp = 0;
 			for (unsigned i = 0; i != sizeof(sample_type); ++i) {
-				ASSERT(wav_data.begin() <= src && src < wav_data.end())
+				utki::assert(
+					[&]() {
+						return wav_data.begin() <= src && src < wav_data.end();
+					},
+					SL
+				);
 				tmp |= ((sample_type(*src)) << (utki::byte_bits * i));
 				++src; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic, "TODO: fix")
 			}
-			ASSERT(this->data.begin() <= dst && dst < this->data.end())
+			utki::assert(
+				[&]() {
+					return this->data.begin() <= dst && dst < this->data.end();
+				},
+				SL
+			);
 			*dst = tmp;
 		}
 	}

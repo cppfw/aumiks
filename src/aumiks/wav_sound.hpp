@@ -36,11 +36,14 @@ namespace aumiks {
 class wav_sound : public aumiks::sound
 {
 public:
-	const uint8_t num_channels;
+	const unsigned num_channels;
 	const uint32_t sampling_rate;
 
 protected:
-	wav_sound(uint8_t chans, int32_t freq) :
+	wav_sound(
+		unsigned chans, //
+		uint32_t freq
+	) :
 		num_channels(chans),
 		sampling_rate(freq)
 	{}
