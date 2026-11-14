@@ -31,10 +31,15 @@ SOFTWARE.
 
 namespace aumiks {
 
-//TODO: doxygen
+/**
+ * @brief An audio sink, which accepts audio sources and plays them.
+ */
 class sink
 {
 protected:
+	/**
+	 * @brief Default constructor.
+	 */
 	sink() = default;
 
 public:
@@ -44,15 +49,29 @@ public:
 	sink(sink&&) = delete;
 	sink& operator=(sink&&) = delete;
 
+	/**
+	 * @brief Default destructor.
+	 */
 	virtual ~sink() = default;
 
+	/**
+	 * @brief Start the sink.
+	 * The sink starts requesting audio data from the connected source and playing it.
+	 */
 	virtual void start() = 0;
 
+	/**
+	 * @brief Stop the sink.
+	 * @throw std::invalid_argument if stopping the sink is not supported.
+	 */
 	virtual void stop()
 	{
 		throw std::invalid_argument("sink::stop(): unsupported");
 	}
 
+	/**
+	 * @brief The input of the sink to which an audio source can be connected.
+	 */
 	aumiks::input input;
 };
 

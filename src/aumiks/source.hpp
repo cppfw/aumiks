@@ -35,7 +35,11 @@ SOFTWARE.
 
 namespace aumiks {
 
-// TODO: doxygen
+/**
+ * @brief A source from which audio data can be streamed.
+ * A source is used to play a particular sound. A source is one-shot: once it has ended,
+ * it cannot be rewound or replayed; to play the same sound again, a new source must be created.
+ */
 class source : virtual public utki::shared
 {
 	friend class input;
@@ -43,8 +47,16 @@ class source : virtual public utki::shared
 	bool is_source_connected = false;
 
 protected:
+	/**
+	 * @brief Default constructor.
+	 */
 	source() = default;
 
+	/**
+	 * @brief Fill a sample buffer with audio data from this source.
+	 * @param buf - sample buffer to fill.
+	 * @return true if there was some audio data to fill the buffer with, false if the source has ended.
+	 */
 	virtual bool fill_sample_buffer(utki::span<frame> buf) noexcept = 0;
 
 public:
@@ -54,9 +66,16 @@ public:
 	source(source&&) = delete;
 	source& operator=(source&&) = delete;
 
+	/**
+	 * @brief Default destructor.
+	 */
 	~source() override = default;
 
-	// thread safe
+	/**
+	 * @brief Check if the source is connected to the sink.
+	 * This method is thread-safe.
+	 * @return true if the source is connected to the sink.
+	 */
 	bool is_connected() const noexcept
 	{
 		return this->is_source_connected;

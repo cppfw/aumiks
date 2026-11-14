@@ -39,6 +39,9 @@ namespace aumiks {
 class sound : virtual public utki::shared
 {
 protected:
+	/**
+	 * @brief Default constructor.
+	 */
 	sound() = default;
 
 public:
@@ -48,10 +51,18 @@ public:
 	sound(sound&&) = delete;
 	sound& operator=(sound&&) = delete;
 
+	/**
+	 * @brief Default destructor.
+	 */
 	~sound() override = default;
 
-	//TODO: doxygen
 	//TODO: make frequency real?
+	/**
+	 * @brief Create a source to play this sound.
+	 * @param frequency - the sampling rate, in Hz, at which the created source will produce audio data.
+	 *        Usually this is the sink's sampling rate. If 0, the sound's own sampling rate is used (no resampling).
+	 * @return a new source object for playing this sound.
+	 */
 	virtual std::shared_ptr<aumiks::source> create_source(uint32_t frequency = 0) const = 0;
 };
 
