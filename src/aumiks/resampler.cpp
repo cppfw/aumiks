@@ -58,30 +58,44 @@ bool resampler::fill_sample_buffer(utki::span<frame> buf) noexcept
 	for (; dst != buf.end(); ++src) {
 		this->scale += s;
 		for (; this->scale > 0 && dst != buf.end(); this->scale -= no_resample_step, ++dst) {
-			ASSERT(dst != buf.end(), [&](auto& o) {
-				o << "s = " << s << " buf.size() = " << buf.size() << " this->tmp_buf.size() = " << this->tmp_buf.size()
-				  << " this->scale = " << this->scale << " dst-end = " << (dst - buf.end());
-			})
-			ASSERT(src != this->tmp_buf.cend(), [&](auto& o) {
-				o << "s = " << s << " buf.size() = " << buf.size() << " this->tmp_buf.size() = " << this->tmp_buf.size()
-				  << " this->scale = " << this->scale << " dst-end = " << (dst - buf.end());
-			})
+			utki::assert(
+				dst != buf.end(),
+				[&](auto& o) {
+					o << "s = " << s << " buf.size() = " << buf.size()
+					  << " this->tmp_buf.size() = " << this->tmp_buf.size() << " this->scale = " << this->scale
+					  << " dst-end = " << (dst - buf.end());
+				},
+				SL
+			);
+			utki::assert(
+				src != this->tmp_buf.cend(),
+				[&](auto& o) {
+					o << "s = " << s << " buf.size() = " << buf.size()
+					  << " this->tmp_buf.size() = " << this->tmp_buf.size() << " this->scale = " << this->scale
+					  << " dst-end = " << (dst - buf.end());
+				},
+				SL
+			);
 			*dst = *src;
 		}
 	}
-	ASSERT(dst == buf.end())
+	utki::assert(dst == buf.end(), SL);
 
 	if (src != this->tmp_buf.cend()) {
 		// one more sample left in source buffer
-		ASSERT(src + 1 == this->tmp_buf.cend(), [&](auto& o) {
-			o << "s = " << s << " buf.size() = " << buf.size() << " this->tmp_buf.size() = " << this->tmp_buf.size()
-			  << " this->scale = " << this->scale << " src-end = " << (src - this->tmp_buf.cend());
-		})
+		utki::assert(
+			src + 1 == this->tmp_buf.cend(),
+			[&](auto& o) {
+				o << "s = " << s << " buf.size() = " << buf.size() << " this->tmp_buf.size() = " << this->tmp_buf.size()
+				  << " this->scale = " << this->scale << " src-end = " << (src - this->tmp_buf.cend());
+			},
+			SL
+		);
 		this->scale += s;
 	}
 
 	if (this->scale > 0) {
-		ASSERT(s > no_resample_step) // was upsampling
+		utki::assert(s > no_resample_step, SL); // was upsampling
 		this->last_frame_for_upsampling = this->tmp_buf.back();
 	}
 

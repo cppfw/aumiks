@@ -41,7 +41,7 @@ struct frame {
 
 	void add(const frame& f)
 	{
-		ASSERT(this->channel.size() == f.channel.size())
+		utki::assert(this->channel.size() == f.channel.size(), SL);
 		for (unsigned i = 0; i != this->channel.size(); ++i) {
 			this->channel[i] += f.channel[i];
 		}

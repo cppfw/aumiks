@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
 		auto snd1 = aumiks::wav_sound::load("../samples/sample44100mono16.wav");
 		auto snd2 = aumiks::wav_sound::load("../samples/ice_break.wav");
 
-		ASSERT(snd1)
-		ASSERT(snd2)
+		utki::assert(snd1, SL);
+		utki::assert(snd2, SL);
 
 		mixer->connect(snd1->create_source(sink.sampling_rate));
 		mixer->connect(snd2->create_source(sink.sampling_rate));

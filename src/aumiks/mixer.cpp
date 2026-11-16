@@ -60,7 +60,7 @@ bool mixer::fill_sample_buffer(utki::span<frame> buf) noexcept
 
 		auto src = this->tmp_buf.cbegin();
 		for (auto dst = buf.begin(), end = buf.end(); dst != end; ++dst, ++src) {
-			ASSERT(src != this->tmp_buf.cend())
+			utki::assert(src != this->tmp_buf.cend(), SL);
 			dst->add(*src);
 		}
 	}

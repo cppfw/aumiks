@@ -56,22 +56,22 @@ class wav_sound_impl : public wav_sound
 	private:
 		bool fill_sample_buffer(utki::span<frame> buf) noexcept override
 		{
-			ASSERT(this->sound.get().data.size() % audout::num_channels(frame_type) == 0)
-			ASSERT(this->cur_sample % audout::num_channels(frame_type) == 0)
+			utki::assert(this->sound.get().data.size() % audout::num_channels(frame_type) == 0, SL);
+			utki::assert(this->cur_sample % audout::num_channels(frame_type) == 0, SL);
 
 			size_t frames_to_copy =
 				(this->sound.get().data.size() - this->cur_sample) / audout::num_channels(frame_type);
 			using std::min;
 			frames_to_copy = min(frames_to_copy, buf.size()); // clamp top
 
-			ASSERT(frames_to_copy <= buf.size())
+			utki::assert(frames_to_copy <= buf.size(), SL);
 
 			if (frames_to_copy == 0) {
 				// TODO: check number of replays
 				return true;
 			}
 
-			ASSERT(this->cur_sample <= this->sound.get().data.size())
+			utki::assert(this->cur_sample <= this->sound.get().data.size(), SL);
 			const sample_type* start_sample = &this->sound.get().data[this->cur_sample];
 
 			this->cur_sample += frames_to_copy * audout::num_channels(frame_type);

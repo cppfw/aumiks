@@ -52,10 +52,14 @@ speakers::speakers(audout::rate sampling_rate, uint16_t buffer_size_millis) :
 
 void speakers::fill(utki::span<std::int16_t> play_buf) noexcept
 {
-	ASSERT(play_buf.size() % audout::num_channels(audout::frame::stereo) == 0, [&](auto& o) {
-		o << "play_buf.size() = " << play_buf.size()
-		  << "num_channels = " << audout::num_channels(audout::frame::stereo);
-	})
+	utki::assert(
+		play_buf.size() % audout::num_channels(audout::frame::stereo) == 0,
+		[&](auto& o) {
+			o << "play_buf.size() = " << play_buf.size()
+			  << "num_channels = " << audout::num_channels(audout::frame::stereo);
+		},
+		SL
+	);
 	this->smp_buf.resize(play_buf.size() / audout::num_channels(audout::frame::stereo));
 
 	if (this->input.fill_sample_buffer(utki::make_span(this->smp_buf))) {
@@ -66,7 +70,7 @@ void speakers::fill(utki::span<std::int16_t> play_buf) noexcept
 	auto dst = play_buf.begin();
 	for (; src != this->smp_buf.cend(); ++src) {
 		for (unsigned i = 0; i != src->channel.size(); ++i, ++dst) {
-			ASSERT(utki::overlaps(play_buf, dst))
+			utki::assert(utki::overlaps(play_buf, dst), SL);
 			using std::min;
 			using std::max;
 			*dst = int16_t( //
@@ -80,5 +84,5 @@ void speakers::fill(utki::span<std::int16_t> play_buf) noexcept
 			);
 		}
 	}
-	ASSERT(dst == play_buf.end())
+	utki::assert(dst == play_buf.end(), SL);
 }

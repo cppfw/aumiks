@@ -31,7 +31,7 @@ using namespace aumiks;
 
 void input::connect(std::shared_ptr<aumiks::source> source)
 {
-	ASSERT(source)
+	utki::assert(source, SL);
 
 	if (this->is_connected()) {
 		throw std::logic_error("the input already connected");
